@@ -1,0 +1,39 @@
+ h1,  h2,  h3,  h4,  h5,  h6,  p,  ul,  ol,  pre,  div.codeblock,  blockquote {
+    margin: 0 0 20px;
+}
+
+/*.page-content .field-item > .description { display:none; }*/
+
+.page-content .field-item{
+	position:relative;
+	}
+.page-content .field-item > .description {
+    background: url("images/popup.png") no-repeat scroll 50% 100% transparent;
+
+	-moz-transition: visibility 0s linear 0.5s, opacity .5s linear 0s;
+	-webkit-transition: visibility 0s linear 0.5s, opacity .5s linear 0s;
+	-o-transition: visibility 0s linear 0.5s, opacity .5s linear 0s;
+	transition: visibility 0s linear 0.5s, opacity .5s linear 0s;
+	visibility: hidden;
+	opacity:0;
+
+    border-top: 1px solid #D8E4E0;
+    bottom: 100%;
+    color: #668877;
+    margin: 0 0 -15px;
+    padding: 9px 10px 20px;
+    position: absolute;
+    right: -15px;
+    width: 240px;
+    z-index: 5;
+}
+
+.page-content .field-item:hover > .description { /*display:block;*/
+/* sobreescribimos el delay, porque aquí queremos que sea visible desde el ppio, pero con 0 opacidad*/
+-moz-transition-delay:0s;
+-webkit-transition-delay:0s;
+-o-transition-delay:0s;
+transition-delay:0s;
+visibility: visible;
+opacity:1;
+  }

@@ -1,0 +1,117 @@
+<?php
+/**
+ * @file
+ *  Provides a replacement pager element for Views displays.
+ */
+
+/**
+ * Implementation of hook_views_api().
+ *
+ * @see hook_views_api()
+ */
+function views_load_more_views_api() {
+  return array('api' => '3.0-alpha1');
+}
+
+// We need to implement our own tpls for items being return via the load-more pager.
+
+/**
+ * Implementation of hook_theme().
+ *
+ * @see hook_theme()
+ */
+function views_load_more_theme() {
+  return array(
+    'views_load_more_pager' => array(
+      'arguments' => array('element' => 0),
+    ),
+  );
+}
+
+/**
+ * Implementation of hook_ajax_data_alter().
+ *
+ * @param $object
+ *  The settings to be modified.
+ * @param $type
+ *  The object type (usually just 'view').
+ * @param $view
+ *  The View which will be manipulated.
+ *
+ * @see hook_ajax_data_alter()
+ */
+function views_load_more_ajax_data_alter(&$object, $type, $view) {
+	//krumo($object);
+  // Change the callback if its a views_load_more pagers.
+  if (is_a($view->query->pager, 'views_plugin_pager_load_more')) {
+    // If AJAX driven exposed filters are enabled, and the exposed form
+    // is submitted, we'll return to page 0. Skip our callback on the
+    // very first page.
+    if ($view->query->pager->current_page <= 0) {
+      return;
+    }
+    $object->__callbacks = array('Drupal.viewsLoadMore');   
+	// viewsScrollTop 
+	 drupal_add_js('console.log('.json_encode(array('Drupal Backtrace'=>$object)).');','inline');
+  }
+}
+
+/**
+ * Provides a theme implementation for the pager element.
+ * @param $text
+ *  The anchor text that will be used for this pager link.
+ * @param $limit
+ *  How many items should be paged.
+ * @param $element
+ *  (Not sure how this is used)
+ * @param $parameters
+ *  GET parameters passed to theme_pager_next().
+ * @param $quantity
+ *  The number of "pages" to display. Ignored by this module.
+ * @param $settings
+ *  Javascript settings to pass-through.
+ *  - Information passed from views_plugin_pager_load_more.inc:
+ *    - css_class: The classname(s) used to identify this view.
+ *    - row_class: The classname(s) used to identify row(s) in this view.
+ *    - link_class: The classname(s) to add to the Pager anchor.
+ *    - style_plugin: The display plugin this view is using.
+ *    - total_items: How many items the view found.
+ * @return
+ *  A themed pager element.
+ * @retval string
+ */
+function theme_views_load_more_pager($text = '', $limit = 10, $element = 0, $parameters = array(), $quantity = 9, $settings = array()) {
+  global $pager_page_array, $pager_total;
+
+  // Lets add our JS.
+  drupal_add_js(drupal_get_path('module', 'views_load_more') . '/views_load_more.js', 'module');
+
+  // Process the settings for this javascript.
+  drupal_add_js(array('views_load_more' => $settings), 'setting', 'header');
+
+  // Lets get out load more button.
+  $li_next = theme('pager_next', (!empty($text) ? $text : t('Load More')), $limit, $element, 1, $parameters);
+  if (empty($li_next)) {
+    $li_next = "&nbsp;";
+  }
+
+  // Generate the "Load More" anchor if:
+  // - The total number of items the view found is higher than the number we're displaying.
+  //   This is useful for "load_more" instances where the initial offset is small, and
+  //   the site wants "load more" to load all other results.
+  // - The pager has another page in it.
+  // - We aren't displaying ALL results.
+  if ($limit > 0 || $pager_total[$element] > 1) {
+    $items[] = array(
+      'class' => 'pager-next',
+      'data' => $li_next,
+    );
+    // If a custom pager class was set, ensure it is set on the pager element.
+    $custom_class = !empty($settings['link_class']) ? ' ' . $settings['pager_class'] : NULL;
+    return theme('item_list', $items, NULL, 'ul', array('class' => 'pager' . $custom_class));
+  }
+
+  // There are no pages left.
+  // The pager will not ouput anything.
+  return '';
+}

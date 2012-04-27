@@ -1,0 +1,10 @@
+name = Views Load More
+description = Yet another load more pager for views
+core = 6.x
+dependencies[] = views
+; Information added by drupal.org packaging script on 2012-03-02
+version = "6.x-3.1"
+core = "6.x"
+project = "views_load_more"
+datestamp = "1330726845"
+

@@ -1,0 +1,81 @@
+  ; The name and description of the theme used on the admin/build/themes page.
+name        = utopicus
+description = Utopic_US Theme. Tema para el frontend, páginas NO "Open Atrium", estáticas, tours, etc...   basado en Zen.
+
+engine = phptemplate
+
+  ; The screenshot used on the admin/build/themes page.
+screenshot = screenshot.png
+
+  ; "core" specifies the version of Drupal that this theme is compatible with.
+
+core       = 6.x
+
+
+  ; This section adds CSS files to your theme. The media type is specified in
+  ; the brackets. Typical CSS media types include "all", "screen", "print", and
+  ; "handheld". See http://www.w3.org/TR/CSS21/media.html#media-types for a full
+  ; list of stylesheet media types in CSS 2.1. The iPhone's preferred media type
+  ; is based on the CSS3 Media queries. http://www.w3.org/TR/css3-mediaqueries/
+  ;
+  ; You can also override any of Zen's stylesheets or any module's stylesheets,
+  ; an /extremely/ useful feature. See the excellent Drupal 6 Theme Guide at
+  ; http://drupal.org/node/263967 for more details.
+; stylesheets[all][]   = css/html-reset.css
+; stylesheets[all][]   = css/wireframes.css
+; stylesheets[all][]   = css/layout-fixed.css
+; stylesheets[all][]   = css/page-backgrounds.css
+; stylesheets[all][]   = css/tabs.css
+; stylesheets[all][]   = css/messages.css
+; stylesheets[all][]   = css/pages.css
+; stylesheets[all][]   = css/block-editing.css
+; stylesheets[all][]   = css/blocks.css
+; stylesheets[all][]   = css/navigation.css
+; stylesheets[all][]   = css/panels-styles.css
+; stylesheets[all][]   = css/views-styles.css
+; stylesheets[all][]   = css/nodes.css
+; stylesheets[all][]   = css/comments.css
+; stylesheets[all][]   = css/forms.css
+; stylesheets[all][]   = css/fields.css
+; stylesheets[print][] = css/print.css
+; stylesheets[handheld][] = css/mobile.css
+; stylesheets[only screen and (max-device-width: 480px)][] = css/iphone.css
+
+stylesheets[all][]   = css/all.css
+stylesheets[all][]   = css/fancybox.css
+stylesheets[handheld][] = css/allmobile.css
+
+  ; Set the conditional stylesheets that are processed by IE.
+conditional-stylesheets[if IE][all][]       = css/ie.css
+; conditional-stylesheets[if lte IE 6][all][] = css/ie6.css
+
+  ; Optionally add some JavaScripts to your theme.
+; scripts[] = js/jquery-main.js
+
+
+  ;
+  ; To add a new region, 
+  ; add a line line to this file, and then add the new variable to your
+  ; page.tpl.php template.
+regions[sidebar_first]  = First sidebar
+regions[sidebar_second] = Second sidebar
+regions[navigation]     = Navigation bar
+regions[highlight]      = Highlighted content
+regions[content_top]    = Content top
+regions[content_bottom] = Content bottom
+regions[header]         = Header
+regions[footer]         = Footer
+regions[page_closure]   = Page closure
+
+features[] = logo
+features[] = name
+features[] = slogan
+features[] = mission
+features[] = node_user_picture
+features[] = comment_user_picture
+features[] = search
+features[] = favicon
+features[] = primary_links
+features[] = secondary_links
+
+; Set the default settings to be used in theme-settings.php

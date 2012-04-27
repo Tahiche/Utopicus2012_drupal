@@ -1,0 +1,242 @@
+diff --git a/includes/plugins.inc b/includes/plugins.inc
+index c636e27..4c6e757 100644
+--- a/includes/plugins.inc
++++ b/includes/plugins.inc
+@@ -28,6 +28,7 @@ function views_views_plugins() {
+         'no remove' => TRUE,
+         'js' => array('misc/collapse.js', 'misc/textarea.js', 'misc/tabledrag.js', 'misc/autocomplete.js', "$path/dependent.js"),
+         'use ajax' => TRUE,
++        'will scroll top' => TRUE,
+         'use pager' => TRUE,
+         'use more' => TRUE,
+         'accept attachments' => TRUE,
+@@ -40,6 +41,7 @@ function views_views_plugins() {
+         'theme' => 'views_view',
+         'uses hook menu' => TRUE,
+         'use ajax' => TRUE,
++        'will scroll top' => TRUE,
+         'use pager' => TRUE,
+         'use more' => TRUE,
+         'accept attachments' => TRUE,
+@@ -53,6 +55,7 @@ function views_views_plugins() {
+         'theme' => 'views_view',
+         'uses hook block' => TRUE,
+         'use ajax' => TRUE,
++        'will scroll top' => TRUE,
+         'use pager' => TRUE,
+         'use more' => TRUE,
+         'accept attachments' => TRUE,
+@@ -65,6 +68,7 @@ function views_views_plugins() {
+         'handler' => 'views_plugin_display_attachment',
+         'theme' => 'views_view',
+         'use ajax' => TRUE,
++        'will scroll top' => TRUE,
+         'use pager' => FALSE,
+         'use more' => TRUE,
+         'accept attachments' => FALSE,
+@@ -77,6 +81,7 @@ function views_views_plugins() {
+         'parent' => 'page', // so it knows to load the page plugin .inc file
+         'uses hook menu' => TRUE,
+         'use ajax' => FALSE,
++        'will scroll top' => FALSE,
+         'use pager' => FALSE,
+         'accept attachments' => FALSE,
+         'admin' => t('Feed'),
+diff --git a/includes/view.inc b/includes/view.inc
+index 57f7525..6a6cb7c 100644
+--- a/includes/view.inc
++++ b/includes/view.inc
+@@ -82,6 +82,7 @@ class view extends views_db_object {
+   var $build_info = array();
+ 
+   var $use_ajax = FALSE;
++  var $will_scroll_top = TRUE;
+ 
+   // Where the results of a query will go.
+   var $result = array();
+@@ -331,6 +332,14 @@ class view extends views_db_object {
+   }
+ 
+   /**
++   * Whether or not the view will scroll back to its top when
++   * content is loaded via AJAX.
++   */
++  function set_will_scroll_top($scroll_top) {
++    $this->will_scroll_top = $scroll_top;
++  }
++
++  /**
+    * Set the exposed filters input to an array. If unset they will be taken
+    * from $_GET when the time comes.
+    */
+diff --git a/js/ajax_view.js b/js/ajax_view.js
+index fc9a8c3..793321c 100644
+--- a/js/ajax_view.js
++++ b/js/ajax_view.js
+@@ -137,21 +137,25 @@ Drupal.behaviors.ViewsAjaxView = function() {
+                   data: viewData,
+                   success: function(response) {
+                     $(this).removeClass('views-throbbing');
+-                    // Scroll to the top of the view. This will allow users
+-                    // to browse newly loaded content after e.g. clicking a pager
+-                    // link.
+-                    var offset = $(target).offset();
+-                    // We can't guarantee that the scrollable object should be
+-                    // the body, as the view could be embedded in something
+-                    // more complex such as a modal popup. Recurse up the DOM
+-                    // and scroll the first element that has a non-zero top.
+-                    var scrollTarget = target;
+-                    while ($(scrollTarget).scrollTop() == 0 && $(scrollTarget).parent()) {
+-                      scrollTarget = $(scrollTarget).parent()
+-                    }
+-                    // Only scroll upward
+-                    if (offset.top - 10 < $(scrollTarget).scrollTop()) {
+-                      $(scrollTarget).animate({scrollTop: (offset.top - 10)}, 500);
++                    // Check if the displays AJAX settings permit content to scroll-to-top.
++                    // If not, skip this section.
++                    if (viewData.will_scroll_top) {
++                      // Scroll to the top of the view. This will allow users
++                      // to browse newly loaded content after e.g. clicking a pager
++                      // link.
++                      var offset = $(target).offset();
++                      // We can't guarantee that the scrollable object should be
++                      // the body, as the view could be embedded in something
++                      // more complex such as a modal popup. Recurse up the DOM
++                      // and scroll the first element that has a non-zero top.
++                      var scrollTarget = target;
++                      while ($(scrollTarget).scrollTop() == 0 && $(scrollTarget).parent()) {
++                        scrollTarget = $(scrollTarget).parent()
++                      }
++                      // Only scroll upward
++                      if (offset.top - 10 < $(scrollTarget).scrollTop()) {
++                        $(scrollTarget).animate({scrollTop: (offset.top - 10)}, 500);
++                      }
+                     }
+                     // Call all callbacks.
+                     if (response.__callbacks) {
+diff --git a/modules/node.views_default.inc b/modules/node.views_default.inc
+index de684ce..32d8010 100644
+--- a/modules/node.views_default.inc
++++ b/modules/node.views_default.inc
+@@ -189,6 +189,7 @@ function node_views_default_views() {
+     'perm' => '',
+   ));
+   $handler->override_option('use_ajax', '1');
++  $handler->override_option('will_scroll_top', '1');
+   $handler->override_option('items_per_page', 36);
+   $handler->override_option('use_pager', '1');
+   $handler->override_option('style_plugin', 'table');
+diff --git a/plugins/views_plugin_display.inc b/plugins/views_plugin_display.inc
+index 5e6f4ae..0707781 100644
+--- a/plugins/views_plugin_display.inc
++++ b/plugins/views_plugin_display.inc
+@@ -258,6 +258,17 @@ class views_plugin_display extends views_plugin {
+   }
+ 
+   /**
++   * Does this display scroll-to-top when
++   * content has finished loading via AJAX?
++   */
++  function will_scroll_top() {
++    if (!empty($this->definition['will scroll top'])) {
++      return $this->get_option('will_scroll_top');
++    }
++    return TRUE;
++  }
++
++  /**
+    * Does the display have a pager enabled?
+    */
+   function use_pager() {
+@@ -339,6 +350,7 @@ class views_plugin_display extends views_plugin {
+       'title' => array('title'),
+       'css_class' => array('css_class'),
+       'use_ajax' => array('use_ajax'),
++      'will_scroll_top' => array('will_scroll_top'),
+       'hide_attachment_summary' => array('hide_attachment_summary'),
+       'group_by' => array('group_by'),
+       'query' => array('query'),
+@@ -400,6 +412,7 @@ class views_plugin_display extends views_plugin {
+ 
+           'display_description' => FALSE,
+           'use_ajax' => TRUE,
++          'will_scroll_top' => TRUE,
+           'hide_attachment_summary' => TRUE,
+           'pager' => TRUE,
+           'pager_options' => TRUE,
+@@ -456,6 +469,10 @@ class views_plugin_display extends views_plugin {
+         'default' => FALSE,
+         'bool' => TRUE,
+       ),
++      'will_scroll_top' => array(
++        'default' => TRUE,
++        'bool' => TRUE,
++      ),
+       'hide_attachment_summary' => array(
+         'default' => FALSE,
+         'bool' => TRUE,
+@@ -1076,6 +1093,14 @@ class views_plugin_display extends views_plugin {
+         'value' => $this->get_option('use_ajax') ? t('Yes') : t('No'),
+         'desc' => t('Change whether or not this display will use AJAX.'),
+       );
++      if ($this->get_option('use_ajax')) {
++        $options['will_scroll_top'] = array(
++          'category' => 'advanced',
++          'title' => t('Scroll to top'),
++          'value' => $this->get_option('will_scroll_top') ? t('Yes') : t('No'),
++          'desc' => t('Change whether or not the view will scroll-to-top when AJAX content is finished loading.'),
++        );
++      }
+     }
+     if (!empty($this->definition['accept attachments'])) {
+       $options['hide_attachment_summary'] = array(
+@@ -1334,6 +1359,19 @@ class views_plugin_display extends views_plugin {
+           '#default_value' => $this->get_option('use_ajax') ? 1 : 0,
+         );
+         break;
++      case 'will_scroll_top':
++        $form['#title'] .= t('Scroll view to top');
++        $form['description'] = array(
++          '#prefix' => '<div class="description form-item">',
++          '#suffix' => '</div>',
++          '#value' => t('If set, when content has finished loading via AJAX, the view will scroll back to the top of its container.'),
++        );
++        $form['will_scroll_top'] = array(
++          '#type' => 'radios',
++          '#options' => array(1 => t('Yes'), 0 => t('No')),
++          '#default_value' => $this->get_option('will_scroll_top') ? 1 : 0,
++        );
++        break;
+       case 'hide_attachment_summary':
+         $form['#title'] .= t('Hide attachments when displaying argument summary');
+         $form['hide_attachment_summary'] = array(
+@@ -2112,6 +2150,7 @@ class views_plugin_display extends views_plugin {
+         break;
+       case 'enabled':
+       case 'use_ajax':
++      case 'will_scroll_top':
+       case 'hide_attachment_summary':
+         $this->set_option($section, (bool)$form_state['values'][$section]);
+         break;
+@@ -2425,6 +2464,7 @@ class views_plugin_display extends views_plugin {
+    */
+   function pre_execute() {
+     $this->view->set_use_ajax($this->use_ajax());
++    $this->view->set_will_scroll_top($this->will_scroll_top());
+     if ($this->use_more() && !$this->use_more_always()) {
+       $this->view->get_total_rows = TRUE;
+     }
+diff --git a/theme/theme.inc b/theme/theme.inc
+index 5cdd1e9..c75c52b 100644
+--- a/theme/theme.inc
++++ b/theme/theme.inc
+@@ -130,6 +130,9 @@ function template_preprocess_views_view(&$vars) {
+ //            'view_base_path' => isset($view->display['page']) ? substr(url($view->display['page']->display_options['path']), strlen($base_path)) : '',
+             'view_base_path' => $view->get_path(),
+             'view_dom_id' => $vars['dom_id'],
++            // Determine if the content area will scroll-to-top when content is finished loading.
++            // Default to 1 so older views are not negatively impacted by this.
++            'will_scroll_top' => isset($view->will_scroll_top) ? (int) $view->will_scroll_top : 1,
+             // To fit multiple views on a page, the programmer may have
+             // overridden the display's pager_element.
+             'pager_element' => isset($view->query->pager) ? $view->query->pager->get_pager_id() : 0,
