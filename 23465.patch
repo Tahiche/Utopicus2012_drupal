@@ -1,0 +1,13 @@
+diff --git a/includes/pager.inc b/includes/pager.inc
+index a1ad312..a5ff830 100644
+--- a/includes/pager.inc
++++ b/includes/pager.inc
+@@ -51,6 +51,8 @@
+ function pager_query($query, $limit = 10, $element = 0, $count_query = NULL) {
+   global $pager_page_array, $pager_total, $pager_total_items;
+   $page = isset($_GET['page']) ? $_GET['page'] : '';
++  // Provide a fallback value to avoid division by 0.
++  $limit = $limit ? $limit : 10;
+ 
+   // Substitute in query arguments.
+   $args = func_get_args();
