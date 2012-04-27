@@ -1,0 +1,4 @@
+name = Facebook Feed Group
+description = "Get the last posts of a Facebook group's wall."
+package = " Custom"
+core = 6.x

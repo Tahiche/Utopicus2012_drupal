@@ -1,0 +1,11 @@
+; $Id: devel_forminspect.info,v 1.2.2.1.2.1 2007/11/04 16:27:47 heine Exp $
+name = Form inspect
+description = View the contents of form arrays.
+package = Development
+core = 6.x
+; Information added by drupal.org packaging script on 2007-11-09
+version = "6.x-1.x-dev"
+core = "6.x"
+project = "devel_forminspect"
+datestamp = "1194566709"
+

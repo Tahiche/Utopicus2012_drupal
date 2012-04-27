@@ -1,0 +1,11 @@
+Incluye link para enable/disable devel_themer (Theme Developer)
+
+Patched:
+
+// PATCH
+//admin_menu_toggle_theme_developer
+function admin_menu_toggle_theme_developer() {
+
+admin_menu.module
+admin_menu.install
+admin_menu.inc

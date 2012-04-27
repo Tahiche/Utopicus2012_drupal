@@ -1,0 +1,8 @@
+name = Custom themechanger
+description = Para asignar un tema a un tipo de contenido. POr ej. Admin para nodequeue
+core = 6.x
+package = " NR"
+version = "6.x-1.0"
+core = "6.x"
+project = "themechanger"
+

@@ -1,0 +1,52 @@
+<?php
+// $Id:$
+/
+* @file
+* Adds "delete" tab (MENU_LOCAL_TASK) for all nodes and disables default "delete" button on node forms.
+*/
+
+/
+* Implementation of hook_menu().
+*/
+function deletetab_menu(){
+  $items = array();
+
+  $items['node/%node/erase'] = array(
+    'title' => 'Delete', 
+    'access callback' => 'node_access',
+    'access arguments' => array('delete', 1),
+    'page callback' => 'deletetab_delete',
+    'page arguments' => array(1),
+    'type' => MENU_LOCAL_TASK,
+    'weight' => 10,   
+  ); 
+   
+  return $items;
+} 
+
+/
+* Redirects to default Drupal delete path
+*/
+function deletetab_delete($node) {
+  drupal_goto('node/' . $node->nid . '/delete');
+}
+
+/
+* Implementation of hook_form_alter().
+* Removes "delete" button from node form.
+*/
+function deletetab_form_alter(&$form, &$form_state, $form_id) {
+  if (deletetab_string_ends_with($form_id, 'node_form')) {
+    unset($form['buttons']['delete']);
+  }
+}
+
+/**
+* Check whether $full_str ends with $end_str
+*/
+function deletetab_string_ends_with($full_str, $end_str)      {
+  // Look at the end of full_str for the substring the size of end_str
+  $full_str_end = substr($full_str, strlen($full_str) - strlen($end_str));
+  // If it matches, it does end with EndStr
+  return $full_str_end == $end_str;
+}

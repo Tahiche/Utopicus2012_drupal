@@ -1,0 +1,6 @@
+<?php
+// $Id: devel_forminspect.install,v 1.2.4.1 2007/11/04 16:27:47 heine Exp $
+
+function devel_forminspect_install() {
+  db_query("UPDATE {system} SET weight = 100 WHERE name = 'devel_forminspect'");
+}

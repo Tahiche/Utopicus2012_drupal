@@ -1,0 +1,5 @@
+name = "gdocfield"
+description = "Implements a lovely tabbed gdocs view"
+core = 6.x
+package = " Custom" 
+dependencies[] = filefield

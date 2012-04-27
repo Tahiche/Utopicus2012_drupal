@@ -1,0 +1,66 @@
+<?php
+
+function themechanger_init() {
+    global $custom_theme;
+   global $right_theme;
+   global $current_theme;
+   
+     $adminTheme=variable_get('admin_theme', '0');
+   
+ 
+      
+	  $current_theme = variable_get('theme_default','none');
+	  
+
+ // echo "<h1>current_theme theme ".$current_theme."</h1>";
+ 
+	 
+    if ( (arg(0) == 'node'  &&  is_numeric(arg(1)) && arg(2) == 'nodequeue') ||
+	(arg(0) == 'user')
+	 ) {
+        $right_theme = variable_get('admin_theme', '0');
+		//echo "<h1>$right_theme</h1>";
+       // init_theme();
+    }
+	
+	
+	 if ( (arg(0) == 'node'  &&  is_numeric(arg(1)) && arg(2) == 'simplenews') ) {
+        $right_theme = variable_get('admin_theme', '0');
+		//echo "<h1>$right_theme</h1>";
+       // init_theme();
+    }
+	
+		
+		if( arg(0) == 'user' ){
+	   //echo "VAMOSPAYA";
+	   $right_theme = 'NuevaRevista';
+		// init_theme();
+		// echo "<h1>$right_theme</h1>";
+	   }
+	   
+	if ((arg(0) == 'node' && arg(1) == 'add') ||  (arg(0) == 'node' && arg(2) == 'edit') ||  (arg(0) == 'node' && arg(1) == 'edit')  ) {
+	    // echo "arg(0) == 'node' && arg(1) == 'add'";
+		 $right_theme = variable_get('admin_theme', '0');
+		// init_theme();
+		//echo "<h1>right_theme inside -> $right_theme</h1>";
+		
+	}
+
+//if ((arg(0) == 'node')) $right_theme = variable_get('admin_theme', '0');
+
+  /* echo "<h1>current_theme theme ".$current_theme."</h1>";
+   
+   echo "<h1>custom_theme</h1>" .$custom_theme;
+   echo "<h1>right_theme </h1>".$right_theme;
+   echo "custom_theme != right_theme->".$custom_theme !== $right_theme;*/
+
+   if($right_theme && ($current_theme !== $right_theme) ){
+	   $custom_theme = $right_theme;
+	   init_theme(); 
+	   }
+	   
+  
+}
+
+
+

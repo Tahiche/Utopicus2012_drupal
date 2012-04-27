@@ -1,0 +1,7 @@
+; $Id: $
+name = Delete Tab
+description = Adds "delete" tab (MENU_LOCAL_TASK) for all nodes and disables default "delete" button on node forms.
+package = Administration
+
+project = "deletetab"
+core = "6.x"

@@ -1,0 +1,280 @@
+<?php
+
+/**
+ * Declare information about a formatter.
+ *
+ * @return
+ *   An array keyed by formatter name. Each element of the array is an associative
+ *   array with these keys and values:
+ *   - "label": The human-readable label for the formatter.
+ *   - "field types": An array of field type names that can be displayed using
+ *     this formatter.
+ */
+/*function gdocfield_field_formatter_info() {
+  return array(
+    'gdocfield' => array(
+      'label' => t('gdoc embed inline'),
+      'field types' => array('filefield'),
+      'multiple values' => CONTENT_HANDLE_CORE,
+    ),
+	 'gdocfieldlightbox' => array(
+      'label' => t('gdoc embed lightbox'),
+      'field types' => array('filefield'),
+      'multiple values' => CONTENT_HANDLE_CORE,
+    ),
+  );
+}*/
+
+function gdocfield_field_formatter_info() {
+  $formatters = array(
+    'newwindow' => array(
+      'label' => t('GDOC FIELD - Open Doc in New window'),
+      'field types' => array('filefield'),
+      'description' => t('Displays a link to the DOC that opens in a new window.'),
+    ),
+  );
+  $formatters['inline'] = array(
+      'label' => t('GDOC FIELD - Open doc in GDoc inline frame'),
+      'field types' => array('filefield'),
+      'description' => t('Opens doc in inline iframe.'),
+    );
+  if (module_exists('lightbox2')) {
+    $formatters['popup'] = array(
+      'label' => t('GDOC FIELD - Open in a lightbox window'),
+      'field types' => array('filefield'),
+      'description' => t('Displays a link to the referenced DOC that opens in a lightbox window.'),
+    );
+	
+	$formatters['opengdocsframe'] = array(
+      'label' => t('GDOC LINK - Open in a lightbox window with link to edit.'),
+      'field types' => array('link'),
+      'description' => t('Abre el link a la URL de Google Docs en lighbox con link a la URL del Documento.'),
+    );
+	
+  }
+  return $formatters;
+}
+
+
+/**
+* Implementation of hook_theme().
+*
+* We declare our theme functions according to the array keys in  hook_field_formatter_info
+*/
+function gdocfield_theme() {
+  $theme = array(
+    'gdocfield_formatter_newwindow' => array(
+      'arguments' => array('element' => NULL),
+    ),
+  );
+  $theme['gdocfield_formatter_inline'] = array('arguments' => array('element' => NULL));
+  
+  if (module_exists('lightbox2')) {
+    $theme['gdocfield_formatter_popup'] = array('arguments' => array('element' => NULL));
+	
+	$theme['gdocfield_formatter_opengdocsframe'] = array('arguments' => array('element' => NULL));
+  }
+  return $theme;
+}
+
+
+/**
+* Theming functions for our formatters
+*
+* And here we do our magic. You can use dsm($element) to see what you have to play with (requires devel module).
+*/
+function theme_gdocfield_formatter_newwindow($element) {
+	// copiado de filefield_formatter.inc
+  $file = $element['#item'];
+ 
+ // Views may call this function with a NULL value, return an empty string.
+  if (empty($file['fid'])) {
+    return '';
+  }
+
+  $path = $file['filepath'];
+  $url = file_create_url($path);
+  $icon = theme('filefield_icon', $file);
+
+  // Set options as per anchor format described at
+  // http://microformats.org/wiki/file-format-examples
+  // TODO: Possibly move to until I move to the more complex format described 
+  // at http://darrelopry.com/story/microformats-and-media-rfc-if-you-js-or-css
+  $options = array(
+    'attributes' => array(
+      'type' => $file['filemime'] . '; length=' . $file['filesize'],
+	  'target' => 'blank_',
+    ),
+  );
+
+  // Use the description as the link text if available.
+  if (empty($file['data']['description'])) {
+    $link_text = $file['filename'];
+  }
+  else {
+    $link_text = $file['data']['description'];
+    $options['attributes']['title'] = $file['filename'];
+  }
+
+  return '<div class="filefield-file">'. $icon . l($link_text, $url, $options) .'</div>';
+  
+}
+
+function theme_gdocfield_formatter_inline($element) {
+  $item = $element['#item'];
+  global $base_url;
+  $filepathurl = $base_url . '/' . $item['filepath'];
+  
+   $options = array(
+    'attributes' => array(
+      'type' => $file['filemime'] . '; length=' . $file['filesize'],
+	  'target' => 'blank_',
+    ),
+  );
+  
+
+  $output = '<iframe src="http://docs.google.com/viewer?url=' . $filepathurl . '&amp;embedded=true" style="width:600px; height:350px;" frameborder="0"></iframe>';
+  $output .= '<p>' . l(t('Download the document'), $filepathurl,$options) . '</p>';
+
+  return $output;
+}
+
+
+function theme_gdocfield_formatter_popup($element) {
+	
+  $item = $element['#item'];
+  
+  $file=(object)$item;
+  
+  if(! function_exists("imagefield_file_is_image")) {
+	  module_load_include('inc', 'imagefield', 'imagefield_file');
+ }
+
+ // krumo($file);
+
+
+ // echo "imagefield_file_is_image =".imagefield_file_is_image($file);
+//exit;
+  global $base_url;
+  $filepathurl = $base_url . '/' . $item['filepath'];
+
+if (empty($item['data']['description'])) {
+    $link_text = $item['filename'];
+  }
+  else {
+    $link_text = $item['data']['description'];
+  }
+ /*echo "<p>filepathurl</p>".$filepathurl;
+ echo "     ////    ". "/".$item['filepath'];*/
+ 
+if (!imagefield_file_is_image($file)){
+$output = '<h3><a href="http://docs.google.com/viewer?url=' . $filepathurl . '&amp;embedded=true" frameborder="0" rel="lightframe[search|width:900px; height:400px; scrolling: auto;]['.$link_text.']">'.$link_text.'</a></h3>';
+}
+else{
+ $output= '<a href="' . $filepathurl . '" frameborder="0" rel="lightframe[search|width:900px; height:400px; scrolling: auto;]['.$link_text.']">'.theme('imagecache', 'AttachmentThumbnail', $filepathurl, $alt = $link_text, $title = $link_text).'</a><h3>'.$link_text.'</h3>';
+ 
+ // theme("imagefield_admin_thumbnail",$item)
+}
+ 
+//$output = '<iframe src="http://docs.google.com/viewer?url=' . $filepathurl . '&amp;embedded=true" style="width:600px; height:350px;" frameborder="0"></iframe>';
+ $options = array(
+    'attributes' => array(
+      'type' => $item['filemime'] . '; length=' . $item['filesize'],
+	  'target' => 'blank_',
+    ),
+  );
+$output .= '<p>' . l(t('Download the document'), $filepathurl,$options) . '</p>';
+
+  return $output;
+}
+
+
+
+
+
+function theme_gdocfield_formatter_opengdocsframe($element) {
+  $item = $element['#item'];
+ // krumo($item);
+  global $base_url;
+  $filepathurl = $base_url . '/' . $item['filepath'];
+
+if (empty($item['data']['description'])) {
+    $link_text = $item['filename'];
+  }
+  else {
+    $link_text = $item['data']['description'];
+  }
+//$output = '<h3><a href="http://docs.google.com/viewer?url=' . $filepathurl . '&amp;embedded=true" frameborder="0" rel="lightframe[search|width:900px; height:400px; scrolling: auto;]['.$link_text.']">'.$link_text.'</a></h3>';
+$lightboxlink="<a target='_BLANK' href=\"".$item['url']."\">".t('Open in new window')."</a>";
+
+$output='<h3><a href="'.$item['url'].'" rel="lightframe[search|width:900px; height:400px; scrolling: auto;]['.htmlentities($lightboxlink).']">'.$item['display_title'].'</a></h3>';
+ 
+//$output = '<iframe src="http://docs.google.com/viewer?url=' . $filepathurl . '&amp;embedded=true" style="width:600px; height:350px;" frameborder="0"></iframe>';
+ $options = array(
+    'attributes' => array(
+      'type' => $item['filemime'] . '; length=' . $item['filesize'],
+	  'target' => 'blank_',
+    ),
+  );
+// $output .= '<p>' . l(t('Download the document'), $filepathurl,$options) . '</p>';
+
+$output.="<div class='description'> Enlace a Documento de Google Docs. Debes tener en cuenta que sólo los documentos públicos, o aquellos compartidos con el usuario, serán visibles. </div>";
+  return $output;
+}
+/* Theme function for popup links */
+/*function theme_formattertest_formatter_popup($element) {
+  $nid = $element['#item']['nid'];
+  $link_id = 'popup-'. $nid; // we want an unique id for each link so we can tell popups api to only do those =)
+  $output = '';
+  if (!empty($nid) && is_numeric($nid) && ($title = _nodereference_titles($nid))) {
+    $output = l($title, 'node/'. $nid, array('attributes' => array('id' => $link_id)));
+  }
+  popups_add_popups(array('#'. $link_id));
+  return $output;
+}*/
+
+/**
+ * Implementation of hook_theme().
+ */
+/*function gdocfield_theme() {
+  return array(
+    'gdocfield_formatter_gdocfield' => array(
+      'arguments' => array('element' => NULL),
+    ),
+  );
+}*/
+
+/*function gdocfieldlightbox_theme() {
+  return array(
+    'gdocfield_formatter_gdocfieldlightbox' => array(
+      'arguments' => array('element' => NULL),
+    ),
+  );
+}*/
+
+/**
+ * Formatter theme function for file fields presented as gdoc viewer
+ *
+ * @ingroup themeable
+ */
+/*function theme_gdocfield_formatter_gdocfield($element) {
+  $item = $element['#item'];
+  global $base_url;
+  $filepathurl = $base_url . '/' . $item['filepath'];
+
+  $output = '<iframe src="http://docs.google.com/viewer?url=' . $filepathurl . '&amp;embedded=true" style="width:470px; height:296px;" frameborder="0"></iframe>';
+  $output .= '<p>' . l(t('Download the document'), $filepathurl) . '</p>';
+
+  return $output;
+}*/
+
+
+/*function theme_gdocfield_formatter_gdocfieldlightbox($element) {
+  $item = $element['#item'];
+  global $base_url;
+  $filepathurl = $base_url . '/' . $item['filepath'];
+
+  $output = '<a href="http://www.google.com" rel="lightframe[search|width:400px; height:300px; scrolling: auto;][Search Google]">Search google</a><a href="http://www.yahoo.com" rel="lightframe[search|width:400px; height:300px;]">Search yahoo</a><a href="http://www.yahoo.com" rel="lightframe[search|width:400px; height:300px;][Search Yahoo]">Search yahoo</a>';
+
+  return $output;
+}*/

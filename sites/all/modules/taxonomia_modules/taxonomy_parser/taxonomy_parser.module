@@ -1,0 +1,152 @@
+<?php
+
+/*
+ * Module originally written by Graham Taylor
+ */
+
+/**
+ * @param $term_categories
+ * strutured array of parent / child taxonomy terms to import
+ * 
+ * array should be in format
+ * ['parent term'] = array(
+ *   [1] = 'child term',
+ *   [2] = 'child term',
+ *   ['vocab'] = vocabulary name
+ * );
+ *  
+ * @param $type
+ * optional node type to search for the taxonomy vocabulary in
+ */
+function taxonomy_parser_import_taxonomy($term_categories, $type = null){
+    
+  // find local vid of the vocabulary
+  $vocabs = taxonomy_get_vocabularies($type);
+
+  // cycle through each category
+  if(!empty($term_categories)){
+    foreach($term_categories as $category => $sub_categories){
+  	  // reset re-used values
+  	  $parent = NULL;
+  	  $parent_term = array();
+  	  
+      if(is_array($vocabs)){
+  	    foreach($vocabs as $vocab){
+  	      if($vocab->name === $term_categories[$category]['vocab']){
+  		    $target_vid = $vocab->vid;
+   	      }
+  	    }
+      }
+  	  
+  	  // check term exists and add it 
+  	  $parent_term = taxonomy_parser_check_term_exists($category, $target_vid, true, null);
+  
+ 	  // add parent to the taxonomy array
+  	  $taxonomy[$parent_term->tid] = $parent_term;
+  	  $parent = $parent_term->tid;  	
+  	
+  	  // now do child categories
+  	  foreach($sub_categories as $sub_category){
+  	    // skip the ['vocab'] array key as we don't want to add it as a term
+  	    if(strcmp($sub_category, $term_categories[$category]['vocab']) === 0){
+  	      continue;
+  	    }
+  	    // check term exists
+  	    $thissubterm = taxonomy_parser_check_term_exists($sub_category, $target_vid, false, $parent);
+	    // add it to the taxonomy array 
+	    $taxonomy[$thissubterm->tid] = $thissubterm;
+  	  } 	
+    }
+  }
+  // return taxonomy if you want to apply it to a node.
+  return $taxonomy;
+}
+
+/**
+ * Checks the term that is trying to be added exists
+ * If it doesn't it will save the term and return it.
+ * otherwise it loads the term from the database and returns the loaded
+ * term
+ * 
+ * @param $category
+ * the term to be added
+ * 
+ * @param $target_vid
+ * The target vocabulary ID the term belongs to
+ * 
+ * @param $is_parent
+ * boolean value for whether the term is a parent term or not
+ * 
+ * @param $parent
+ * optional - the parent term ID.
+ * 
+ * @return $thisterm
+ * The term object added / returned from the database
+ */
+function taxonomy_parser_check_term_exists($category, $target_vid, $is_parent, $parent = NULL){
+  
+  // if the term to be added is a parent term, pull out all parent terms,
+  // otherwise if a child term pull out all child terms based on the parent ID.
+  if($is_parent){
+  	 $result = db_query("SELECT d.name FROM {term_data} d INNER JOIN {term_hierarchy} t ON d.tid = t.tid WHERE d.vid = %d AND t.parent = 0", $target_vid);
+  }else{
+  	 $result = db_query("SELECT d.name FROM {term_data} d INNER JOIN {term_hierarchy} t ON d.tid = t.tid WHERE d.vid = %d AND t.parent = %d", $target_vid, $parent);
+  }
+  
+  // build array of term names
+  $terms = array();
+    while ($term = db_fetch_object($result)) {
+      $terms[] = $term->name;
+  }
+
+  //check if term exists
+  $form_values = array();
+  $thisterm = array();
+  if(array_search($category, $terms) === false){
+  	// it doesn't, save it.
+  	$form_values['vid'] = $target_vid;
+  	$form_values['name'] = $category;
+  	if($parent){
+  	  $form_values['parent'][] = $parent;
+  	}
+  	taxonomy_save_term($form_values);
+  	
+  	//reload the term
+  	$terms_by_name = taxonomy_get_term_by_name($category);
+  	
+  	// make sure the term is in the same vocabulary
+  	// there may be overlap so we can't assume
+  	foreach($terms_by_name as $term){
+  	  if($term->vid == $target_vid){
+  	  	$thisterm = $term;
+  	  }
+  	} 
+  }else{
+  	$terms_by_name = taxonomy_get_term_by_name($category);
+  	foreach($terms_by_name as $term){
+  	  if($term->vid == $target_vid){
+  	    // its a parent term.
+  	    if($is_parent){
+  	      $parents = array();
+  	      $parents = taxonomy_get_parents($term->tid);
+  	      if(empty($parents)){
+  	        // get top level parent
+  	        $thisterm = $term;
+  	      }
+  	    }else{
+  	  	  // child term
+  	  	  $children = array();
+  	  	  // get all the children of the parent term
+  	  	  $children = taxonomy_get_children($parent, $target_vid);
+  	  	  // compare each child against the term to decide which one it is
+  	  	  foreach($children as $tid => $child){
+  	  	    if(strcmp($category,$child->name) == 0){
+  	  	      $thisterm = $children[$tid];
+  	  	    }
+  	  	  }
+  	    }
+  	  }	
+  	}
+  } 
+  return $thisterm;
+}

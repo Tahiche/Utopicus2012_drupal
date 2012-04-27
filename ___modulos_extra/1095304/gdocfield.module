@@ -1,0 +1,48 @@
+<?php
+
+/**
+ * Declare information about a formatter.
+ *
+ * @return
+ *   An array keyed by formatter name. Each element of the array is an associative
+ *   array with these keys and values:
+ *   - "label": The human-readable label for the formatter.
+ *   - "field types": An array of field type names that can be displayed using
+ *     this formatter.
+ */
+function gdocfield_field_formatter_info() {
+  return array(
+    'gdocfield' => array(
+      'label' => t('gdoc embed'),
+      'field types' => array('filefield'),
+      'multiple values' => CONTENT_HANDLE_CORE,
+    ),
+  );
+}
+
+/**
+ * Implementation of hook_theme().
+ */
+function gdocfield_theme() {
+  return array(
+    'gdocfield_formatter_gdocfield' => array(
+      'arguments' => array('element' => NULL),
+    ),
+  );
+}
+
+/**
+ * Formatter theme function for file fields presented as gdoc viewer
+ *
+ * @ingroup themeable
+ */
+function theme_gdocfield_formatter_gdocfield($element) {
+  $item = $element['#item'];
+  global $base_url;
+  $filepathurl = $base_url . '/' . $item['filepath'];
+
+  $output = '<iframe src="http://docs.google.com/viewer?url=' . $filepathurl . '&amp;embedded=true" style="width:470px; height:296px;" frameborder="0"></iframe>';
+  $output .= '<p>' . l(t('Download the document'), $filepathurl) . '</p>';
+
+  return $output;
+}

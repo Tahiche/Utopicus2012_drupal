@@ -1,0 +1,6 @@
+name = "imageformatters"
+description = "Imageformatters para diferentes casos como el grayscale"
+core = 6.x
+package = " Custom" 
+dependencies[] = filefield
+dependencies[] = imagecache 

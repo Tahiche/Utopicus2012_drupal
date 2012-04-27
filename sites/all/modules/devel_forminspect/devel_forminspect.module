@@ -1,0 +1,77 @@
+<?php
+// $Id: devel_forminspect.module,v 1.2.4.2 2007/11/08 20:09:59 heine Exp $
+
+function devel_forminspect_menu() {
+  $items = array();
+  $items['admin/settings/forminspect'] = array(
+      'title' => 'Form inspect',
+      'page callback' => 'drupal_get_form',
+      'page arguments' => array('devel_forminspect_settings'),
+      'access arguments' => array('administer site configuration'),
+      'type' => MENU_NORMAL_ITEM,
+      'description' => t('Ignore certain forms.'),
+  );
+  return $items;
+}
+
+
+function devel_forminspect_settings(&$form_state) {
+  $form['devel_forminspect_enabled'] = array(
+    '#type' => 'checkbox',
+    '#title' => t('Display form information'),
+    '#default_value' => variable_get('devel_forminspect_enabled', FALSE),
+  );
+  $form['devel_forminspect_ignore'] = array(
+    '#type' => 'textarea',
+    '#title' => t('Ignore forms with the following ids'),
+    '#description' => t('Enter one form id per line. The * character is a wildcard. Example form ids are <em>devel_forminspect_settings</em> for this settings form or <em>*_node_form</em> for every node submission form. '),
+    '#default_value' => variable_get('devel_forminspect_ignore', ''),
+  );
+  return system_settings_form($form);
+}
+
+function devel_forminspect_form_alter(&$form, $form_state, $form_id) {
+  static $regexp;
+
+  if (variable_get('devel_forminspect_enabled', FALSE)) {
+    if (!isset($regexp) && ($ignore_forms = variable_get('devel_forminspect_ignore', ''))) {
+      $regexp = '/^('. preg_replace(array('/(\r\n?|\n)/', '/\\\\\*/'), array('|', '.*'), preg_quote($ignore_forms, '/')) .')$/';
+    }
+
+    if (isset($regexp) && preg_match($regexp, $form_id)) {
+      return;
+    }
+    elseif (user_access('access devel information') && variable_get('devel_forminspect_display_form_dump', TRUE)) {
+      drupal_add_css(drupal_get_path('module', 'devel_forminspect') .'/devel_forminspect.css');
+
+      if (module_exists('devel') && has_krumo()) {
+        $form['#suffix'] .= '<br /><b>'. check_plain($form_id) . krumo_ob($form) . t('@form_id form state', array('@form_id' => $form_id)). krumo_ob($form_state);
+      }
+      else {
+        $form['devel_form_inspect_dump'] = array(
+          '#type' => 'fieldset',
+          '#title' => t('@form_id information', array('@form_id' => $form_id)),
+          '#weight' => 1000,
+          'devel_form_inspect_form' => array(
+            '#type' => 'fieldset',
+            '#title' => t('Form array'),
+            '#collapsible' => TRUE,
+            '#collapsed' => TRUE,
+            'devel_form_inspectform_contents' => array(
+              '#value' => '<div class="devel-form-dump devel-form-dump-'. $zebra .'"><pre>'. check_plain(print_r($form, TRUE)) .'</pre></div>'
+            ),
+          ),
+          'devel_form_inspect_form_state' => array(
+            '#type' => 'fieldset',
+            '#title' => t('Form state'),
+            '#collapsible' => TRUE,
+            '#collapsed' => TRUE,
+            'devel_form_inspectform_contents' => array(
+              '#value' => '<div class="devel-form-dump devel-form-dump-'. $zebra .'"><pre>'. check_plain(print_r($form_state, TRUE)) .'</pre></div>'
+            ),
+          ),
+        );
+      }
+    }
+  }
+}

@@ -1,0 +1,34 @@
+$Id
+
+Menu structure must follow this example:
+
+Page1
+- Page2
+- Page3
+Page4
+- Page5
+-- Page6
+
+or this
+
+Page1
+* Page2
+** Page3
+Page4
+* Page5
+** Page6
+*** Page7
+
+Also, you may optionally specify path alias (alternative path provided by path module)
+or external URL. Writing it after node's title, separating by semicolon or vertical bar:
+URLs should ALWAYS start with "http://".
+
+Page1|page1
+- Page2|page1/page2
+- Page3|page1/page3
+Page4;http://domain.com/
+- Page5;http://mail.com/index.php
+-- Page6;page4/page5/page6
+
+Space(s) between indentation symbol "*" or "-" and menu/node title are optional,
+however you cannot put spaces between indentation symbols like "* * *" or "-- - -".

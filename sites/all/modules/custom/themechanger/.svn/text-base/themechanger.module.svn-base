@@ -1,0 +1,46 @@
+<?php
+
+function themechanger_preprocess_page($vars) {
+    global $custom_theme;
+   
+  /* echo "<h1>Custom theme".$custom_theme."</h1>";
+   echo "<h1>".arg(0)."</h1>";
+    echo "<h1>".arg(2)."</h1>";*/
+   $adminTheme=variable_get('admin_theme', '0');
+      
+    if ( (arg(0) == 'node'  &&  is_numeric(arg(1)) && arg(2) == 'nodequeue') ||
+	(arg(0) == 'user')
+	 ) {
+        $custom_theme = variable_get('admin_theme', '0');
+		//echo "<h1>$custom_theme</h1>";
+        init_theme();
+    }
+	
+	
+	 if ( (arg(0) == 'node'  &&  is_numeric(arg(1)) && arg(2) == 'simplenews') ) {
+        $custom_theme = variable_get('admin_theme', '0');
+		//echo "<h1>$custom_theme</h1>";
+        init_theme();
+    }
+	
+	if ( arg(0) == 'node'  &&  (arg(1) == 'add' || arg(1) == 'edit') ) {
+        $custom_theme = variable_get('admin_theme', '0');
+		
+        init_theme();
+    }
+	
+	if ((arg(0) == 'node' && arg(1) == 'add') ||  (arg(0) == 'node' && arg(2) == 'edit')  ) {
+		 $custom_theme = variable_get('admin_theme', '0');
+		 init_theme();
+		
+	}
+	
+   if( (arg(0) == 'user' && arg(2) == 'edit') || (arg(0) == 'user' && arg(2) == 'add')){
+	   //echo "VAMOSPAYA";
+	   $custom_theme = 'NuevaRevista';
+		 init_theme();
+	   }
+}
+
+
+

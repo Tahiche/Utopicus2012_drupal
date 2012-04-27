@@ -1,0 +1,22 @@
+<?php
+
+	require_once 'sites/all/libraries/facebook/facebook.php';
+
+    $appId = '326618597382675'; //appid from facebook
+    $secret = '6c0f0b0395663d2d4f05d5cee77744fe'; //secret from facebook
+    $groupId = '101591433303223'; //facebook groupid
+   
+    $facebook = new Facebook(array(
+      'appId'  => $appId,
+      'secret' => $secret,
+      'cookie' => true,
+    ));
+   
+    $response = $facebook->api('/'.$groupId.'/feed', array('limit' => 6, 'fields'=>'from,message,created_time'));   
+    print "<div class='facebook-feed-title'>Facebook Feed</div>";
+    foreach ($response['data'] as $value) {
+        print "<div class='facebook-from'><a href='http://www.facebook.com/home.php?#!/profile.php?id=".$value['from']['id']."'>".$value['from']['name']."</a> wrote:</div>";
+        print "<div class='facebook-message'>".$value['message']."</div>";
+    }
+
+?>
