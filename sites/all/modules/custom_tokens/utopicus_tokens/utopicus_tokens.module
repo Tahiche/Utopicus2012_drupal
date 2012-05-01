@@ -1,11 +1,17 @@
 <?php // $Id$
 
-/**
- * @file
- * Node body tokens module : provides tokens for node body and teaser.
- * Four versions : HTML checked, raw, HTML stripped, and HTML escaped.
- */
+function utopicus_tokens_nodeapi(&$node, $op, $a3 = NULL, $a4 = NULL){
+	global $token_filter_node;
 
+  if ($op == 'load') {
+   $token_filter_node = $node;
+ }
+	/*if ($op === 'view') {
+		// miKrumo($node);
+      $node->body = token_replace($node->body,'node');
+   }*/
+   
+	}
 /**
  * Implementation of hook_token_list().
  */
@@ -70,18 +76,7 @@ function utopicus_get_tab_value(){
 	global $token_filter_node;
 	return "TABS=".check_markup($token_filter_node->field_tab[0]['value'])."XXXXX";
 	}
-function utopicus_tokens_nodeapi(&$node, $op, $a3 = NULL, $a4 = NULL){
-	global $token_filter_node;
 
-  if ($op == 'load') {
-   $token_filter_node = $node;
- }
-	/*if ($op === 'view') {
-		// miKrumo($node);
-      $node->body = token_replace($node->body,'node');
-   }*/
-   
-	}
 
 /**
  * Implementation of hook_filter.
@@ -120,7 +115,7 @@ function utopicus_tokens_filter($op, $delta = 0, $format = -1, $text = '' ) {
 /**
  * Helper function for preg_replace_callback to generate the html for each token filter
  */
-function utopicus_tokens_replacetoken($matches) {  
+/*function utopicus_tokens_replacetoken($matches) {  
 $all_tokens = token_get_list('node');
 
 $token = $matches[0];
@@ -135,7 +130,7 @@ $token = $matches[0];
     default:
       $object = NULL;
       break;
-  } 
+  }
   
   // add [ ] to the token so str_replace correctly replaces token values
   // if not, a token like 'custom_text' won't be properly replaced if another token like 'custom' exists  
@@ -143,6 +138,5 @@ $token = $matches[0];
  // $output = token_replace($token, $type, $object, '[', ']');  
   $token =$matches[0];
   $output = token_replace($token, $type, $object, '[', ']');  
-  $output = "blablabla";
-  return $output;
-}
+   return $output;
+} */
