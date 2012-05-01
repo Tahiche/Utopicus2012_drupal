@@ -1,0 +1,5 @@
+; $Id$
+name = Human Readable Roles
+description = Allows the definition of a special human readable version of a role name
+dependencies[] = token
+core = 6.x

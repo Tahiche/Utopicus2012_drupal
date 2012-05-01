@@ -1,0 +1,55 @@
+<?php
+
+/**
+ * @file
+ * This file is for the 'Simple Tokens' module
+ */
+/**
+ * Implements hook_token_info().
+ */
+function simple_tokens_token_info() {
+  $types['andy_pangus'] = array(
+    'name' => t("Andy Pangus Tokens"),
+    'description' => t("Tokens for Andy Pangus."),
+  );
+  
+  // Andy Pangus specific tokens.
+  $andy_pangus['user_name'] = array(
+    'name' => t("User Name"),
+    'description' => t("The {user}.name of the user viewing the content."),
+  );
+  $andy_pangus['user_email'] = array(
+    'name' => t("User Email"),
+    'description' => t("The {user}.mail of the user viewing the content."),
+  );
+  
+  return array(
+    'types' => $types,
+    'tokens' => array(
+      'andy_pangus' => $andy_pangus,
+    ),
+  );
+}
+/**
+ * Implements hook_tokens().
+ */
+function simple_tokens_tokens($type, $tokens, array $data = array(), array $options = array()) {
+  global $user;
+  
+  $replacements = array();
+  
+  if ($type == 'andy_pangus') {
+    foreach ($tokens as $name => $original) {
+      switch ($name) {
+        case 'user_name':
+          $replacements[$original] = $user->name;
+        break;
+        case 'user_email':
+          $replacements[$original] = $user->mail;
+        break;
+      }
+    }
+  }
+  
+  return $replacements;
+}

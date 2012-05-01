@@ -1,0 +1,148 @@
+<?php // $Id$
+
+/**
+ * @file
+ * Node body tokens module : provides tokens for node body and teaser.
+ * Four versions : HTML checked, raw, HTML stripped, and HTML escaped.
+ */
+
+/**
+ * Implementation of hook_token_list().
+ */
+function utopicus_tokens_token_list($type = 'all') {
+  if ($type == 'node' || $type == 'all') {
+    $tokens = array();
+
+    $tokens['node']['body']            = t('Node body');
+    $tokens['node']['body-raw']        = t('Node body. WARNING - raw user input');
+    $tokens['node']['body-stripped']   = t('Node body. HTML tags stripped');
+    $tokens['node']['body-plain']      = t('Node body. HTML tags escaped');
+
+    $tokens['node']['teaser']          = t('Node teaser');
+    $tokens['node']['teaser-raw']      = t('Node teaser. WARNING - raw user input');
+    $tokens['node']['teaser-stripped'] = t('Node teaser. HTML tags stripped');
+    $tokens['node']['teaser-plain']    = t('Node teaser. HTML tags escaped');
+
+    $tokens['node']['tabs']    = t('Tabs en el node');
+	
+    return $tokens;
+  }
+}
+
+/**
+ * Implementation of hook_token_values().
+ */
+function utopicus_tokens_token_values($type, $object = NULL, $options = array()) {
+	global $token_filter_node;
+	
+  $values = array();
+
+  switch ($type) {
+    case 'node':
+
+
+      // Cast to an object just in case fussy Drupal gave us an array
+      $node = (object)$object;
+	  if(is_null($node)) {
+		  $node=$token_filter_node;
+		  }
+      krumo($token_filter_node); 
+	 
+      $values['tabs']     = utopicus_get_tab_value();
+      $values['body']             = check_markup($node->body);
+      $values['body-raw']         = $node->body;
+      $values['body-stripped']    = strip_tags($node->body);
+      $values['body-plain']       = check_plain($node->body);
+
+      $values['teaser']           = check_markup($node->teaser);
+      $values['teaser-raw']       = $node->teaser;
+      $values['teaser-stripped']  = strip_tags($node->teaser);
+      $values['teaser-plain']     = check_plain($node->teaser);
+
+      break;
+  }
+  
+
+  return $values;
+}
+
+function utopicus_get_tab_value(){
+	global $token_filter_node;
+	return "TABS=".check_markup($token_filter_node->field_tab[0]['value'])."XXXXX";
+	}
+function utopicus_tokens_nodeapi(&$node, $op, $a3 = NULL, $a4 = NULL){
+	global $token_filter_node;
+
+  if ($op == 'load') {
+   $token_filter_node = $node;
+ }
+	/*if ($op === 'view') {
+		// miKrumo($node);
+      $node->body = token_replace($node->body,'node');
+   }*/
+   
+	}
+
+/**
+ * Implementation of hook_filter.
+ * 
+ * Adds the Token filter to the input format options.
+ */
+ 
+function utopicus_tokens_filter($op, $delta = 0, $format = -1, $text = '' ) {
+
+  switch ($op) {
+    case 'list':
+      return array(0 => t('Utopicus Token filter'));
+    case 'description':
+      return t('Allows you to use token values in a filter enclosed. Eg. [token global site-name] or [token user user-name]');
+    case 'settings':
+      break;
+    case 'no cache':
+      return TRUE;
+    case 'prepare':
+      return $text;
+    case 'process':
+      // generate some header code, form tag and we save the node id so that the 
+      // javascript has a convenient place to get it from
+	  // krumo($text);
+     
+       // $output .= preg_replace_callback("|\[(.+?)\]|i", 'utopicus_tokens_replacetoken', $text);
+		$output .=token_replace( $text, 'node'); 
+        return $output;
+     
+      break;
+    default:
+      return $text;
+  } 
+}
+
+/**
+ * Helper function for preg_replace_callback to generate the html for each token filter
+ */
+function utopicus_tokens_replacetoken($matches) {  
+$all_tokens = token_get_list('node');
+
+$token = $matches[0];
+ global $user;
+  $type  = $matches[1];
+  $token = $matches[2];
+  switch ($type) {
+    case 'user' :
+      $object = $user;
+      break;
+    case 'global':
+    default:
+      $object = NULL;
+      break;
+  } 
+  
+  // add [ ] to the token so str_replace correctly replaces token values
+  // if not, a token like 'custom_text' won't be properly replaced if another token like 'custom' exists  
+ // $token = '['.$token.']';
+ // $output = token_replace($token, $type, $object, '[', ']');  
+  $token =$matches[0];
+  $output = token_replace($token, $type, $object, '[', ']');  
+  $output = "blablabla";
+  return $output;
+}

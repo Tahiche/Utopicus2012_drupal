@@ -1,0 +1,6 @@
+name = Simple Tokens
+description = A module with a couple tokens
+package = Andy Pangus Examples
+core = 7.x
+dependencies[] = token
+files[] = simple_tokens.module

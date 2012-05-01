@@ -1,0 +1,76 @@
+<?php
+
+/*
+ * hook_form_alter()
+ * Adds a textbox to the edit role name form
+ */
+function rolenames_form_alter(&$form, &$form_state, $form_id) {
+    switch($form['form_id']['#value']) {
+        case 'user_admin_role':
+            $name = rolenames_get_rolename($form['rid']['#value'], false);
+            $form['name']['#weight'] = -1;
+            $form['readable_name'] = array(
+                '#type' => 'textfield',
+                '#length' => 5,
+                '#weight' => 0,
+                '#title' => 'Human Readable Name',
+                '#description' => 'Enter a human readable name here.  It will be available for later use as a token in Ubercart\'s conditional actions under uc_role.',
+                '#default_value' => ($name) ? $name : null,
+             );
+            $form['#submit'][] = 'rolenames_role_submit';
+    }
+}
+
+/*
+ * hook_form_submit()
+ * Submit function to store human readable role name in the db
+ */
+function rolenames_role_submit($form, $form_state) {
+    $record['role_name'] = $form_state['values']['readable_name'];
+    $record['rid'] = $form_state['values']['rid'];
+
+    if($form['readable_name']['#default_value']) {
+        drupal_write_record('role_names', $record, 'rid');
+    } else {
+        drupal_write_record('role_names', $record);
+    }
+
+}
+
+/*
+ * hook_token_list()
+ * Prepares a token for "readable-role-name" in conditional actions
+ */ 
+function rolenames_token_list($type = 'all') {
+  if ($type == 'uc_roles' || $type == 'ubercart' || $type == 'all') {
+    $tokens['uc_roles']['readable-role-name'] = t('The optional human-readable version of the role name.  If not set or blank, defaults to the normal role name.');
+  }
+
+  return $tokens;
+}
+/*
+ * hook_token_values()
+ */ 
+function rolenames_token_values($type, $object = NULL) {
+  switch ($type) {
+    case 'uc_roles':
+      $values['readable-role-name'] = check_plain(rolenames_get_rolename($object->rid));
+      break;
+  }
+
+  return $values;
+}
+
+/*
+ * helper function for rolenames.  
+ * Returns the human readable role name if available.  If not available,
+ * will fallback to the regular role name.
+ */
+function rolenames_get_rolename($rid, $fallback=true) {
+    if(!$rid) {return false;}
+    $result = db_result(db_query('SELECT role_name FROM {role_names} WHERE rid=%d', $rid));
+    if(!$result && $fallback) {
+        $result = _uc_roles_get_name($rid);
+    }
+    return $result;
+}
