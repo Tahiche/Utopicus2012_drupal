@@ -1,4 +1,4 @@
-<?php
+<?php 
 /**
  * @file
  * Contains theme override functions and preprocess functions for the theme.
@@ -65,6 +65,7 @@
  * Implementation of HOOK_theme().
  */
 function utopicus_theme(&$existing, $type, $theme, $path) {
+		
  /* $hooks = zen_theme($existing, $type, $theme, $path);
   // Add your theme hooks like this:
   /*
@@ -215,7 +216,7 @@ function utopicus_preprocess_node(&$vars, $hook) {
 }
 
 
-function utopicus_pager_next($text, $limit, $element = 0, $interval = 1, $parameters = array()) {
+/*function utopicus_pager_next($text, $limit, $element = 0, $interval = 1, $parameters = array()) {
   global $pager_page_array, $pager_total;
   $output = '';
 
@@ -226,14 +227,14 @@ function utopicus_pager_next($text, $limit, $element = 0, $interval = 1, $parame
     if ($page_new[$element] == ($pager_total[$element] - 1)) {
       $output = theme('pager_last', $text, $limit, $element, $parameters);
     }
-    // The next page is not the last page.
+    // The next page is not the last page. 
     else {
       $output = theme('pager_link', $text, $page_new, $element, $parameters);
     }
   }
 
   return "pagerrrrrrr".$output;
-}
+}*/
 /**
  * Override or insert variables into all templates.
  *

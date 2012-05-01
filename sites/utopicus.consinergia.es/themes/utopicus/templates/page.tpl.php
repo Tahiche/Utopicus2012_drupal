@@ -129,9 +129,7 @@
 
  <?php //print $highlight; ?>
         <?php //print $breadcrumb; ?>
-        <?php if ($title): ?>
-          <h1 class="title"><?php print $title; ?></h1>
-        <?php endif; ?>
+        
         <?php //print $messages; ?>
         <?php if ($tabs): ?>
           <div class="tabs"><?php //print $tabs; ?></div>
@@ -142,7 +140,21 @@
         
 			<!-- main -->
 		<div id="main">
+        
+        <?php if ($title): ?>
+        <div class="main-heading">
+          <h1 class="title"><?php print $title; ?></h1>
+          </div>
+        <?php endif; ?>
+        
+        <div class="main-section">
+        <div id="content">
         <?php print $content; ?>
+        </div>
+        </div>
+        
+        
+        
 		</div> 
         <!-- // main -->
         

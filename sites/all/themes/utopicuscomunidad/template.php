@@ -77,14 +77,20 @@ function utopicuscomunidad_preprocess_page(&$vars, $hook) {
   if(isset($_GET['krumo']) && $_GET['krumo']=="p"){
 	krumo($vars);
   }
+  
+  if($vars['node']->nid==1503) {
+	drupal_add_css('sites/all/themes/utopicuscomunidad/css/all.css','theme');
+	drupal_add_css('sites/all/themes/utopicuscomunidad/css/fancybox.css','theme');
+	$vars['styles'] = drupal_get_css();
+	drupal_add_js('sites/all/themes/utopicuscomunidad/js/jquery-main.js', 'theme');
+	$vars['scripts'] = drupal_get_js();
+  }
   //print_r($vars['node']->links['print']['title']);
   //print_r($vars['node']->links['print']['title']);
   //print_r($vars['menu_item']->page_arguments[0]->links['print']['title']);
    // To remove a class from $classes_array, use array_diff().
   //$vars['classes_array'] = array_diff($vars['classes_array'], array('class-to-remove'));
 }
-
-
 
 function utopicuscomunidad_preprocess_node(&$vars, $hook) {
   
@@ -99,6 +105,8 @@ function utopicuscomunidad_preprocess_node(&$vars, $hook) {
   }
   // To remove a class from $classes_array, use array_diff().
   //$vars['classes_array'] = array_diff($vars['classes_array'], array('class-to-remove'));
+  
+  $vars['template_files'][] = 'node-'. $vars['node']->nid;  
 }
 
 

@@ -52,7 +52,7 @@ function utopicus_tokens_token_values($type, $object = NULL, $options = array())
 	  if(is_null($node)) {
 		  $node=$token_filter_node;
 		  }
-      krumo($token_filter_node); 
+     //krumo($token_filter_node); 
 	 
       $values['tabs']     = utopicus_get_tab_value();
       $values['body']             = check_markup($node->body);
