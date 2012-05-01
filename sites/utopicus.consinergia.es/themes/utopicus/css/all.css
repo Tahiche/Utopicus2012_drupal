@@ -671,7 +671,7 @@ button:hover{cursor:pointer;}
 /* tabs-area */
 .tabs-area{
 	overflow:hidden;
-	height:1%;
+	/*height:1%;*/
 	padding:10px 6px 0 0;
 }
 /* tabset */
@@ -1719,7 +1719,7 @@ h2.content{
 #content .block{padding:13px 0 17px;}
 #content .block.padding{padding:12px 3px 11px;}
 
-.cke_show_borders{padding:10px;}
+.cke_show_borders{padding:10px !important;}
 
 #content .block p, .cke_show_borders p{margin:0 0 20px;}
 
@@ -1756,6 +1756,8 @@ h2.content{
 	padding:30px 4px 33px;
 	border:solid #b4b3b5;
 	border-width:1px 0;
+	/****************************************************************************/
+	float:left;
 }
 #content .block-boxes h3{margin:0 0 -2px;}
 #content .block-boxes p{margin:0;}

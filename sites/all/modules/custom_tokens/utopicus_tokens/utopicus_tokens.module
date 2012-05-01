@@ -29,7 +29,9 @@ function utopicus_tokens_token_list($type = 'all') {
     $tokens['node']['teaser-stripped'] = t('Node teaser. HTML tags stripped');
     $tokens['node']['teaser-plain']    = t('Node teaser. HTML tags escaped');
 
-    $tokens['node']['tabs']    = t('Tabs en el node');
+    $tokens['node']['tabs']    = t('Tabs/Pestañas en el cuerpo del artículo');
+	
+	$tokens['node']['cajas'] = t('Cajas  en el cuerpo del artículo');
 	
     return $tokens;
   }
@@ -55,6 +57,9 @@ function utopicus_tokens_token_values($type, $object = NULL, $options = array())
      //krumo($token_filter_node); 
 	 
       $values['tabs']     = utopicus_get_tab_value();
+	  
+	   $values['cajas']     = utopicus_get_cajas_value();
+	   
       $values['body']             = check_markup($node->body);
       $values['body-raw']         = $node->body;
       $values['body-stripped']    = strip_tags($node->body);
@@ -74,11 +79,59 @@ function utopicus_tokens_token_values($type, $object = NULL, $options = array())
 
 function utopicus_get_tab_value(){
 	global $token_filter_node;
-	return "TABS=".check_markup($token_filter_node->field_tab[0]['value'])."XXXXX";
+	//
+	if(!$token_filter_node->field_tabtitle[0]['value']) return;
+	
+	//miKrumo($token_filter_node);
+	$output='<div class="tabs-area">';
+	
+	$output.='<ul class="tabset">';
+	foreach($token_filter_node->field_tabtitle as $num=>$tabtit){
+		// echo "<br>$num $tabtit</br>";
+		$output.='<li class="'.($num==0?"active":" ").'" >';
+		$output.='<a class="tab" href="#tab'.$num.'">'.$tabtit["value"].'</a>';
+		$output.='</li>';
+		//<a class="tab" href="#tab1">TAB1</a>
+		}
+	$output.='</ul>';
+	
+	$output.='<div class="tab-content">';
+	
+	foreach($token_filter_node->field_tab as $num=>$tabcontent){
+		$output.='<div id="tab'.$num.'" style="display: '.($num==0?"block":"none").';">'.$tabcontent["value"].'</div>';
+	}
+	$output.='</div>';
+	
+	$output.='</div>';
+	return $output;
 	}
 
+function utopicus_get_cajas_value(){
+	global $token_filter_node;
+	//
+	if(!$token_filter_node->field_tabtitle[0]['value']) return;
+	
+	// miKrumo($token_filter_node);
+	
+	$output='<div class="block block-boxes">';
+	
+	
+	foreach($token_filter_node->field_caja as $num=>$caja){
+		/*
+		//si quisieramos quitar h1 y poner h3 en vez
+		$text=str_replace('<h1>','<h3>',$text);
+		$text=str_replace('</h1>','</h3>',$text);
 
-/**
+		*/
+		$output.='<div class="box">';
+		$output.=check_markup($caja['value']);
+		$output.='</div>';
+		}
+	
+		
+	$output.='</div>';
+	return $output;
+	}/**
  * Implementation of hook_filter.
  * 
  * Adds the Token filter to the input format options.
