@@ -148,9 +148,9 @@
         <?php endif; ?>
         
         <div class="main-section">
-        <div id="content">
+        
         <?php print $content; ?>
-        </div>
+       
         </div>
         
         

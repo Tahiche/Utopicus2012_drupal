@@ -71,19 +71,19 @@
  * @see zen_process()
  */
 ?>
-<h1>THIS IS NODE TPL</h1>
-<div id="node-<?php print $node->nid; ?>" class="<?php print $classes; ?> clearfix">
+<div id="content">
+<div id="node-<?php print $node->nid; ?>" class="content-area padding <?php print $classes; ?> clearfix">
   <?php print $user_picture; ?>
 
-  <?php if (!$page && $title): ?>
-    <h2 class="title"><a href="<?php print $node_url; ?>"><?php print $title; ?></a></h2>
-  <?php endif; ?>
 
-  <?php if ($unpublished): ?>
-    <div class="unpublished"><?php print t('Unpublished'); ?></div>
-  <?php endif; ?>
+ 
 
-  <?php if ($display_submitted || $terms): ?>
+  <div class="contenidonodo">
+    <?php print $content; ?>
+  </div>
+  
+  
+   <?php if ($display_submitted || $terms): ?>
     <div class="meta">
       <?php if ($display_submitted): ?>
         <span class="submitted">
@@ -97,9 +97,6 @@
     </div>
   <?php endif; ?>
 
-  <div class="content">
-    <?php print $content; ?>
-  </div>
-
   <?php print $links; ?>
+  </div>
 </div><!-- /.node -->

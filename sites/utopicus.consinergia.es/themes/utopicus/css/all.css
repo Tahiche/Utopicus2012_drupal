@@ -9,7 +9,7 @@ html{color:#000;background:#fff}body,div,dl,dt,dd,ul,ol,li,h1,h2,h3,h4,h5,h6,pre
 * {font-size: 100.01%;}
 html {
 	font-size: 62.5%;
-	/*font-size: 100%;*/
+	/*font-size: 11px;*/
 	background:#e0e0e0;
 }
 body{
@@ -698,7 +698,7 @@ button:hover{cursor:pointer;}
 .tabset .active a{padding:7px 15px 3px;}
 /* tab-content */
 .tab-content{
-	font-size:1.2em;
+	font-size:1em;
 	line-height:1.583em;
 }
 /* map */
@@ -1575,11 +1575,16 @@ button:hover{cursor:pointer;}
 	border-bottom:1px solid #d0d0d0;
 }
 /* holder */
-.content-area>.holder{
+/*.content-area>.holder{
 	overflow:hidden;
 	height:1%;
 	padding:1px 20px 0 1px;
 	font-size:1.2em;
+	line-height:1.583em;
+}*/
+.content-area>.holder{
+	overflow:hidden;
+	padding:1px 20px 0 1px;
 	line-height:1.583em;
 }
 .content-area>.holder>.text{
@@ -1752,12 +1757,17 @@ h2.content{
 /* block-boxes */
 #content .block-boxes{padding:1px 0 37px 4px !important;}
 #content .block-boxes .box{
-	width:322px;
+	
 	padding:30px 4px 33px;
 	border:solid #b4b3b5;
 	border-width:1px 0;
 	/****************************************************************************/
+	/*width:322px;*/
+	width: 47%;
+	height:80px;
+	overflow:hidden;
 	float:left;
+	margin-right:5px;
 }
 #content .block-boxes h3{margin:0 0 -2px;}
 #content .block-boxes p{margin:0;}
@@ -2187,4 +2197,8 @@ ul li:after,
 	padding:10px; 
 	display:block;
 	float:left;
+	}
+/**********************************************************************************************************/
+a.imagecache-Image454x145 .image{
+	padding:0 !important;
 	}
