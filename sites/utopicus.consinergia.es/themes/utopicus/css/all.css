@@ -9,6 +9,7 @@ html{color:#000;background:#fff}body,div,dl,dt,dd,ul,ol,li,h1,h2,h3,h4,h5,h6,pre
 * {font-size: 100.01%;}
 html {
 	font-size: 62.5%;
+	/*font-size: 100%;*/
 	background:#e0e0e0;
 }
 body{
@@ -670,7 +671,7 @@ button:hover{cursor:pointer;}
 /* tabs-area */
 .tabs-area{
 	overflow:hidden;
-	height:1%;
+	/*height:1%;*/
 	padding:10px 6px 0 0;
 }
 /* tabset */
@@ -1679,11 +1680,18 @@ button:hover{cursor:pointer;}
 	line-height:1.583em;
 	padding:3px 0 0;
 }
-#content h2{
+#content h2{ 
 	margin:0 0 8px;
 	font:700 1.333em/1.438em 'Asap', Arial, Helvetica, sans-serif;
 	text-transform:uppercase;
 }
+/**************************************************************************************************************/
+h2.content{
+	margin:0 0 8px;
+	font:700 1.333em/1.438em 'Asap', Arial, Helvetica, sans-serif;
+	text-transform:uppercase;
+	} 
+	
 #content h3{
 	font:700 1.333em/1.438em 'Asap', Arial, Helvetica, sans-serif;
 	margin:0 0 3px;
@@ -1710,7 +1718,11 @@ button:hover{cursor:pointer;}
 /* block */
 #content .block{padding:13px 0 17px;}
 #content .block.padding{padding:12px 3px 11px;}
-#content .block p{margin:0 0 20px;}
+
+.cke_show_borders{padding:10px !important;}
+
+#content .block p, .cke_show_borders p{margin:0 0 20px;}
+
 #content .block .holder{
 	height:1%;
 	padding:0 9px 0 3px;
@@ -1744,6 +1756,8 @@ button:hover{cursor:pointer;}
 	padding:30px 4px 33px;
 	border:solid #b4b3b5;
 	border-width:1px 0;
+	/****************************************************************************/
+	float:left;
 }
 #content .block-boxes h3{margin:0 0 -2px;}
 #content .block-boxes p{margin:0;}
@@ -2170,7 +2184,7 @@ ul li:after,
 .caja_cuerpo{
 	font-style:italic;
 	border:#036 2px solid;
-	padding:10px;
+	padding:10px; 
 	display:block;
 	float:left;
 	}
