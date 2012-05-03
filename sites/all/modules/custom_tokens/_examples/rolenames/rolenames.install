@@ -1,0 +1,38 @@
+<?php
+/*
+ * hook_schema()
+ */
+function rolenames_schema() {
+  $schema['role_names'] = array(
+  'description' => t('TODO: please describe this table!'),
+  'fields' => array(
+    'rid' => array(
+      'description' => t('TODO: please describe this field!'),
+      'type' => 'int',
+      'not null' => TRUE,
+    ),
+    'role_name' => array(
+      'description' => t('TODO: please describe this field!'),
+      'type' => 'varchar',
+      'length' => '50',
+      'not null' => TRUE,
+    ),
+  ),
+  'primary key' => array('rid'),
+);
+  return $schema;
+}
+
+/*
+ *  hook_install()
+ */ 
+function rolenames_install() {
+    drupal_install_schema('rolenames');
+}
+
+/*
+ * hook_uninstall()
+ */
+function rolenames_uninstall() {
+	drupal_uninstall_schema('rolenames');
+}

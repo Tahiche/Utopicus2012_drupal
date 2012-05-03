@@ -1,0 +1,195 @@
+<?php // $Id$
+
+function utopicus_tokens_nodeapi(&$node, $op, $a3 = NULL, $a4 = NULL){
+	global $token_filter_node;
+
+  if ($op == 'load') {
+   $token_filter_node = $node;
+ }
+	/*if ($op === 'view') {
+		// miKrumo($node);
+      $node->body = token_replace($node->body,'node');
+   }*/
+   
+	}
+/**
+ * Implementation of hook_token_list().
+ */
+function utopicus_tokens_token_list($type = 'all') {
+  if ($type == 'node' || $type == 'all') {
+    $tokens = array();
+
+    $tokens['node']['body']            = t('Node body');
+    $tokens['node']['body-raw']        = t('Node body. WARNING - raw user input');
+    $tokens['node']['body-stripped']   = t('Node body. HTML tags stripped');
+    $tokens['node']['body-plain']      = t('Node body. HTML tags escaped');
+
+    $tokens['node']['teaser']          = t('Node teaser');
+    $tokens['node']['teaser-raw']      = t('Node teaser. WARNING - raw user input');
+    $tokens['node']['teaser-stripped'] = t('Node teaser. HTML tags stripped');
+    $tokens['node']['teaser-plain']    = t('Node teaser. HTML tags escaped');
+
+    $tokens['node']['tabs']    = t('Tabs/Pestañas en el cuerpo del artículo');
+	
+	$tokens['node']['cajas'] = t('Cajas  en el cuerpo del artículo');
+	
+    return $tokens;
+  }
+}
+
+/**
+ * Implementation of hook_token_values().
+ */
+function utopicus_tokens_token_values($type, $object = NULL, $options = array()) {
+	global $token_filter_node;
+	
+  $values = array();
+
+  switch ($type) {
+    case 'node':
+
+
+      // Cast to an object just in case fussy Drupal gave us an array
+      $node = (object)$object;
+	  if(is_null($node)) {
+		  $node=$token_filter_node;
+		  }
+     //krumo($token_filter_node); 
+	 
+      $values['tabs']     = utopicus_get_tab_value();
+	  
+	   $values['cajas']     = utopicus_get_cajas_value();
+	   
+      $values['body']             = check_markup($node->body);
+      $values['body-raw']         = $node->body;
+      $values['body-stripped']    = strip_tags($node->body);
+      $values['body-plain']       = check_plain($node->body);
+
+      $values['teaser']           = check_markup($node->teaser);
+      $values['teaser-raw']       = $node->teaser;
+      $values['teaser-stripped']  = strip_tags($node->teaser);
+      $values['teaser-plain']     = check_plain($node->teaser);
+
+      break;
+  }
+  
+
+  return $values;
+}
+
+function utopicus_get_tab_value(){
+	global $token_filter_node;
+	//
+	if(!$token_filter_node->field_tabtitle[0]['value']) return;
+	
+	//miKrumo($token_filter_node);
+	$output='<div class="tabs-area">';
+	
+	$output.='<ul class="tabset">';
+	foreach($token_filter_node->field_tabtitle as $num=>$tabtit){
+		// echo "<br>$num $tabtit</br>";
+		$output.='<li class="'.($num==0?"active":" ").'" >';
+		$output.='<a class="tab" href="#tab'.$num.'">'.$tabtit["value"].'</a>';
+		$output.='</li>';
+		//<a class="tab" href="#tab1">TAB1</a>
+		}
+	$output.='</ul>';
+	
+	$output.='<div class="tab-content">';
+	
+	foreach($token_filter_node->field_tab as $num=>$tabcontent){
+		$output.='<div id="tab'.$num.'" style="display: '.($num==0?"block":"none").';">'.$tabcontent["value"].'</div>';
+	}
+	$output.='</div>';
+	
+	$output.='</div>';
+	return $output;
+	}
+
+function utopicus_get_cajas_value(){
+	global $token_filter_node;
+	//
+	if(!$token_filter_node->field_tabtitle[0]['value']) return;
+	
+	// miKrumo($token_filter_node);
+	
+	$output='<div class="block block-boxes">';
+	
+	
+	foreach($token_filter_node->field_caja as $num=>$caja){
+		/*
+		//si quisieramos quitar h1 y poner h3 en vez
+		$text=str_replace('<h1>','<h3>',$text);
+		$text=str_replace('</h1>','</h3>',$text);
+
+		*/
+		$output.='<div class="box">';
+		$output.=check_markup($caja['value']);
+		$output.='</div>';
+		}
+	
+		
+	$output.='</div>';
+	return $output;
+	}/**
+ * Implementation of hook_filter.
+ * 
+ * Adds the Token filter to the input format options.
+ */
+ 
+function utopicus_tokens_filter($op, $delta = 0, $format = -1, $text = '' ) {
+
+  switch ($op) {
+    case 'list':
+      return array(0 => t('Utopicus Token filter'));
+    case 'description':
+      return t('Allows you to use token values in a filter enclosed. Eg. [token global site-name] or [token user user-name]');
+    case 'settings':
+      break;
+    case 'no cache':
+      return TRUE;
+    case 'prepare':
+      return $text;
+    case 'process':
+      // generate some header code, form tag and we save the node id so that the 
+      // javascript has a convenient place to get it from
+	  // krumo($text);
+     
+       // $output .= preg_replace_callback("|\[(.+?)\]|i", 'utopicus_tokens_replacetoken', $text);
+		$output .=token_replace( $text, 'node'); 
+        return $output;
+     
+      break;
+    default:
+      return $text;
+  } 
+}
+
+/**
+ * Helper function for preg_replace_callback to generate the html for each token filter
+ */
+/*function utopicus_tokens_replacetoken($matches) {  
+$all_tokens = token_get_list('node');
+
+$token = $matches[0];
+ global $user;
+  $type  = $matches[1];
+  $token = $matches[2];
+  switch ($type) {
+    case 'user' :
+      $object = $user;
+      break;
+    case 'global':
+    default:
+      $object = NULL;
+      break;
+  }
+  
+  // add [ ] to the token so str_replace correctly replaces token values
+  // if not, a token like 'custom_text' won't be properly replaced if another token like 'custom' exists  
+ // $token = '['.$token.']';
+ // $output = token_replace($token, $type, $object, '[', ']');  
+  $token =$matches[0];
+  $output = token_replace($token, $type, $object, '[', ']');  
+   return $output;
+} */

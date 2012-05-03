@@ -1,0 +1,14 @@
+name = "Token insert UI"
+description = "Allows you to insert tokens in a textfield or wysiwyg field."
+core = 6.x
+version = "6.x-2.0"
+package = Token insert
+dependencies[] = token
+
+
+; Information added by drupal.org packaging script on 2011-08-01
+version = "6.x-2.0"
+core = "6.x"
+project = "token_insert"
+datestamp = "1312188719"
+

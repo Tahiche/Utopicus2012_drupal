@@ -1,0 +1,56 @@
+<?php // $Id$
+
+/**
+ * @file
+ * Node body tokens module : provides tokens for node body and teaser.
+ * Four versions : HTML checked, raw, HTML stripped, and HTML escaped.
+ */
+
+/**
+ * Implementation of hook_token_list().
+ */
+function node_body_tokens_token_list($type = 'all') {
+  if ($type == 'node' || $type == 'all') {
+    $tokens = array();
+
+    $tokens['node']['body']            = t('Node body');
+    $tokens['node']['body-raw']        = t('Node body. WARNING - raw user input');
+    $tokens['node']['body-stripped']   = t('Node body. HTML tags stripped');
+    $tokens['node']['body-plain']      = t('Node body. HTML tags escaped');
+
+    $tokens['node']['teaser']          = t('Node teaser');
+    $tokens['node']['teaser-raw']      = t('Node teaser. WARNING - raw user input');
+    $tokens['node']['teaser-stripped'] = t('Node teaser. HTML tags stripped');
+    $tokens['node']['teaser-plain']    = t('Node teaser. HTML tags escaped');
+
+    return $tokens;
+  }
+}
+
+/**
+ * Implementation of hook_token_values().
+ */
+function node_body_tokens_token_values($type, $object = NULL, $options = array()) {
+  $values = array();
+
+  switch ($type) {
+    case 'node':
+
+      // Cast to an object just in case fussy Drupal gave us an array
+      $node = (object)$object;
+
+      $values['body']             = check_markup($node->body);
+      $values['body-raw']         = $node->body;
+      $values['body-stripped']    = strip_tags($node->body);
+      $values['body-plain']       = check_plain($node->body);
+
+      $values['teaser']           = check_markup($node->teaser);
+      $values['teaser-raw']       = $node->teaser;
+      $values['teaser-stripped']  = strip_tags($node->teaser);
+      $values['teaser-plain']     = check_plain($node->teaser);
+
+      break;
+  }
+
+  return $values;
+}
