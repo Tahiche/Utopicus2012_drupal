@@ -71,14 +71,41 @@
  * @see zen_process()
  */
 ?>
+<div id="content">
 <div id="node-<?php print $node->nid; ?>" class="content-area padding <?php print $classes; ?>">
  
 
-  <div class="content">
-    <?php print $content; ?>
+
+  
+ <?php if($field_top_image[0]['filepath']): 
+ $imgTit=$field_top_image[0]['data']['title'];
+ 
+ ?>
+ <div class="aside">
+						<!-- photo -->
+                        <?php print theme('imagecache','Imagen_template_327x327',$field_top_image[0]['filepath'],  $imgTit ,  $imgTit, array("class"=>"photo") ); ?>
+                         <?php if($field_image_footer [0]['value']):?>
+						<!-- quote-box -->
+						<blockquote class="quote-box">
+							<div>
+								<q><?php echo $field_image_footer [0]['value'] ?></q>
+							</div>
+						</blockquote>
+						<?php endif; ?>
+</div>
+ <?php endif; ?>
+ 
+ 
+   <div class="holder">
+   <div class="text-holder">
+    <?php print $content; 
+	
+	?>
+    </div>
   </div>
   
- <?php if ($terms): ?>
+  
+ <?php if ($terms): ?> 
         <div class="terms terms-inline"><?php print $terms; ?></div>
       <?php endif; ?>
 
@@ -86,4 +113,6 @@
   
   
   <?php print $links; ?>
-</div><!-- /.node -->
+  </div><!-- /.node -->
+  </div>
+
