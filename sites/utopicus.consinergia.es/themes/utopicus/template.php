@@ -179,9 +179,7 @@ function utopicus_preprocess_page(&$vars, $hook) {
 }
 
 function utopicus_preprocess_node(&$vars, $hook) {
-  if(isset($_GET['krumon'])){
-	krumo($vars);
-  }
+  
   // krumo($vars);
   //default template suggestions for all nodes
   $vars['template_files'] = array();
@@ -211,8 +209,31 @@ function utopicus_preprocess_node(&$vars, $hook) {
       $vars['template_files'][] = 'node-'.$vars['node']->nid.'-teaser';
     }
   }
+ 
+  // según lo elegido en el campo template de la Pagina Utopicus asignamos un template para el nodo
+  if($vars['type']=="pageutopicus"){
+	  
+	  switch($vars['field_tipotemplate'][0]['value']){
+		  case '111':
+		   $vars['template_files'][] = 'node-template-article-page-a';
+		  break;
+		  case '112':
+		  $vars['template_files'][] = 'node-template-content-a-page-ca';
+		  break;
+		  case '113':
+		   $vars['template_files'][] = 'node-template-content-b-page-cb';
+		  break;
+		  default:
+		  break;
+		  }
+	  // krumo($vars);
+	  } // fin -- if($vars['type']=="pageutopicus
+	  
   // To remove a class from $classes_array, use array_diff().
   //$vars['classes_array'] = array_diff($vars['classes_array'], array('class-to-remove'));
+  if(isset($_GET['krumon'])){
+	krumo($vars);
+  }
 }
 
 

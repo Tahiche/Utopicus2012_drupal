@@ -1,0 +1,19 @@
+<?php
+// $Id$
+
+function mediaembed_wysiwyg_plugin($editor, $version) {
+  switch ($editor) {
+    case 'ckeditor':
+      return array(
+        'MediaEmbed' => array(
+          'url' => 'http://www.fluidbyte.net/index.php?view=embed-youtube-vimeo-etc-into-ckeditor',
+          'buttons' => array(
+            'MediaEmbed' => t('Media Embed'),
+          ),
+          'load' => TRUE,
+          'internal' => TRUE,
+        ),
+      );
+     break;
+  }
+}

@@ -1,0 +1,19 @@
+name = "Utopicus_Admin"
+description = "Admin theme based on Rubik."
+base theme = "rubik"
+core = "6.x"
+engine = "phptemplate"
+
+stylesheets[screen][] = "utopicadmin.css"
+
+; Regions
+regions[header] = "Header"
+regions[content] = "Content"
+regions[left] = "Left"
+regions[right] = "Right"
+
+; DesignKit
+designkit[color][background] = "#0088cc"
+designkit[logo][logo] = "imagecache_scale:200x50"
+designkit[logo][print] = "imagecache_scale:600x150"
+

@@ -1,0 +1,109 @@
+<?php
+/*function miKrumo($var){
+	 if (!function_exists('krumo')){
+	 include_once  drupal_get_path('module', 'devel'). '/krumo/class.krumo.php';
+			}
+	echo "<div id='krumoDiv'>	";	
+	krumo($var);
+	echo"</div>";
+}*/
+
+function Form_alters_init(){
+	//echo "<h1> Form_alters_form_alter Form_alters_init</h1>"; 
+	}
+
+function Form_alters_form_alter(&$form, &$form_state, $form_id) {
+ 
+/*echo "<h1> Form_alters $form_id</h1>";
+miKrumo($form);*/
+ //pageutopicus_node_form
+ if (isset($form_id) && $form_id == "pageutopicus_node_form") {
+	// miKrumo($form);
+	 $form['body_field']['body']['#prefix'] = "<div class='bodyhelp help '>".t('Crear "Tabs" y "Cajas" en los campos de abajo. Introducir [cajas] y/o [tabs] en el cuerpo para que aparezcan en el lugar designado.<p>Para insertar un vídeo dentro de el cuerpo (en vez de utilizar la entrada para vídeo de más abajo), simplemente pegar la URL de YouTube o Vimeo. Por ejemplo "http://www.youtube.com/watch?v=PdDpJbbRZmQ".')."</div>";
+	/* $form['body_field']['body']['#suffix'] = "<div class='help'>This site is moderated. Profane and sexually explicit content will be removed.</div>";*/
+ }
+ 
+ 
+ 
+ 
+ 
+  if (isset($form_id) && $form_id == "author_node_form") {
+	  	
+    if (is_array($form['taxonomy']['44'])) {
+      //miKrumo($form['taxonomy']['44']["#options"]);
+	  // loop through taxonomy form elements
+      foreach ($form['taxonomy']['44']["#options"] as $k => $v) {
+		if(is_object($v)) {
+			// el nombre del término
+			$item=reset($v->option);
+			// si empieza por guión es de segundo mnivel, lo quitamos.
+			if(substr($item,0,1)=="-"){
+				unset($form['taxonomy']['44']["#options"][$k]);
+				}
+			}
+        
+      }
+    }
+  }
+  //comment_form
+  if (isset($form_id) && $form_id == "comment_form") {
+	  
+	 // krumo($form); 
+	 $form['comment_filter']['comment']['#rows']='5';
+	 $form['comment_filter']['comment']['#resizable'] = false;
+	 unset($form['preview']);
+	 $form['#parameters'][3]="<div id='tucomentario'>TU COMENTARIO</div>";
+	 // krumo($form); 
+  }
+  
+  
+
+ 
+ 
+ 
+  
+  if ($form_id == "user_register" || $form_id == "user_login" ) {	
+
+}
+
+
+
+
+
+  
+   /* CAMBIAR FORMATO DE FECHA PARA LA AUTORÍA */
+  if(isset($form['author']['date'])){
+  $form['author']['date']['#description'] = t('Formato: dd-mm-aaaa. No cambiar para dejar fecha de publicación.', array('%time' => !empty($node->date) ? $node->date : format_date($node->created, 'custom', 'd-m-Y'))); 
+  //$form['author']['date']['#default_value'] = "weweewwewe";
+  if (isset($form['#node']->date)) {
+    //$form['author']['date']['#default_value'] = format_date($form['#node']->date, 'custom', 'd-m-Y');
+	$form['author']['date']['#default_value'] = format_date(strtotime($form['#node']->date), 'custom', 'd-m-Y');
+  }
+
+  } //fin isset($form['author']['date'];
+  
+  
+  
+ // poner drupal user asociado a a autor  autor se puede poner autor drupoal asociado. Así el blogero no tiene que poner su autor al escribir, por defecto sale el asociado a su uid de usuario
+if (isset($form_id) && $form_id == "blog_node_form") {
+
+$nid=$form['uid']['#value'];
+// si no hay autor definido, sacamos el autor del usuario, para blogeros!!
+		if(!$form['field_op_author'][0]["#default_value"]['nid']){
+		$result=db_query("SELECT * FROM {content_type_author} WHERE field_author_user_uid=%d LIMIT 1", $nid );
+		while ($r = db_fetch_object($result)) {
+		  $autorNID = $r->nid;
+		  //krumo($r);
+		}
+		if($autorNID)$form['field_op_author'][0]["#default_value"]['nid']=$autorNID;
+		}
+
+  }
+    
+
+//echo "FORMe=   ".$form_id;
+  
+  
+}
+
+?>

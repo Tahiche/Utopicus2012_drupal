@@ -1,0 +1,55 @@
+@charset "utf-8";
+/* CSS Document */
+*{
+	-webkit-transition:all 150ms ease-in-out;
+	-moz-transition:all 150ms ease-in-out;
+	-o-transition:all 150ms ease-in-out;
+	transition:all 150ms ease-in-out;
+}
+.column-main {
+   width:66%;
+}
+
+.column-side {
+   width: 34%;
+}
+
+
+body.utopicadmin{
+	background-color:#BBD7F2;
+	
+	}
+
+#edit-title-wrapper label{
+	font-size:16px;
+	}
+	
+.group-tabs .filter-options{
+	color:#3C0;
+	font-style:italic;
+	display:none;
+	
+	}
+	
+#cke_contents_edit-group-tabs-0-field-tab-value, #cke_contents_edit-group-tabs-1-field-tab-value , #cke_contents_edit-group-tabs-2-field-tab-value , #cke_contents_edit-group-tabs-3-field-tab-value , #cke_contents_edit-group-tabs-4-field-tab-value, #cke_contents_edit-group-multicajas-0-field-caja-value, #cke_contents_edit-group-multicajas-1-field-caja-value{ 
+	height:150px !important;
+	}
+
+#group_tabs_values fieldset.collapsible{
+	display:none;
+	
+	}
+td.content-multigroup-cell-field-caja .filter-options{
+	display:none;
+	}
+td.content-multiple-drag{
+	padding:0;}
+a.tabledrag-handle{
+	margin-right:0;
+	}
+.help{
+	color: #666666;
+	font-size:11px;
+	margin-top:10px;
+	
+	}

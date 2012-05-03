@@ -1,0 +1,26 @@
+name = "Utopicus_Comunidad"
+description = "Scene Example skin for Open Atrium."
+version = "0.1"
+core = "6.x"
+atrium = "1.x"
+engine = "phptemplate"
+base theme = "ginkgo"
+
+stylesheets[screen][] = "comunidad.css"
+
+admin[admin menu] = 1 
+admin[admin inline] = 0
+
+features[] = ""
+
+spaces_design_site = "#333333"
+spaces_design_og = "#666666"
+spaces_design_user = "#999999"
+
+designkit[color][background][title] = "Background"
+designkit[color][background][description] = "Color for headers, other fills."
+designkit[color][background][default] = "#333333"
+designkit[image][logo][title] = "Logo"
+designkit[image][logo][description] = "Header logo."
+designkit[image][logo][imagecache] = "imagecache_scale:300x40"
+

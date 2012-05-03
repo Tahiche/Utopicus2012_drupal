@@ -1,0 +1,7 @@
+; $Id: $
+name = WYSIWYG Alterations
+description = Alter wysiwyg styles dropdown and such.
+package = " Custom" 
+
+project = "wysiwyg_alter"
+core = "6.x"

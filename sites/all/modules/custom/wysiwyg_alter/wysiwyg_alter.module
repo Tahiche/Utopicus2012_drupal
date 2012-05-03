@@ -1,0 +1,38 @@
+<?php 
+function wysiwyg_alter_wysiwyg_editor_settings_alter(&$settings, $context) {
+	//miKrumo($context);
+  if($context['profile']->editor == 'ckeditor') {
+	
+	// options here http://docs.cksource.com/ckeditor_api/symbols/CKEDITOR.config.html#.bodyClass
+	 
+	$settings['contentsCss'][] = base_path() . drupal_get_path('theme', 'utopicus')."/css/all.css?ran=".rand();
+	$settings['bodyId'] = 'content';
+	
+	$settings['resize_enabled'] = false;
+	
+    // $settings['justifyClasses'] = array('rteleft', 'rtecenter', 'rteright', 'rtejustify');
+	$settings['stylesCombo_stylesSet'] = 'my_styles:' . base_path() . drupal_get_path('module', 'wysiwyg_alter').'/wysiwyg_styles.js'; 
+}
+
+
+/*
+global $theme_info;
+  $framework_files = array();
+  $other_files = array();
+  if ($theme_info->name == 'zen_ninesixty') { // Change to the name of your theme
+    // Emulate zen_ninesixty_css_reorder().
+    if ($context['profile']->editor == 'tinymce') {
+      $styles = explode(',', $settings['content_css']);
+      foreach($styles as $i => $file) {
+        if (strpos($file, 'framework') !== FALSE) {
+          $framework_files[] = $file;
+        }
+        else {
+          $other_files[] = $file;
+        }
+      }
+      $settings['content_css'] = implode(',', $framework_files) . implode(',', $other_files);
+    }
+  }
+  */
+}

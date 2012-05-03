@@ -1,0 +1,12 @@
+--- emfield.audit.inc.orig	2010-10-22 10:35:27.329753253 -0400
++++ emfield.audit.inc	2010-10-22 10:35:37.113761037 -0400
+@@ -34,8 +34,7 @@
+     $table = $db_info['table'];
+     $provider_column = $db_info['columns']['provider']['column'];
+     $module = $field['module'];
+-    $sql = "SELECT $provider_column FROM {$table} GROUP BY $provider_column";
+-    $results = db_query($sql);
++    $results = db_query("SELECT $provider_column FROM {%s} GROUP BY $provider_column", $table);
+     while ($result = db_fetch_object($results)) {
+       $provider = emfield_system_list($module, $result->$provider_column);
+       if (empty($provider)) {

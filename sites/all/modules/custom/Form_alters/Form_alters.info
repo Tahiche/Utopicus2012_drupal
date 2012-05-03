@@ -1,0 +1,6 @@
+name = Form Alters
+project = "Form Alters"
+description = "Alter forms, like taxonomy tree."
+package = " Custom"
+version = "6.x"
+core = 6.x
