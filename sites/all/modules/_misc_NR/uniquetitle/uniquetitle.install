@@ -1,0 +1,49 @@
+<?php
+
+/**
+ * @file
+ * Documentation missing
+ */
+
+/**
+ * Implementation of hook_uninstall().
+ */
+function uniquetitle_uninstall() {
+  variable_del('uniquetitle_settings');
+}
+
+/**
+ * Implementation of hook_enable().
+ */
+function uniquetitle_enable() {
+  /*
+    Ha a modul már aktiválva volt legalább egy tartalom típusra, és aztán ki lett kapcsolva,
+    akkor az újra bekapcsolásnál ellenőrízni kell, hogy az ellenőrzés alatt álló
+    tartalom típusok megfelelnek-e a beállított feltételeknek.
+    Ha valamelyik tartalom típus nem tesz eleget a feltételeknek,
+    akkor az el lesz távolítva az ellenőrzésből.
+
+    Az újbóli ellenőrzés alá helyezéssel gond lehet azokban az esetekben,
+    ha egy tartalomnak egy régebbi verziója sérti meg az egyediséget.
+    Főleg akkor ha ezt párban teszi egy másik régebbi verziójú tartalommal.
+  */
+  /*
+    If this module was active for a content type, and the module turned off.
+    During this module sleeping, create some nodes whith same title,
+    and dou you want turn on this module again, must check the data consistenci.
+    If have nodes with same title, the module settings will be modified.
+  */
+  module_load_include('inc', 'uniquetitle');
+  $node_types = node_get_types();
+  $settings = uniquetitle_get_settings();
+  foreach ($settings['uniqueinfo'] as $type => $uniqueinfo) {
+    if ($uniqueinfo['unique']) {
+      $duplications = uniquetitle_get_title_duplications($type, $uniqueinfo['casesensitive']);
+      if (count($duplications)) {
+        drupal_set_message(t('Two or more nodes has same title in type %type', array('%type' => $node_types[$type]->name)), 'warning');
+        $settings['uniqueinfo'][$type]['unique'] = 0;
+      }
+    }
+  }
+  variable_set('uniquetitle_settings', $settings);
+}

@@ -1,0 +1,41 @@
+K 25
+svn:wc:ra_dav:version-url
+V 60
+/nuevarevista/!svn/ver/6/sites/all/modules/login_destination
+END
+LICENSE.txt
+K 25
+svn:wc:ra_dav:version-url
+V 72
+/nuevarevista/!svn/ver/6/sites/all/modules/login_destination/LICENSE.txt
+END
+login_destination.info
+K 25
+svn:wc:ra_dav:version-url
+V 83
+/nuevarevista/!svn/ver/6/sites/all/modules/login_destination/login_destination.info
+END
+.project
+K 25
+svn:wc:ra_dav:version-url
+V 69
+/nuevarevista/!svn/ver/6/sites/all/modules/login_destination/.project
+END
+README.txt
+K 25
+svn:wc:ra_dav:version-url
+V 71
+/nuevarevista/!svn/ver/6/sites/all/modules/login_destination/README.txt
+END
+login_destination.module
+K 25
+svn:wc:ra_dav:version-url
+V 85
+/nuevarevista/!svn/ver/6/sites/all/modules/login_destination/login_destination.module
+END
+login_destination.install
+K 25
+svn:wc:ra_dav:version-url
+V 86
+/nuevarevista/!svn/ver/6/sites/all/modules/login_destination/login_destination.install
+END

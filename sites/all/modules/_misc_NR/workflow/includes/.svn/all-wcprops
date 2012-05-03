@@ -1,0 +1,41 @@
+K 25
+svn:wc:ra_dav:version-url
+V 60
+/nuevarevista/!svn/ver/6/sites/all/modules/workflow/includes
+END
+workflow.actions.inc
+K 25
+svn:wc:ra_dav:version-url
+V 81
+/nuevarevista/!svn/ver/6/sites/all/modules/workflow/includes/workflow.actions.inc
+END
+workflow.inc
+K 25
+svn:wc:ra_dav:version-url
+V 73
+/nuevarevista/!svn/ver/6/sites/all/modules/workflow/includes/workflow.inc
+END
+workflow.views_default.inc
+K 25
+svn:wc:ra_dav:version-url
+V 87
+/nuevarevista/!svn/ver/6/sites/all/modules/workflow/includes/workflow.views_default.inc
+END
+workflow.node.inc
+K 25
+svn:wc:ra_dav:version-url
+V 78
+/nuevarevista/!svn/ver/6/sites/all/modules/workflow/includes/workflow.node.inc
+END
+workflow.classes.inc
+K 25
+svn:wc:ra_dav:version-url
+V 81
+/nuevarevista/!svn/ver/6/sites/all/modules/workflow/includes/workflow.classes.inc
+END
+workflow.views.inc
+K 25
+svn:wc:ra_dav:version-url
+V 79
+/nuevarevista/!svn/ver/6/sites/all/modules/workflow/includes/workflow.views.inc
+END

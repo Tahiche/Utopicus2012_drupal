@@ -1,0 +1,60 @@
+@@ -209,8 +209,7 @@ function userprotect_form_alter(&$form, &$form_state, $form_id) {
+         $protected['up_pass'] = TRUE;
+       }
+       if (isset($form['account']['status']) && !userprotect_check_bypass('up_status') && userprotect_get_user_protection($account, 'up_status')) {
+-        $form['account']['status']['#disabled'] = TRUE;
+-        $form['account']['status']['#value'] = $account->status;
++        unset($form['account']['status']);
+         $protected['up_status'] = TRUE;
+       }
+       // Special hack for RoleAssign module compatibility.
+@@ -459,6 +458,7 @@ function userprotect_perm() {
+     'change own e-mail',
+     'change own password',
+     'change own openid',
++    'change own status',
+     'administer userprotect',
+   );
+ }
+@@ -956,14 +956,15 @@ function userprotect_user_protection_defaults() {
+  * @return The default bypass array.
+  */
+ function userprotect_administrator_bypass_defaults() {
+-
+-  $defaults = array();
+-  $protections = userprotect_user_protection_defaults();
+-  foreach ($protections as $protection => $value) {
+-  	$defaults[$protection] = $protection;
+-  }
+-
+-  return $defaults;
++ return array('up_name' => 0,
++    'up_mail' => 0,
++    'up_pass' => 0,
++    'up_status' => 0,
++    'up_roles' => 0,
++    'up_openid' => 0,
++    'up_delete' => 0,
++    'up_edit' => 0,
++  );
+ }
+ 
+ /**
+@@ -1140,7 +1141,7 @@ function userprotect_get_user_protection($account, $protection) {
+   // and password determined by the role-based setting in the userprotect
+   // section at admin/user/access. This is done for consistency with the
+   // way core handles the self-editing of usernames.
+-  if ($uid == $user->uid && in_array($protection, array('up_name', 'up_mail', 'up_pass', 'up_openid', 'up_edit'))) {
++  if ($uid == $user->uid && in_array($protection, array('up_name', 'up_mail', 'up_pass', 'up_openid', 'up_edit','up_status'))) {
+     switch ($protection) {
+       case 'up_name':
+         return !user_access('change own username');
+@@ -1150,6 +1151,8 @@ function userprotect_get_user_protection($account, $protection) {
+         return !user_access('change own password');
+       case 'up_openid':
+         return !user_access('change own openid');
++      case 'up_status':
++        return !user_access('change own status');
+       // Always let user access their own edit page.
+       case 'up_edit':
+         return FALSE;

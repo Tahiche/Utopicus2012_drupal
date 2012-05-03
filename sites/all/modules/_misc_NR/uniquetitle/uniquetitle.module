@@ -1,0 +1,115 @@
+<?php
+
+/**
+ * @file
+ * Ez a modul segít megelőzni azt, hogy egy tartalom típuson belűl 2 node-nak ugyan olyan címe legyen.
+ * Hasznos lehet olyan webhelyek számára melyek fórumot üzemeltetnek vagy e-shop -ot
+ * a fórum témák illetve a termékek egyedi elnevezése érdekében.
+ *
+ * This module help to prevent the title duplications in a same content type.
+ * This is usefull for the forum topics and e-shop products.
+ */
+
+/**
+ * Implementation of hook_perm().
+ */
+function uniquetitle_perm() {
+  return array('Administer Unique title');
+}
+
+/**
+ * Implementation of hook_menu().
+ */
+function uniquetitle_menu() {
+  $items = array();
+  $items['admin/settings/uniquetitle'] = array(
+    'title'            => 'Unique title administration',
+    'description'      => 'Administrative interface for Unique title.',
+    'page callback'    => 'drupal_get_form',
+    'page arguments'   => array('uniquetitle_settings_form'),
+    'access arguments' => array('Administer Unique title'),
+    'file'             => 'uniquetitle.inc',
+  );
+  return $items;
+}
+
+/**
+ * Implementation of hook_nodeapi().
+ */
+function uniquetitle_nodeapi(&$node, $op, $a3 = NULL, $a4 = NULL) {
+  switch ($op) {
+    case 'validate':
+      module_load_include('inc', 'uniquetitle');
+      if (uniquetitle_must_be_unique($node->type) AND $exists = uniquetitle_title_exists($node)) {
+        $message = t("The value in the '%label' field already been used!", array('%label' => $a3['title']['#title']));
+        $exists = node_load($exists->nid);
+        if (node_access('view', $exists)) {
+          // @Notice: target attribute is invalid
+          // http://www.w3.org/MarkUp/2004/xhtml-faq#target
+          $message .= ' '. t(
+            'Puede ver el existente <a!attributes>aquí</a>.',
+            array('!attributes' => drupal_attributes(array('href' => url("node/{$exists->nid}"), 'target' => '_blank')))
+          );
+        }
+        else {
+          $message .= ' '. t('You have no access to view the exists one');
+        }
+        form_set_error('title', $message);
+      }
+      break;
+  }
+}
+
+/**
+ * Remove the non exists content types from the settings
+ * and add the exists ones which is not exists in the settings.
+ *
+ * @return array
+ *    The module settings.
+ */
+function uniquetitle_get_settings() {
+  $key = 'uniquetitle_settings';
+  $settings = variable_get($key, _uniquetitle_default_values($key));
+  $node_types = node_get_types();
+  $uniqueinfo = _uniquetitle_default_values('uniquetitle_uniqueinfo');
+  foreach (array_keys($node_types) as $type) {
+    //Default settings for the newly created content types
+    if (!array_key_exists($type, $settings['uniqueinfo'])) {
+      $settings['uniqueinfo'][$type] = $uniqueinfo;
+    }
+  }
+
+  //Delete the settings of the deleted content types
+  $settings['uniqueinfo'] = array_intersect_key($settings['uniqueinfo'], $node_types);
+  return $settings;
+}
+
+/**
+ * Default values of the module
+ *
+ * @param string $key
+ *    Unique identifier of the value.
+ *
+ * @return mixed
+ *    Value of the $key.
+ */
+function _uniquetitle_default_values($key) {
+  switch ($key) {
+    case 'uniquetitle_settings':
+      $node_types = node_get_types();
+      $uniqueinfo = _uniquetitle_default_values('uniquetitle_uniqueinfo');
+      $return = array(
+        'uniqueinfo' => array_fill_keys(array_keys($node_types), $uniqueinfo),
+      );
+      return $return;
+
+    case 'uniquetitle_uniqueinfo':
+      return array(
+        'unique'        => 0,
+        'casesensitive' => 0,
+      );
+
+    default:
+      throw new Exception();
+  }
+}

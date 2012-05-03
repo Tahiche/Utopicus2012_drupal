@@ -1,0 +1,11 @@
+name = "Node Access"
+description = "Provides flexible node access control."
+package = Access control
+
+
+; Information added by drupal.org packaging script on 2011-02-25
+version = "6.x-6.x-dev"
+core = "6.x"
+project = "node_access"
+datestamp = "1298619755"
+
