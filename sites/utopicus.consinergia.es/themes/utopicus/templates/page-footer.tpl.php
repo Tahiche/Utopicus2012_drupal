@@ -61,6 +61,7 @@ global $theme_pathabsoluto;
 			<div class="box">
 				<strong class="title"><a href="#">COWORKING</a></strong>
 				<ul>
+                	<li><a href="#">Listado Coworkers</a></li>
 					<li><a href="#">Tour</a></li>
 					<li><a href="#">Comunidad</a></li>
 					<li><a href="#">Espacios</a></li>
@@ -82,10 +83,10 @@ global $theme_pathabsoluto;
 			<div class="box">
 				<strong class="title"><a href="#">ACTIVIDADES</a></strong>
 				<ul>
-					<li><a href="#">Eventos</a></li>
+					<li><a href="#">Agenda de Actividades</a></li>
 					<li><a href="#">utopic_Sundays</a></li>
 					<li><a href="#">utopic_TV</a></li>
-					<li><a href="#">Transformadora</a></li>
+					
 				</ul>
 			</div>
 			<!-- box -->
@@ -107,22 +108,22 @@ global $theme_pathabsoluto;
 				<ul>
 					<li><a href="#">Madrid US_1</a></li>
 					<li><a href="#">Madrid US_2</a></li>
-					<li><a href="#">utopic_Bar</a></li>
-					<li><a href="#">utopic_Gallery</a></li>
-					<li><a href="#">Open_US</a></li>
+					<li><a href="#">La Utópica Bar</a></li>
+					<li><a href="#">Utopic_Gallery</a></li>
+					<li><a href="#">La Transformadora</a></li>
 					<li><a href="#">Alquiler de Espacios</a></li>
 				</ul>
 			</div>
 			<!-- box -->
 			<div class="box">
-				<strong class="title"><a href="#">QUE SOMOS</a></strong>
+				<strong class="title"><a href="#">_US</a></strong>
 				<ul>
-					<li><a href="#">El proyecto</a></li>
-					<li><a href="#">El equipo</a></li>
-					<li><a href="#">Noticias</a></li>
-					<li><a href="#">Patrocinadores</a></li>
-					<li><a href="#">Sala de prensa</a></li>
-					<li><a href="#">Contacto</a></li>
+					<li><a href="/proyecto">El proyecto utopic_US</a></li>
+					<li><a href="/equipo">El equipo</a></li>
+					<li><a href="/noticias">Noticias</a></li>
+					<li><a href="/patrocinadores">Patrocinadores</a></li>
+					<li><a href="/sala_de_prensa">Sala de prensa</a></li>
+					<li><a href="/contacto">Contacto</a></li>
 				</ul>
 			</div>
 		</div>

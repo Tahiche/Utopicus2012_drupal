@@ -12,11 +12,10 @@ function themechanger_init() {
 	  $current_theme = variable_get('theme_default','none');
 	  
 
- // echo "<h1>current_theme theme ".$current_theme."</h1>";
+// echo "<h1>current_theme theme ".$current_theme."</h1>";
  
 	 
-    if ( (arg(0) == 'node'  &&  is_numeric(arg(1)) && arg(2) == 'nodequeue') ||
-	(arg(0) == 'user')
+    if ( (arg(0) == 'node'  &&  is_numeric(arg(1)) && arg(2) == 'nodequeue')
 	 ) {
         $right_theme = variable_get('admin_theme', '0');
 		//echo "<h1>$right_theme</h1>";

@@ -1,0 +1,17 @@
+name = Popup test
+description = Adds a popup test page to the navigation menu
+package = User interface
+version = "6.x-1-0"
+core = 6.x
+
+dependencies[] = popup
+
+files[] = popup_test.module
+files[] = includes/popup_test.pages.inc
+
+; Information added by drupal.org packaging script on 2011-04-05
+version = "6.x-3.22"
+core = "6.x"
+project = "popup"
+datestamp = "1302023216"
+

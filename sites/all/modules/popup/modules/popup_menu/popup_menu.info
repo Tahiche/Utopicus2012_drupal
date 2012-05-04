@@ -1,0 +1,18 @@
+name = Popup menu
+description = Enable menus to be displayed as popups within block regions
+package = User interface
+version = "6.x-3.2"
+core = 6.x
+
+dependencies[] = popup_ui
+dependencies[] = menu
+
+files[] = popup_menu.module
+files[] = includes/popup_menu.util.inc
+
+; Information added by drupal.org packaging script on 2011-04-05
+version = "6.x-3.22"
+core = "6.x"
+project = "popup"
+datestamp = "1302023216"
+

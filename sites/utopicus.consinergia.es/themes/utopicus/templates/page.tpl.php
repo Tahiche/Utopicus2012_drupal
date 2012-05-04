@@ -118,6 +118,7 @@
 </head>
 <body class="<?php print $classes; ?>">
 
+
 <!-- wrapper -->
 	<div id="wrapper">
     <!--  holder -->

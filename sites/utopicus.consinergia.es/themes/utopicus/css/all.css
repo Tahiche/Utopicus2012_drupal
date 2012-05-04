@@ -14,7 +14,7 @@ html {
 }
 body{
 	color:#5e5e5e;
-	font:400 1em 'Asap', Arial, Verdana, sans-serif;
+	font:400 12px 'Asap', Arial, Verdana, sans-serif;
 	background:#e0e0e0;
 }
 a{
@@ -267,7 +267,7 @@ button:hover{cursor:pointer;}
 	font:700 14px/16px 'Asap', Arial, Helvetica, sans-serif;
 	text-transform:uppercase;
 }
-.search-section .text{
+.search-section .text {
 	float:left;
 	height:14px;
 	width:373px;
@@ -2202,3 +2202,35 @@ ul li:after,
 a.imagecache-Image454x145 .image{
 	padding:0 !important;
 	}
+	/********************************************* FORMS *******************************************************/
+	
+.form-text {
+	/*float:left;*/
+	height:14px;
+	width:373px;
+	font:400 11px/14px 'Asap', Arial, Helvetica, sans-serif;
+	background:#ddd;
+	border:0;
+	margin:0 3px 0 0;
+	padding:8px 11px 7px;
+}
+form label{
+ /*float: left;*/
+    font: 700 14px/16px 'Asap',Arial,Helvetica,sans-serif;
+    margin: 0 20px 0 0;
+    padding: 7px 0 0;
+    text-transform: uppercase;
+}
+
+
+
+
+/* Animated throbber */
+html.js input.form-autocomplete {
+      background-image: url("/misc/throbber.gif");
+    background-position: 100% 9px;
+    background-repeat: no-repeat;/* LTR */
+}
+html.js input.throbbing {
+  background-position: 100% -12px; /* LTR */
+}

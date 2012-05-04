@@ -50,8 +50,8 @@ if (empty($theme_pathabsoluto)){
 						</ul>
 						<!-- loginmenu -->
 						<ul class="loginmenu">
-							<li><a href="#">ÚNETE </a></li>
-							<li><a href="#">ACCEDER</a></li>
+							<li><a href="/user">ÚNETE </a></li>
+							<li><a href="/user">ACCEDER</a></li>
 						</ul>
 					</div>
 				</div>

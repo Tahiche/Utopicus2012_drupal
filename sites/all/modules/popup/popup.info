@@ -1,0 +1,17 @@
+name = Popup
+description = Enable CSS/JQuery popus of embedded content
+package = User interface
+version = "6.x-3.22"
+core = 6.x
+
+files[] = popup.module
+files[] = includes/popup.admin.inc
+files[] = includes/popup.processing.inc
+files[] = includes/popup.util.inc
+
+; Information added by drupal.org packaging script on 2011-04-05
+version = "6.x-3.22"
+core = "6.x"
+project = "popup"
+datestamp = "1302023216"
+
