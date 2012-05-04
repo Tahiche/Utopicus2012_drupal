@@ -30,12 +30,12 @@ function themechanger_init() {
     }
 	
 		
-		if( arg(0) == 'user' ){
+		/*if( arg(0) == 'user' ){
 	   //echo "VAMOSPAYA";
 	   $right_theme = 'NuevaRevista';
 		// init_theme();
 		// echo "<h1>$right_theme</h1>";
-	   }
+	   }*/
 	   
 	if ((arg(0) == 'node' && arg(1) == 'add') ||  (arg(0) == 'node' && arg(2) == 'edit') ||  (arg(0) == 'node' && arg(1) == 'edit')  ) {
 	    // echo "arg(0) == 'node' && arg(1) == 'add'";
@@ -52,7 +52,10 @@ function themechanger_init() {
    echo "<h1>custom_theme</h1>" .$custom_theme;
    echo "<h1>right_theme </h1>".$right_theme;
    echo "custom_theme != right_theme->".$custom_theme !== $right_theme;*/
-
+if(isset($_GET['theme'])){
+	if($_GET['theme']=="admin") $right_theme = variable_get('admin_theme', '0');
+	}
+	
    if($right_theme && ($current_theme !== $right_theme) ){
 	   $custom_theme = $right_theme;
 	   init_theme(); 

@@ -1,14 +1,17 @@
-
+//alert("condidtional");
 if (!Drupal.ConditionalFields) {
   Drupal.ConditionalFields = {};
 }
 
 Drupal.ConditionalFields.switchField = function(id, values, onPageReady) {
   // Check each controlled field
+  // console.log(Drupal.settings.ConditionalFields.controlling_fields[id]);
+  
   if (Drupal.settings.ConditionalFields.controlling_fields == undefined || Drupal.settings.ConditionalFields.controlling_fields[id] == undefined) {
     return;
   }
   $.each(Drupal.settings.ConditionalFields.controlling_fields[id], function(i, controlledField) {
+	//console.log($(this));
     var triggers = Drupal.ConditionalFields.checkTriggered(controlledField, values);
     // If the field was not triggered, hide it
     if (!triggers) {
@@ -52,6 +55,7 @@ Drupal.ConditionalFields.checkTriggered = function(controlledField, selectedValu
 }
 
 Drupal.ConditionalFields.doAnimation = function(fieldSettings, showOrHide, onPageReady) {
+	//console.log("doAnimation");
   /* Multiple fields are enclosed in a wrapper */
   if ($(fieldSettings.field_id).parents('#' + fieldSettings.field_id.substring(13) + '-add-more-wrapper').length == 1) {
     var toSwitch = $('#' + fieldSettings.field_id.substring(13) + '-add-more-wrapper');
@@ -109,13 +113,14 @@ Drupal.ConditionalFields.findValues = function(field) {
 }       
 
 Drupal.ConditionalFields.fieldChange = function() {
-  var values = Drupal.ConditionalFields.findValues($(this));
+   var values = Drupal.ConditionalFields.findValues($(this));
   var id = '#' + $(this).attr('id');
-  Drupal.ConditionalFields.switchField(id, values, false);
+   Drupal.ConditionalFields.switchField(id, values, false);
 }
 
 Drupal.behaviors.ConditionalFields = function (context) {
   $('.conditional-field.controlling-field:not(.conditional-field-processed)').addClass('conditional-field-processed').each(function () {
+	  console.log($(this));
     /* Set default state */
     Drupal.ConditionalFields.switchField('#' + $(this).attr('id'), Drupal.ConditionalFields.findValues($(this)), true);
     if ($(this).find('option, input:not(:text)').length > 0) {

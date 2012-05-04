@@ -1,0 +1,84 @@
+Index: multistep.admin.inc
+===================================================================
+RCS file: /cvs/drupal-contrib/contributions/modules/multistep/Attic/multistep.admin.inc,v
+retrieving revision 1.1.2.5
+diff -u -p -r1.1.2.5 multistep.admin.inc
+--- multistep.admin.inc	8 Sep 2009 13:30:40 -0000	1.1.2.5
++++ multistep.admin.inc	17 Feb 2010 23:49:22 -0000
+@@ -76,7 +76,7 @@ function multistep_admin_settings_form(&
+     '#type' => 'textfield',
+     '#title' => t('Previous button'),
+     '#default_value' => variable_get('multistep_button_prev', '< Previous'),
+-    '#description' => t('This button will bring you back one step.'),
++    '#description' => t('This button will bring you back one step. To omit this button, remove any text and leave this field blank.'),
+     '#weight' => -10,
+   );
+   $form['multistep']['buttons']['multistep_button_next'] = array(
+@@ -90,7 +90,7 @@ function multistep_admin_settings_form(&
+     '#type' => 'textfield',
+     '#title' => t('Save button'),
+     '#default_value' => variable_get('multistep_button_save', 'Save'),
+-    '#description' => t('This button will save the form while remaining in the current step.'),
++    '#description' => t('This button will save the form while remaining in the current step. To omit this button, remove any text and leave this field blank.'),
+     '#weight' => -8,
+   );
+   $form['multistep']['buttons']['multistep_button_done'] = array(
+@@ -153,15 +153,9 @@ function multistep_admin_settings_status
+  * Validates the navigation button labels form to make sure they contain text.
+  */
+ function multistep_admin_settings_buttons_form_validate($form, &$form_state) {
+-  if (empty($form_state['values']['multistep_button_prev']) || !isset($form_state['values']['multistep_button_prev'])) {
+-    form_set_error('multistep_button_prev', 'You need to enter a label for the <em>Previous</em> button.');
+-  }
+   if (empty($form_state['values']['multistep_button_next']) || !isset($form_state['values']['multistep_button_next'])) {
+     form_set_error('multistep_button_next', 'You need to enter a label for the <em>Next</em> button.');
+   }
+-  if (empty($form_state['values']['multistep_button_save']) || !isset($form_state['values']['multistep_button_save'])) {
+-    form_set_error('multistep_button_save', 'You need to enter a label for the <em>Save</em> button.');
+-  }
+   if (empty($form_state['values']['multistep_button_done']) || !isset($form_state['values']['multistep_button_done'])) {
+     form_set_error('multistep_button_done', 'You need to enter a label for the <em>Done</em> button.');
+   }
+Index: multistep.module
+===================================================================
+RCS file: /cvs/drupal-contrib/contributions/modules/multistep/multistep.module,v
+retrieving revision 1.1.2.2.2.33
+diff -u -p -r1.1.2.2.2.33 multistep.module
+--- multistep.module	14 Dec 2009 20:31:49 -0000	1.1.2.2.2.33
++++ multistep.module	17 Feb 2010 23:49:22 -0000
+@@ -420,20 +420,24 @@ function multistep_form_alter(&$form, &$
+     }
+   }
+   // This adds different submitting buttons (Previous, Save, Next, Done).
+-  if ($step > 1) {
+-    $form['buttons']['previous'] = array(
++  if(variable_get('multistep_button_prev', '')) {
++    if ($step > 1) {
++      $form['buttons']['previous'] = array(
++        '#type' => 'submit',
++        '#value' => variable_get('multistep_button_prev', '< Previous'),
++        '#submit' => array('multistep_previous'),
++        '#weight' => 101,
++      );
++    }
++  }
++  if (variable_get('multistep_button_save', '')) {
++    $form['buttons']['save'] = array(
+       '#type' => 'submit',
+-      '#value' => variable_get('multistep_button_prev', '< Previous'),
+-      '#submit' => array('multistep_previous'),
+-      '#weight' => 101,
++      '#value' => variable_get('multistep_button_save', 'Save'),
++      '#submit' => array('multistep_save'),
++      '#weight' => 102,
+     );
+   }
+-  $form['buttons']['save'] = array(
+-    '#type' => 'submit',
+-    '#value' => variable_get('multistep_button_save', 'Save'),
+-    '#submit' => array('multistep_save'),
+-    '#weight' => 102,
+-  );
+   if ($step < variable_get('multistep_steps_' . $type, 0) && $step != 0) {
+     $form['buttons']['next'] = array(
+       '#type' => 'submit',

@@ -1438,6 +1438,7 @@ jcf.lib = {
 }
 
 // custom checkbox module
+
 jcf.addModule({
 	name:'checkbox',
 	selector:'input[type=checkbox]',
@@ -1514,6 +1515,7 @@ jcf.addModule({
 	}
 });
 
+/**************************************** .bonito porque conditional fields no funcionaba ***********/
 // custom radio module
 jcf.addModule({
 	name:'radio',
@@ -1525,7 +1527,7 @@ jcf.addModule({
 		uncheckedClass:'rad-unchecked',
 		disabledClass:'rad-disabled',
 		labelDisabledClass:'rad-label-disabled',
-		radStructure:'<span></span>'
+		radStructure:'<span></span>' 
 	},
 	getRadioGroup: function(item){
 		var name = item.getAttribute('name');
@@ -1547,6 +1549,9 @@ jcf.addModule({
 		if(this.labelFor) {
 			jcf.lib.event.add(this.labelFor, 'click', this.toggleRadio, this);
 		}
+		/****************************AÑADIDO para conditional !!! *********************************/
+		
+		
 	},
 	onFocus: function(e) {
 		jcf.modules[this.name].superclass.onFocus.apply(this, arguments);
@@ -1558,6 +1563,15 @@ jcf.addModule({
 		if(!this.realElement.disabled) {
 			this.realElement.checked = true;
 		}
+		/****************************AÑADIDO para conditional !!! *********************************/
+		/*console.log("this.realElement");
+		console.log($(this.realElement).parent());
+		console.log($(this.realElement).parents('.controlling-field'));*/
+	    //$(this.realElement).parents('.controlling-field').click(Drupal.ConditionalFields.fieldChange);
+		var condfield=$(this.realElement).parents('.controlling-field');
+		console.log(condfield);
+		$(condfield).click(Drupal.ConditionalFields.fieldChange);
+		/* ************************ **************************************************    *********/
 		this.refreshState();
 	},
 	refreshState: function(){

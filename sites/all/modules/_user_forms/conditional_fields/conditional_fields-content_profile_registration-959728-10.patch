@@ -1,0 +1,14 @@
+diff --git a/conditional_fields.module b/conditional_fields.module
+index d8f11c3..84c119b 100755
+--- a/conditional_fields.module
++++ b/conditional_fields.module
+@@ -626,6 +626,10 @@ function conditional_fields_allowed_values($field) {
+  * with non-core CCK widgets
+  */
+ function conditional_fields_node_editing_form(&$form, $form_state) {
++  global $user;
++  if (!$user->uid) {
++    $form = conditional_fields_node_after_build($form, $form_state);
++  }
+   $form['#after_build'][] = 'conditional_fields_node_after_build';
+ }

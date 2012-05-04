@@ -626,6 +626,10 @@ function conditional_fields_allowed_values($field) {
  * with non-core CCK widgets
  */
 function conditional_fields_node_editing_form(&$form, $form_state) {
+	global $user;
+if (!$user->uid) {
+   $form = conditional_fields_node_after_build($form, $form_state);
+   }
   $form['#after_build'][] = 'conditional_fields_node_after_build';
 }
 

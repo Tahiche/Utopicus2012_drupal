@@ -7,6 +7,30 @@
 	krumo($var);
 	echo"</div>";
 }*/
+/**
+* Implementation of hook_elements().
+*
+* This extends optionwidgets_elements() to add in additional processing.
+* Note that your module must be weighted higher than optionwidgets
+* for this code to take effect.
+*/
+/******************************************** quitar N/D o N/A de opciones !!!!!!! **************/
+function Form_alters_elements() {
+  $type['optionwidgets_buttons']['#process'][] = 'remove_radio_na';
+  return $type;
+}
+
+/**
+* Unset the N/A option on option widget radio buttons.
+*/
+function remove_radio_na($element) {
+  unset($element['value']['#options']['']);
+  return $element;
+}
+
+
+
+
 
 function Form_alters_init(){
 	//echo "<h1> Form_alters_form_alter Form_alters_init</h1>"; 
@@ -14,8 +38,29 @@ function Form_alters_init(){
 
 function Form_alters_form_alter(&$form, &$form_state, $form_id) {
  
-/*echo "<h1> Form_alters $form_id</h1>";
-miKrumo($form);*/
+
+ if (isset($form_id) && $form_id == "profile_node_form") {
+	 //
+//miKrumo($form);
+	 unset($form['locale']);
+	 unset($form['theme_select']);
+	 unset($form['timezone']);
+	 unset($form['status']);
+	 unset($form['roles']);
+	//if(!$form['buttons']['next']){
+		 /*$form['buttons2']['next'] = array(
+		  '#type' => 'submit',
+		  '#value' => variable_get('multistep_button_next', t('Next >')),
+		  '#submit' => array('multistep_next'),
+		  '#weight' => 103,
+    	);*/
+	//} 
+	
+
+    
+
+
+ }
  //pageutopicus_node_form
  if (isset($form_id) && $form_id == "pageutopicus_node_form") {
 	// miKrumo($form);
@@ -101,9 +146,30 @@ $nid=$form['uid']['#value'];
   }
     
 
-//echo "FORMe=   ".$form_id;
+ 
+}
+
+
+/*************************************   MULTISTEP ************/ 
+function Form_alters_content_extra_fields($type_name) {
+	//miKrumo($type_name);
+  $fields['contact'] = array(
+    'label' => t('User contact in profile'),
+    'description' => t('User contact in profile'),
+    'weight' => 30,
+  );
+  $fields['account'] = array(
+    'label' => t('User account in profile'),
+    'description' => t('User account in profile'),
+    'weight' => -10,
+  );
+   $fields['picture'] = array(
+    'label' => t('User picture in profile'),
+    'description' => t('User picture in profile'),
+    'weight' => -1, 
+  );
   
-  
+  return $fields;
 }
 
 ?>
