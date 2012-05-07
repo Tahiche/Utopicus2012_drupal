@@ -39,7 +39,7 @@ function Form_alters_init(){
 function Form_alters_form_alter(&$form, &$form_state, $form_id) {
  
 
- if (isset($form_id) && $form_id == "profile_node_form") {
+ if (isset($form_id) && $form_id == "perfil_usuario_node_form") {
 	 //
 //miKrumo($form);
 	 unset($form['locale']);
@@ -47,17 +47,23 @@ function Form_alters_form_alter(&$form, &$form_state, $form_id) {
 	 unset($form['timezone']);
 	 unset($form['status']);
 	 unset($form['roles']);
-	//if(!$form['buttons']['next']){
-		 /*$form['buttons2']['next'] = array(
-		  '#type' => 'submit',
-		  '#value' => variable_get('multistep_button_next', t('Next >')),
-		  '#submit' => array('multistep_next'),
-		  '#weight' => 103,
-    	);*/
-	//} 
-	
+	// $form['buttons']['previous']['#validate' ]=array();
+	//'#validate' => array(),
+	//krumo(_multistep_get_current_step($type)); 
+	//drupal_set_message( krumo($form) ); 
+	// el hierarchicAL select riompia la validacion,contaba como oblñigatorio en paso 1 a pesar de estar en paso 2
+	$type = $form['#node']->type;
+	$step=_multistep_get_current_step($type);
+ 	if($step==2){
+		// unset($form['taxonomy']);
+		$form['taxonomy'][3]['#required']=1;
+	}
+	else{$form['taxonomy'][3]['#required']=0; }
+	// para boton anterior
+	array_unshift($form['#after_build'], 'Form_alters_form_after_build');
+	// $form['#after_build'][] = 'Form_alters_form_after_build';
 
-    
+   //krumo($form);
 
 
  }
@@ -103,7 +109,6 @@ function Form_alters_form_alter(&$form, &$form_state, $form_id) {
   
   
 
- 
  
  
   
@@ -172,4 +177,29 @@ function Form_alters_content_extra_fields($type_name) {
   return $fields;
 }
 
+
+
+/*
+ * After build handler
+ */
+function Form_alters_form_after_build($form, &$form_state) {
+	
+  if($form_state['clicked_button']['#id'] == 'edit-previous') {
+    Form_alters_disable_validation($form);
+	
+  }
+  //krumo($form);
+  return $form;
+}
+
+function Form_alters_disable_validation(&$element) {
+	//if($element['#type']=="hierarchical_select") krumo($element);
+  unset($element['#needs_validation']);
+   unset($element['#required']);
+  foreach(element_children($element) as $key) {
+    Form_alters_disable_validation($element[$key]);
+  }
+  //krumo($element);
+ // if($element['#type']=="hierarchical_select") krumo($element);
+}
 ?>

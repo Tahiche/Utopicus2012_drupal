@@ -1,0 +1,37 @@
+Index: multistep.module
+===================================================================
+RCS file: /cvs/drupal-contrib/contributions/modules/multistep/multistep.module,v
+retrieving revision 1.1.2.2.2.52
+diff -u -r1.1.2.2.2.52 multistep.module
+--- multistep.module	
++++ multistep.module	
+@@ -833,11 +833,25 @@
+   // @see http://drupal.org/node/566682 - Added support for hierarchical_select.
+   if (arg(0) == 'hierarchical_select_json') {
+     $hsid = $_POST['hsid'];
+-    foreach ($_POST['taxonomy'] as $vid => $config) {
+-      if ($config['hsid'] == $hsid) {
+-        $step = variable_get('multistep_extra_taxonomy_' . $vid . '_' . $type, $step);
++    // Taxonomy module
++    if (!empty($_POST['taxonomy'])) {
++      foreach ($_POST['taxonomy'] as $vid => $config) {
++        if ($config['hsid'] == $hsid) {
++          $step = variable_get('multistep_extra_taxonomy_' . $vid . '_' . $type, $step);
++          break;
++        }
+       }
+     }
++    // Content taxonomy module
++    else {
++      foreach ($_POST as $field => $config) {
++        if (isset($config['tids']['hsid']) && $config['tids']['hsid'] == $hsid) {
++          $step = _multistep_get_field_step($field, $type);
++          break;
++        }
++      }
++    }
++    return $step;
+   }
+   // This condition occurs for autocomplete fields
+   // @see http://drupal.org/node/868826
+

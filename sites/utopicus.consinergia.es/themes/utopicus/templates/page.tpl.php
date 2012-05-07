@@ -123,7 +123,14 @@
 	<div id="wrapper">
     <!--  holder -->
 		<div class="holder">
-        
+  
+  <?php 
+  
+  if ($content_top): ?>
+          <div class="content_top"><?php // print "<pre>".$content_top."</pre>"; ?></div>
+         
+   <?php endif; ?>
+           
               
         <?php print $page_header; ?>
 
@@ -150,7 +157,10 @@
         
         <div class="main-section">
         
+        <?php if ($messages) print $messages;?>
+        
         <?php print $content; ?>
+        
        
         </div>
         

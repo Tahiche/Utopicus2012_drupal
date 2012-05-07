@@ -2223,7 +2223,72 @@ form label{
 }
 
 
+/****************** login div **********************/
 
+input[type=submit], input.form-submit{
+    background: none repeat scroll 0 0 #4B4B4B;
+    color: #E8E8E8;
+    float: left;
+    padding: 7px 4px;
+    text-align: center;
+    min-width: 70px;
+	border:0;
+	text-transform:uppercase;
+	margin:6px;
+	font-size:11px;
+	-webkit-transition:all 500ms ease-out;
+	-moz-transition:all 500ms ease-out;
+	-o-transition:all 500ms ease-out;
+	transition:all 500ms ease-out;
+	 box-shadow: 0 0 5px #bcbcbc;
+	-webkit-box-shadow: 0 0 5px #bcbcbc;
+	-moz-box-shadow: 0 0 5px #bcbcbc;
+	
+}
+input[type=submit]:hover, input.form-submit:hover{
+	background:#a8b1df;
+	text-decoration:none;
+	-webkit-box-shadow: 0 0 5px #66;
+	-moz-box-shadow: 0 0 5px #666;
+}
+
+
+
+
+#toboggan-login{
+	
+	/* Fallback for web browsers that doesn't support RGBa */
+background: rgb(231, 231, 231) transparent;
+/* RGBa with 0.6 opacity */
+background: rgba(231, 231, 231, 0.85);
+
+ z-index: 100;
+    
+	float: right;
+    position: absolute;
+    right: 0;
+    top: 35px;
+	
+	border-top:1px solid #d1d1d1;
+	font-size:10px !important;
+	line-height:1.499em;
+	-webkit-transition:all 1100ms ease-out;
+	-moz-transition:all 1100ms ease-out;
+	-o-transition:all 1100ms ease-out;
+	transition:all 1100ms ease-out;
+	 box-shadow: 0 0 5px #bcbcbc;
+	-webkit-box-shadow: 0 0 5px #bcbcbc;
+	-moz-box-shadow: 0 0 5px #bcbcbc;
+	padding: 10px;
+	}
+#toboggan-login label, #toboggan-login input{
+	font-size: 10px !important;
+
+	}
+#toboggan-login .form-text {
+    margin: 0 3px 0 0;
+    padding:2px 5px;
+    width: 80%;
 
 /* Animated throbber */
 html.js input.form-autocomplete {
@@ -2231,6 +2296,10 @@ html.js input.form-autocomplete {
     background-position: 100% 9px;
     background-repeat: no-repeat;/* LTR */
 }
+
+
+
+
 html.js input.throbbing {
   background-position: 100% -12px; /* LTR */
 }

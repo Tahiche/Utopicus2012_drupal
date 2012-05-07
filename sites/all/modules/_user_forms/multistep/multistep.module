@@ -283,17 +283,22 @@ function multistep_field_access($op, $field, $account = NULL, $node = NULL) {
  * Sync the multistep table to changes in the nodes.
  */
 function multistep_nodeapi(&$node, $op, $a3 = NULL, $a4 = NULL) {
+	//miKrumo($op);
   // Do nothing if multistep is not enabled for this node type.
   if (variable_get('multistep_expose_' . $node->type, 'disabled') != 'enabled') {
     return;
   }
   switch ($op) {
     case 'insert':
+	//krumo($node);
+	
       // Generate the step list for this node in the database.
       _multistep_update_status($node->nid, 'unsubmitted');
       // Integrate with Content Profile Registration
       if (module_exists('content_profile_registration')) {
         $types = content_profile_get_types('types', 'registration_use');
+		
+	//krumo($types);
         if (!empty($types)) {
           // Only works when a single content type is enabeld at registration
           $type = reset($types);
@@ -518,7 +523,16 @@ function multistep_form_alter(&$form, &$form_state, $form_id) {
     if (isset($_REQUEST['edit'])) {
       $query = array_merge($query, array('edit' => $_REQUEST['edit']));
     }
-    drupal_goto($_REQUEST['q'], $query);
+	// drupal_goto($_REQUEST['q'], $query);
+	/***************************************************** PATCH **************************/
+			$dest_q = $_REQUEST['q'];
+			if (substr($_REQUEST['q'],0,3) == 'es/')
+			{
+			$dest_q = str_replace('es/','',$_REQUEST['q']);
+			}
+	drupal_goto($dest_q, $query);
+/***************************************************** PATCH **************************/
+    
   }
   // We need to remove #redirect to prevent redirection to the profile main page
   if (module_exists('content_profile') && is_content_profile($type)) {
@@ -574,6 +588,7 @@ function multistep_form_alter(&$form, &$form_state, $form_id) {
       );
     }
   }
+  
   if (variable_get('multistep_button_save', t('Save'))) {
     $form['buttons']['save'] = array(
       '#type' => 'submit',
@@ -622,7 +637,8 @@ function multistep_form_alter(&$form, &$form_state, $form_id) {
     $form['options']['status']['#default_value'] = 1;
   }
   
-    // miKrumo($form);
+     //miKrumo($form);
+	
 }
 
 /**
@@ -832,11 +848,33 @@ function _multistep_get_current_step($type) {
   // @see http://drupal.org/node/566682 - Added support for hierarchical_select.
   if (arg(0) == 'hierarchical_select_json') {
     $hsid = $_POST['hsid'];
-    foreach ($_POST['taxonomy'] as $vid => $config) {
+   /* foreach ($_POST['taxonomy'] as $vid => $config) {
       if ($config['hsid'] == $hsid) {
         $step = variable_get('multistep_extra_taxonomy_' . $vid . '_' . $type, $step);
       }
+    }*/
+	/**************************  patch **************************/
+	   // Taxonomy module
+   if (!empty($_POST['taxonomy'])) {
+      foreach ($_POST['taxonomy'] as $vid => $config) {
+        if ($config['hsid'] == $hsid) {
+          $step = variable_get('multistep_extra_taxonomy_' . $vid . '_' . $type, $step);
+          break;
+        }
+       }
+     }
+    // Content taxonomy module
+    else {
+      foreach ($_POST as $field => $config) {
+        if (isset($config['tids']['hsid']) && $config['tids']['hsid'] == $hsid) {
+         $step = _multistep_get_field_step($field, $type);
+          break;
+        }
+      }
     }
+    return $step;
+	/************************** fin patch **************************/
+	
   }
   // This condition occurs for autocomplete fields
   // @see http://drupal.org/node/868826
@@ -1055,3 +1093,15 @@ function multistep_views_api() {
     'api' => 2,
   );
 }
+
+
+
+
+
+
+
+
+
+
+
+

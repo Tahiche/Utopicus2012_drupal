@@ -162,8 +162,10 @@ function utopicus_preprocess_page(&$vars, $hook) {
 	}
 	//drupal_set_html_head('<link type="text/css" rel="stylesheet" href="http://fonts.googleapis.com/css?family=Asap:400,700,700italic,400italic" />');
 
-	if(isset($_GET['krumo'])){
-		krumo($vars);
+	if(isset($_GET['krumo'])){ /***************************** quitar en produccion ********************/
+		
+		 krumo($vars);
+		
 	}
 	//$vars['template_files'][]="page-miguel-es-un-capullo";
 

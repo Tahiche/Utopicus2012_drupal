@@ -51,10 +51,18 @@ if (empty($theme_pathabsoluto)){
 						<!-- loginmenu -->
 						<ul class="loginmenu">
 							<li><a href="/user">ÚNETE </a></li>
-							<li><a href="/user">ACCEDER</a></li>
+							<li ><a id="toboggan-login-link" href="/user">ACCEDER</a></li>
 						</ul>
 					</div>
 				</div>
+                
+                            <?php
+//primary-menu.tpl theme hook 
+// print theme('header_menu');
+include_once 'commonforms/login.inc.php';
+?>
+
+
                 <!-- // topbar -->
 				<!-- header-holder -->
 				<div class="header-holder">
@@ -70,6 +78,9 @@ include_once 'menus/primary-menu.tpl.php';
                 <!-- // header-holder -->
 			</div>
             <!-- // header -->
+            
+
+
             <?php 
 			//krumo($variables); 
 			
