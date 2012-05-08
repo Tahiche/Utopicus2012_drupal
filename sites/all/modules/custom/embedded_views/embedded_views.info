@@ -1,0 +1,5 @@
+; $Id$
+name = Embedded Views
+description = Proporciona views con embed para ajax, etc.
+core = 6.x
+package=" Custom"

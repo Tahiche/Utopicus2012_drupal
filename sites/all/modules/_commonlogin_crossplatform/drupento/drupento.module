@@ -1,0 +1,314 @@
+<?php
+
+require_once('drupento.inc');
+require_once('Drupento.class.php');
+
+/**
+ * Implementation of hook_menu
+ *
+ * @return array
+ * 
+ **/
+function drupento_menu() {
+	
+	$items = array();
+
+	$items['admin/settings/drupento'] = array(
+			'title' => 'Drupento',
+			'page arguments' => array('drupento_admin_settings'),
+			'page callback' => 'drupal_get_form',
+			'access arguments' => array('access administration pages')
+	);
+
+	$items['admin/settings/drupento/configuration'] = array(
+			'title' => 'Settings',
+			'page arguments' => array('drupento_admin_settings'),
+			'page callback' => 'drupal_get_form',
+			'access arguments' => array('access administration pages')
+	);
+
+	$items['admin/settings/drupento/flush-cache'] = array(
+ 			'title' => 'Flush Cache',
+ 			'page callback' => 'drupento_flush_cache',
+	    	'access arguments' => array('access administration pages'),
+	   		'file' => 'drupento.inc'
+    );
+
+	return $items;
+}
+
+/**
+ * Builds out the admin settings form array
+ *
+ * @return array
+ * @todo: add message if user inputs an invalid configuration option
+ * 
+ **/
+function drupento_admin_settings_build_form() {
+	
+	$form = array();
+
+	$form['settings'] = array(
+		'#type' => 'fieldset',
+		'#title' => 'Main Settings',
+		'#weight' => 0,
+		'#collapsible' => TRUE
+	);
+	
+	$form['paths'] = array(
+		'#type' => 'fieldset',
+		'#title' => 'Path Settings',
+		'#weight' => 1,
+		'#collapsible' => TRUE
+	);
+	
+	$form['cookies'] = array(
+		'#type' => 'fieldset',
+		'#title' => 'Cookie Settings',
+		'#weight' => 2,
+		'#collapsible' => TRUE
+	);
+
+	$form['advanced'] = array(
+		'#type' => 'fieldset',
+		'#title' => 'Advanced Settings',
+		'#weight' => 3,
+		'#collapsible' => TRUE,
+		'#collapsed' => TRUE
+	);
+
+	// SETTINGS
+	$form['settings']['drupento_cache_lifetime'] = array(
+			'#type' => 'textfield',
+			'#title' => t('Cache lifetime'),
+			'#default_value' => variable_get('drupento_cache_lifetime', 0),
+			'#description' => t("The lifetime of cached files (how often they will be regenerated)."),
+			'#required' =>	FALSE
+	);
+	
+	$form['settings']['drupento_magento_store_code'] = array(
+			'#type' => 'textfield',
+			'#title' => t('Magento store code'),
+			'#default_value' => variable_get('drupento_magento_store_code', ''),
+			'#description' => t("The store code is the machine readable id of the Magento install."),
+			'#required' =>	FALSE
+	);
+	
+	$form['settings']['drupento_callback_config_file'] = array(
+			'#type' => 'textfield',
+			'#title' => t('Callback Configuration File'),
+			'#default_value' => variable_get('drupento_callback_config_file', ''),
+			'#description' => t("Custom Magento API callback file (See documentation). This can typically be placed in the theme directory it is to be used with."),
+			'#required' =>	FALSE
+	);
+
+	$form['settings']['drupento_cache_dir_umask'] = array(
+			'#type' => 'textfield',
+			'#title' => t('Cache directory umask'),
+			'#default_value' => variable_get('drupento_cache_dir_umask', '0777'),
+			'#description' => t("UNIX umas for the cache directory"),
+			'#required' =>	TRUE
+	);
+
+	$form['settings']['drupento_api_url'] = array(
+			'#type' => 'textfield',
+			'#title' => t('Magento API URL'),
+			'#default_value' => variable_get('drupento_api_url', ''),
+			'#description' => t("The Magento API URL (WSDL or XML-RPC url)"),
+			'#required' =>	TRUE
+	);
+
+	$form['settings']['drupento_api_user'] = array(
+			'#type' => 'textfield',
+			'#title' => t('Magento API User'),
+			'#default_value' => variable_get('drupento_api_user', ''),
+			'#description' => t("The Magento API user"),
+			'#required' =>	TRUE
+	);
+	
+	// COOKIES
+	$form['settings']['drupento_api_password'] = array(
+			'#type' => 'textfield',
+			'#title' => t('Magento API Password'),
+			'#default_value' => variable_get('drupento_api_password', ''),
+			'#description' => t("The Magento API password"),
+			'#required' =>	TRUE
+	);
+
+	$form['cookies']['drupento_cookie_lifetime'] = array(
+			'#type' => 'textfield',
+			'#title' => t('Cookie lifetime'),
+			'#default_value' => variable_get('drupento_cookie_lifetime', ini_get('session.cookie_lifetime')),
+			'#description' => t("This controls the session lifetime of Drupento sessions. This value will ONLY be used for users authenticate using the Drupento Auth module"),
+			'#required' =>	FALSE
+	);
+
+	$form['cookies']['drupento_cookie_domain'] = array(
+			'#type' => 'textfield',
+			'#title' => t('Cookie Domain'),
+			'#default_value' => variable_get('drupento_cookie_domain', ''),
+			'#description' => t("This setting controls the domain the cookies for Drupento Auth will be created for. IMPORTANT: The value set in the Magento backend MUST match this EXACTLY."),
+			'#required' =>	TRUE
+	);
+
+	// PATHS
+	$form['paths']['drupento_cache_path'] = array(
+			'#type' => 'textfield',
+			'#title' => t('Cache path'),
+			'#default_value' => variable_get('drupento_cache_path', ''),
+			'#description' => t("The path to the cache files. This will be used on the Magento side to load in cached files."),
+			'#required' =>	FALSE
+	);
+
+	$form['paths']['drupento_magento_install_path'] = array(
+			'#type' => 'textfield',
+			'#title' => t('Path to Magento installation'),
+			'#default_value' => variable_get('drupento_magento_install_path', ''),
+			'#description' => t("The path to Magento."),
+			'#required' =>	FALSE
+	);
+
+	$form['paths']['drupento_simplehtmldom_path'] = array(
+			'#type' => 'textfield',
+			'#title' => t('simplhtmldom path'),
+			'#default_value' => variable_get('drupento_simplehtmldom_path', drupento_get_standard_simplehtmldom_path()),
+			'#description' => t("The path to the simplehtmldom library."),
+			'#required' =>	FALSE
+	);	
+	
+	$form['paths']['drupento_php_cli_binary_path'] = array(
+			'#type' => 'textfield',
+			'#title' => t('php-cli binary path'),
+			'#default_value' => variable_get('drupento_php_cli_binary_path', 'php'),
+			'#description' => t("The path to the php-cli binary to be used. Drupento requires php 5.2+"),
+			'#required' =>	FALSE
+	);	
+
+	// ADVANCED
+	$form['advanced']['drupento_magento_store_id'] = array(
+			'#type' => 'textfield',
+			'#title' => t('Store ID'),
+			'#default_value' => variable_get('drupento_magento_store_id', null),
+			'#description' => t("The store id of your Magento store (used if useing separate databases)"),
+			'#required' =>	FALSE
+	);	
+	$form['advanced']['drupento_magento_website_id'] = array(
+			'#type' => 'textfield',
+			'#title' => t('Website ID'),
+			'#default_value' => variable_get('drupento_magento_website_id', null),
+			'#description' => t("The website ID of your Magento store (used if using separate databases)"),
+			'#required' =>	FALSE
+	);	
+
+	return $form;
+}
+
+/**
+ * Implementation of hook_nodeapi()
+ * Sets up node caching
+ */
+function drupento_nodeapi(&$node, $op) {
+	try {
+		switch($op) {
+			case "update":
+				$cache = drupento_get_cache_file_path(constant('DRUPENTO_CACHE_TYPE_NODE'), "{$node->nid}");
+				
+				$cache_file = $cache['cache_file'];
+				
+				if(!file_exists($cache_file)) {
+					// this node isn't already cached, so no need to re-cache
+					break;	
+				}
+				
+				// otherwise, update the cache file
+				$cache_settings = array();
+				$cache_settings['type'] = 'node';
+				$cache_settings['target'] = $node->nid;
+				
+				Drupento::Cache($cache_settings);
+				break;
+					
+			default:
+				break;
+		}
+	}
+	catch( DrupentoException $e ) {
+		drupento_log_error( $e );
+	}
+}
+
+
+/**
+ * Menu callback - renders admin form
+ *
+ * @return array
+ * 
+ **/
+function drupento_admin_settings() {
+
+	$form = drupento_admin_settings_build_form();
+	
+	$form = system_settings_form($form);
+	$form['#submit'][] = 'drupento_admin_settings_submit';
+	$form['buttons']['#weight'] = 4;
+
+	return $form;
+}
+
+/**
+ * Submit preprocessor for admin settings form - writes configration to 
+ * the specified Magento install directory
+ *
+ * @return boolean
+ * 
+ **/
+function drupento_admin_settings_submit() {
+	
+	//
+	// It's important to have these elements in the database as well
+	// as the DrupentoConf file,
+	// otherwise drupento_conf_get() might fail when on the drupal side
+	//
+	variable_set( 'drupento_drupal_base_path', drupento_get_drupal_base_path() );
+	variable_set( 'drupento_module_path', dirname(__FILE__) );
+	variable_set( 'drupento_drupal_base_url', $_SERVER['HTTP_HOST'] );
+	
+	if(_drupento_write_configuration()) {
+		return true;
+	}
+	return false;
+}
+
+/**
+ * Retrieves the admin settings and writes them to the specified Magento install
+ * location
+ *
+ * @return boolean
+ * 
+ **/
+function _drupento_write_configuration() {
+	
+	$admin_form = drupento_admin_settings_build_form();
+	$flat_form = $admin_form['settings'] + $admin_form['paths'] + $admin_form['cookies'];
+	return _drupento_write_mage_configuration_file($flat_form);
+}
+
+/**
+ * Implements hook_define_mage_cache
+ * Defines a default array of configured caches
+ *
+ * @return array
+ *
+ **/
+function drupento_define_mage_cache() {
+
+	$cache = array();
+	
+	$cache['path'][] = array(
+		'uri'		=> 'home',
+		'element'	=> '#page_header_elements'
+	);
+	
+	
+	return $cache;
+}

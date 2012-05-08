@@ -1,0 +1,5 @@
+<?php 
+function drupento_auth_install() {
+	db_query("UPDATE {system} SET weight = %d WHERE name = '%s'", -1, 'drupento_auth');	
+}
+?>

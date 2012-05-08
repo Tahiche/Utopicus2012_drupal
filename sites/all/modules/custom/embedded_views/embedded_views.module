@@ -1,0 +1,47 @@
+<?php
+// $Id$
+
+/**
+ * @file
+ * TODO: Enter file description here.
+ */
+
+/**
+ * Implementation of hook_menu().
+ */
+ /*
+function embedded_views_menu() { 
+  // This is the minimum information you can provide for a menu item.
+  $items['TODO: Enter path'] = array(
+    'title' => 'TODO: Enter menu item title',
+    'page callback' => 'TODO: Enter callback function',
+    'access arguments' => array('TODO: Enter user permissions'),
+  );
+  // more complex menu item
+  $items['TODO: Enter path'] = array(
+    'title' => 'TODO: Enter menu item title',
+    'description' => 'TODO: Enter description',
+    'page callback' => 'TODO: Enter callback function',
+    'page arguments' => '', // An array of arguments to pass to the page callback function. Integer values pass the corresponding URL component.
+    'access callback' => '', // defaults to user_access()
+    'access arguments' => array('TODO: Enter user permissions'),
+    'weight' => 0,
+    'type' => MENU_NORMAL_ITEM, // One of MENU_NORMAL_ITEM / MENU_CALLBACK / MENU_SUGGESTED_ITEM / MENU_LOCAL_TASK / MENU_DEFAULT_LOCAL_TASK
+    'menu_name' => '', // Menu to place this item in.
+    'title callback' => '', // Function to generate the title, defaults to t(). 
+    'title arguments' => '', // Arguments to send to t() or your custom callback. 
+  );
+  // OPTIONAL: Fill in additional static menu items
+
+  return $items;
+}*/
+function embedded_views_preprocess_page(&$vars, $hook) {
+	if($vars['is_front']){
+	//krumo($vars);
+	$vars['agendaview']=views_embed_view("agenda_front","default"); 
+	$vars['scripts'] = drupal_get_js();
+}
+
+
+
+}
