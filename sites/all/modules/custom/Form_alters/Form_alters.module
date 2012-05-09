@@ -51,6 +51,7 @@ function Form_alters_form_alter(&$form, &$form_state, $form_id) {
 	//'#validate' => array(),
 	//krumo(_multistep_get_current_step($type)); 
 	//drupal_set_message( krumo($form) ); 
+	
 	// el hierarchicAL select riompia la validacion,contaba como oblñigatorio en paso 1 a pesar de estar en paso 2
 	$type = $form['#node']->type;
 	$step=_multistep_get_current_step($type);
@@ -59,6 +60,17 @@ function Form_alters_form_alter(&$form, &$form_state, $form_id) {
 		$form['taxonomy'][3]['#required']=1;
 	}
 	else{$form['taxonomy'][3]['#required']=0; }
+	
+	// legal en paso 3 obliogatorio, rompe validación
+	/*if($step==3){
+		// unset($form['taxonomy']);
+		$form['legal']['legal_accept']['#required']=1;
+	}
+	else{$form['legal']['legal_accept']['#required']=0; }*/
+	// como hay registro que redirige a content profile, me cargo el legal
+	unset($form['legal']);
+	
+	
 	// para boton anterior
 	array_unshift($form['#after_build'], 'Form_alters_form_after_build');
 	// $form['#after_build'][] = 'Form_alters_form_after_build';
@@ -172,6 +184,12 @@ function Form_alters_content_extra_fields($type_name) {
     'label' => t('User picture in profile'),
     'description' => t('User picture in profile'),
     'weight' => -1, 
+  );
+  
+   $fields['legal'] = array(
+    'label' => t('Terms and conditions in profile'),
+    'description' => t('Terms and conditions in profile'),
+    'weight' => 100,
   );
   
   return $fields;

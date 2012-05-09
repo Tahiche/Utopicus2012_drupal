@@ -2219,7 +2219,15 @@ form label{
     font: 700 14px/16px 'Asap',Arial,Helvetica,sans-serif;
     margin: 0 20px 0 0;
     padding: 7px 0 0;
+    /*text-transform: uppercase;*/
+}
+
+form legend {
+    font: 700 16px 'Asap',Arial,Helvetica,sans-serif;
+    margin-top:20px;
+    padding: 7px 0 0;
     text-transform: uppercase;
+	color:#5E5E5E;
 }
 
 
@@ -2289,7 +2297,7 @@ background: rgba(231, 231, 231, 0.85);
     margin: 0 3px 0 0;
     padding:2px 5px;
     width: 80%;
-
+}
 /* Animated throbber */
 html.js input.form-autocomplete {
       background-image: url("/misc/throbber.gif");

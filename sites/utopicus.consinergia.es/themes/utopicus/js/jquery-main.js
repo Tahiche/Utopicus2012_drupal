@@ -1458,6 +1458,16 @@ jcf.addModule({
 		this.realElement.parentNode.insertBefore(this.fakeElement, this.realElement);
 		jcf.lib.event.add(this.realElement, 'click', this.onRealClick, this);
 		this.refreshState();
+		/*********************************************************** PATCH **************************/
+		// permitir link clickable en legal terms, sino propagaba y sólo hacía el checkbox
+		// stopImmediatePropagation permite el link
+		var fake=$(this.realElement.parentNode).find('a');
+		//console.log(fake);
+		$(fake).click(function(event){
+    event.stopImmediatePropagation();
+   // alert('link')
+});
+/***********************************************************fin PATCH **************************/
 	},
 	onFakePressed: function() {
 		jcf.modules[this.name].superclass.onFakePressed.apply(this, arguments);
@@ -1549,7 +1559,7 @@ jcf.addModule({
 		if(this.labelFor) {
 			jcf.lib.event.add(this.labelFor, 'click', this.toggleRadio, this);
 		}
-		/****************************AÑADIDO para conditional !!! *********************************/
+		
 		
 		
 	},
