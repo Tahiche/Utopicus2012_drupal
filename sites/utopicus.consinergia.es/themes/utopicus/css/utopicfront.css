@@ -1,0 +1,47 @@
+@charset "utf-8";
+/* CSS Document */
+
+ul.load-more-pager li.pager-next{
+/*text-indent: -100em;*/
+background: none repeat scroll 0 0 #444444;
+    border-radius: 16px 16px 16px 16px;
+    /*bottom: 0;*/
+    height: 33px;
+    left: 50%;
+    margin: 0 0 0 -20px;
+    overflow: hidden;
+    position: absolute;
+    width: 33px;
+	 padding: 0;
+	-webkit-transition:all 500ms ease-in-out;
+	-moz-transition:all 500ms ease-in-out;
+	-o-transition:all 500ms ease-in-out;
+	transition:all 500ms ease-in-out;
+	}
+
+ul.load-more-pager li.pager-next:hover{background:#afa4d2;}
+
+ul.load-more-pager li.pager-next a{
+	-webkit-transition: 0;
+	-moz-transition:0;
+	-o-transition:0;
+	transition:0;
+
+    display: block;
+    ;
+    overflow: hidden;
+    text-indent: -9999px;
+	height: 11px;
+    margin: 11px 0 0 11px;
+    width: 11px;
+	background: url("../images/bg-form.png") no-repeat scroll 0 -152px transparent;
+	
+	
+	}
+
+ul.load-more-pager li.pager-next a.views-throbbing{
+	height: 16px;
+	width: 16px;
+	background: url("../images/loadingspinner.gif") no-repeat scroll 0 0 transparent;
+	margin: 8px 0 0 8px;
+	}

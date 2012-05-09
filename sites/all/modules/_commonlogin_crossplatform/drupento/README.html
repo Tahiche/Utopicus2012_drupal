@@ -1,0 +1,295 @@
+<p>
+	<a href="http://drupal.org/project/drupento">Drupento</a> aims to integrate two of the most powerful open source systems available - Drupal and Magento. The goal of this project is to provide an lightweight static caching layer between the two systems.  Drupento allows each system to operate independently, letting the developer or themer choose the points of integration.
+</p>
+<p>
+	<a href="http://drupal.org/project/drupento">Drupento</a> consists of 2 parts - the <a href="http://drupal.org/project/drupento">Drupal module</a>, and the <a href="http://www.magentocommerce.com/extension/packages/module/6035/drupento">Magento extension</a>.
+	The Magento extension is <b>required</b> if you are using the Drupento Auth add-on module. It is optional otherwise, however, there are some API enhancements included that are useful when using the Drupento cache layer as well. 
+</p>
+<p>
+	Drupento is developed and maintained by Context (http://contextllc.com). This project came out of necessity when a client specifically requested Drupal and Magento, and the layout required elements of both systems on many pages.
+</p>
+
+<h2>DRUPENTO POWERED SITES</h2>
+http://laurazindel.com
+http://keystoneballast.com
+http://waldensurfboards.com 
+
+<h2>What it Does</h2>
+
+<p>
+	The primary issue that prompted the development of Drupento was that the Magento theme on our client's site needed to share the same menu as the Drupal theme. We also needed to do this WITHOUT bootstrapping Drupal on each page load inside Magento, for obvious performance reasons.
+</p>
+
+<p>
+	Drupento makes this easy with a single, static method:
+
+	<?php Drupento::Output('home', '#primary_nav'); ?>
+	
+	This static method does a lot, making it the primary component of the module. The method and its parameters are explained in detail in the Usage section.
+
+	<ul>
+		<li>Provides an API for use inside of Magento, which allows developers
+		to output Drupal content in a Magento template</li>
+		<li>Provides functionality to cache custom queries to the Magento API (SOAP/XML-RPC)</li>
+		<li>Supports caching of:
+			<ul>
+				<li>Paths/Elements</li>
+				<li>Nodes</li>
+				<li>Custom Callbacks</li>
+			</ul>	
+		</li>
+	</ul>	
+</p>
+	
+<h2>What it DOESN'T</h2>
+<p>
+
+	<ul>
+		<li>By itself, Drupento doesn't provide any integration of the systems outside of the caching mechanism</li>
+		<li>Drupento doesn't do any caching automatically - the developer must invoke Drupento where it is needed</li>
+	</ul>
+</p>
+
+<h2>Installation & Requirements</h2>
+
+<b>REQUIREMENTS:</b>
+
+<p>
+	<b>NOTE:</b> The server must have a copy of the Simple HTML DOM library somewhere that is accessible by the user account running the site. There is a configuration option for the path to the library. Normally, you will want to put this in /sites/all/libraries, which is the default location Drupento looks for. <br/>
+
+	http://simplehtmldom.sourceforge.net/
+</p>
+
+<p>
+	<b>NOTE:</b> These instructions assume your Magento install lives within your Drupal base directory. This is <b>no longer</b> a requirement for usage of the module, but depending on where Magento lives in relationship to where Drupal is installed, you may experience permissions issues.
+</p>
+
+<p>
+	Typically (for us, at least), a Drupento project's directory layout looks something like:
+
+	<ul>
+		<li>
+			/drupal
+			<ul>
+				<li>/index.php</li>
+				<li>/sites</li>
+				<li>/modules</li>
+				<li>... other stuff ...</li>
+				<li>/store (Magento)</li>
+			</ul>
+		</li>
+	</ul>
+	The installation instructions will assume this layout.
+</p>
+
+<p>
+	<b>TO INSTALL:</b>
+	
+	<ol>
+		<li>
+			Copy the drupento directory to your module directory and then enable on the admin modules page.
+		</li>
+		<li>
+			Set up the initial permissions: 
+			<ul>
+				<li>/store (or your Magento install dir) - needs to be writable by the server for the config file. When you save the Drupento configuration options, a configuration file is written to the root of the store. After you have a working setup, you can restrict the permissions on this directory.</li>
+				<li>/path/to/drupento/module - needs to be writable by server (only if you have enabled logging in the code)</li>
+			</ul>
+		</li>
+		<li>
+			Install the Magento extension here: http://www.magentocommerce.com/extension/packages/module/6035/drupento <br />
+			<b>There are no configuration options for the Magento module</b>
+		</li>
+		<li>
+			Configure the drupal module - See next section.		
+		</li>
+	</ol>
+</p>
+
+<h2>Configuration</h2>
+
+<p>
+	Configuration of Drupento is done via the settings page at:
+	http://domain.tld/admin/settings/drupento
+
+	These configuration options are shared between both the Magento and Drupal installations through a config file that gets written upon saving the form.
+</p>
+
+
+<h4>THE OPTIONS:</h4>
+<b>*** NOTE: All paths must be ABSOLUTE ***</b>
+<p>
+	<h5>Main Settings</h5>
+	<ul>
+		<li>Cache lifetime
+			<ul>
+				<li>the number of seconds the cached files will remain fresh. If Drupento tries to include a cache file that is expired, it will re-cache before doing so.</li>
+			</ul>
+		</li>
+		<li>Magento Store Code
+			<ul>
+				<li>The machine code of the Magento store you are connecting to</li>
+			</ul>
+		</li>		
+		<li>Callback Configuration File
+			<ul>
+				<li>the path to the file which contains custom callbacks for the site. This is explained in the <b>Usage</b> section.</li>
+			</ul>
+		</li>
+		<li>Cache directory umask
+			<ul>
+				<li>the umask to use for the cache directory and its subdirectories. Defaults to 0777</li>
+			</ul>
+		</li>
+		<li>Magento API URL
+			<ul>
+				<li>the full url of the Magento API wsdl</li>
+			</ul>
+		</li>
+		<li>Magento API username
+			<ul>
+				<li>the api username</li>
+			</ul>
+		</li>
+		<li>Magento API Password
+			<ul>
+				<li>the api password</li>
+			</ul>
+		</li>
+	</ul>
+	<h5>Path Settings</h5>	
+	<ul>
+		<li>Cache path
+			<ul>
+				<li>the cache path is where the cached files will be stored. This should be a directory under the docroot (/path/to/drupal/cache)</li>
+			</ul>
+		</li>
+		<li>Path to Magento Base Install
+			<ul>
+				<li>the path to the Magento base directory</li>
+			</ul>
+		</li>
+		<li>Simplehtmldom Path
+			<ul>
+				<li>the path to the Simple HTML DOM library. Defaults to the libraries directory</li>
+			</ul>
+		</li>
+		<li>PHP Cli binary path
+			<ul>
+				<li>the path to the php binary on the system. This is required, as many hosts have different versions of php for apache and the cli. Drupento requires PHP 5.2 or later, as well as SOAP (this is a Magento API requirement) for both Apache AND CLI. On unix based systems, to the output of "which php"</li>
+			</ul>
+		</li>
+	</ul>
+	<h5>Cookie Settings</h5>	
+	<ul>
+		<li>Cookie Lifetime
+			<ul>
+				<li>This controls the session lifetime of Drupento sessions. This value will ONLY be used for users authenticated using the Drupento Auth module</li>
+			</ul>
+		</li>
+		<li>Cookie Domain
+			<ul>
+				<li>This setting controls the domain the cookies for Drupento Auth will be created for. IMPORTANT: The value set in the Magento backend MUST match this EXACTLY.</li>
+			</ul>
+		</li>
+	</ul>
+
+	<b>*NOTE: Upon saving the configuration values, a config file is written in the base of the Magento directory.</b>
+</p>
+
+<h2>How it Works</h2>
+<p>
+	Working with Drupento requires a bit of knowledge about how exactly it accomplishes it's task. From start to finish, here is an example of a 'dom_element' cache request made by Drupento.
+</p>
+<p>
+	<?php Drupento::Output('home', '#primary_nav'); ?>
+	<ol>
+		<li>When the above code is executed, Drupento will look for a cache file for the '#primary_nav' element at the path '/home'</li>
+		<li>If the cache file exists (and is not stale), it is simply included. Otherwise, Drupento will the invoke a cli "bridge" script and request a cache file for that path/element</li>
+		<li>Before the element can be cached, the path itself must be cached. If it is not cached already, and it is not stale, Drupento will bootstrap Drupal and cache the entire output of the path.</li>
+		<li>After the path has been cached, the Simple HTML Dom library is used to extract the element from the markup.</li>
+		<li>The element is cached, and then Drupento includes the cache file. Processing continues.</li>
+	</ol>
+</p>
+
+<h2>Usage</h2>
+
+<p>
+	As mentioned previously, most of the functionality of Drupento on the Magento side stems from the <b>Drupento::Output</b> method. The output method can cache the following:
+	<ul>
+		<li>Path & Element</li>
+		<li>Callback</li>
+	</ul>
+</p>
+
+<?php Drupento::Output( $type_or_target, $selector = null, $options = array() ); ?>
+<p>
+	This method is overloaded in a sense - for ease of use, we allow Output() to be called with only two parameters, even though the first parameter is sometimes a cache type (e.g. 'callback'), and other times it is a uri path (e.g. 'home'). 
+</p>
+
+<h3>PATH/ELEMENT CACHING:</h3>
+
+<?php Drupento::Output('home', '#primary_nav'); ?>
+<p>
+	If the first param is not a cache type of either 'callback' or 'node', Drupento will assume you are trying to cache a path/element. 
+</p>
+
+<h3>CALLBACK CACHING:</h3>
+
+<p>
+	This is useful both on the Magento side AND the Drupal side. Callback caching allows us to generate any markup, and cache it to a file. The primary example of this, and the reason callback caching exists, is for use with the API:
+</p>
+	
+<p>
+	Say you wanted to generate a menu of Magento categories and use it on your Drupal homepage. The Magento API is sometimes a reasonable option for getting data, but the overhead of making a SOAP or XML-RPC call on every load makes this less-than-ideal in our case. 
+</p>
+
+<p>
+	In your callback config file (which is specified in the configuration), you can write functions to generate the required markup. <br>Additionally, Drupento provides a simple API wrapper to manage the client and session transport.
+
+	<?php 
+	function print_product_menu() {
+		$html = '';
+		$result = Drupento::Api_get('drupento_category.tree', array(CATEGORY_ID), true);
+
+		foreach( $result as $category ) { 	
+			// generate the html
+			...
+		}
+	
+		return $html;
+	}
+	?>
+</p>
+<p>
+	You can then invoke this callback and cache/output the return by calling:
+	<?php Drupento::Output('callback', 'print_product_menu'); ?>
+</p>
+
+<h3>NODE CACHING:</h3>
+<p>
+	<?php $node = Drupento::Node_load(267); ?>
+
+	If the node is not already cached, Drupento will bootstrap Drupal, perform a node_load, and then cache the serialized $node object.
+	Otherwise, the $node object will be loaded from the cached copy.
+
+	You can then work with the node object just as you would inside of Drupal.
+</p>
+
+<p>
+	Whenever a node is updated in Drupal, Drupento will check to see if there is a cached copy. If one exists, Drupento will re-cache it to keep the Magento side up to date ***
+</p>
+
+<h3>Drupento SSO (drupento_auth)</h3>
+<p>
+	The Drupento Auth module provided with Drupento allows you to use shared credentials for users on your site. Drupento Auth modifies the login form to use email addresses rather than a username. 
+</p>
+<p>
+	The only step needed to enable SSO is to enable the module. Assuming all of your settings are correct, the authentication routines of both systems should then be synced.
+</p>
+<p>
+	<b>NOTES:</b>
+	<ol>
+		<li>Make sure your cookie domain is set properly in the Drupento config, as well as the Magento configuration. The cookie domain should always include the leading '.'.</li>
+	</ol>
+</p>

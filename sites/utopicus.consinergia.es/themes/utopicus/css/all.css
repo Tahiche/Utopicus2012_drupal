@@ -423,7 +423,7 @@ button:hover{cursor:pointer;}
 	position:relative;
 	margin:0 0 8px;
 	border-top:1px solid #d1d1d1;
-	font-size:1.2em;
+	/*font-size:1.2em;*/
 	line-height:1.499em;
 	-webkit-transition:all 500ms ease-in-out;
 	-moz-transition:all 500ms ease-in-out;
