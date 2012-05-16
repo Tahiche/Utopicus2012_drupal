@@ -1,0 +1,258 @@
+<?php
+// $Id$
+
+/**
+ * @file
+ * Magento product functionality.
+ */
+
+/**
+ * Implementation of hook_nodeapi().
+ */
+function magento_product_nodeapi(&$node, $op, $a3 = NULL, $a4 = NULL) {
+  switch ($op) {
+    case 'view':
+      if (!in_array($node->type, magento_stores_get_product_content_types())) {
+        return;
+      }
+
+      drupal_add_css(drupal_get_path('module', 'magento_product') .'/magento_product.css');
+      $node->content['add_to_cart'] = array('#type' => 'markup');
+
+      // Opt dept for stock module.
+      if (function_exists('magento_stock_add_stock_to_product')) {
+        magento_stock_add_stock_to_product($node);
+      }
+      // We use && to prevent notice generation.
+      if (!_magento_product_is_in_stock($node)) {
+        $node->content['add_to_cart']['#value'] = t('This item is out of stock.');
+      }
+      else {
+        // Disable AJAX for `Add to cart` form if product has CUSTOM OPTIONS
+        $ahah = _magento_product_has_custom_options($node) ? NULL : array(
+            'wrapper' => 'magento_cart_state',
+            'method' => 'replace',
+            'effect' => 'fade',
+          );
+
+        $node->content['add_to_cart']['#value'] = drupal_get_form(
+          'magento_cart_add_product_form_'. $node->nid,
+          array(
+            'nid' => $node->nid,
+            'btn_txt' => t('Add to cart')
+          ), $ahah
+        );
+      }
+    break;
+  }
+}
+
+/**
+ * Helper function return whether product is in stock or not.
+ * @param $node
+ *   Node object of the product
+ * @return boolean
+ */
+function _magento_product_is_in_stock($node) {
+  if (empty($node->stock)) {
+    // IF PRODUCT node doesn't have stock information - ASSUME that this product is available anyway ( = is in stock )
+    return TRUE;
+  }
+
+  if (!empty($node->stock['is_in_stock'])) {
+    return TRUE;
+  }
+
+  // IF MANAGE_STOCK is disabled - ASSUME that this product is available anyway ( = is in stock )
+  if (empty($node->stock['manage_stock'])) {
+    if (empty($node->stock['use_config_manage_stock'])) {
+      return TRUE;
+    }
+
+    $default_manage_stock_settings = magento_api_get_config_info('cataloginventory/item_options/manage_stock', NULL, 86400);
+    if (empty($default_manage_stock_settings)) {
+      return TRUE;
+    }
+  }
+
+  return FALSE;
+}
+
+/**
+ * Helper function return whether product has custom options or no.
+ * @param $node
+ *   Node object of the product
+ * @return boolean
+ */
+function _magento_product_has_custom_options($node) {
+  return !empty($node->field_custom_options_data[0]['value']);
+}
+
+/**
+ * Implementation of hook_preprocess_node().
+ */
+function magento_product_preprocess_node(&$vars) {
+    if (in_array($vars['type'], magento_stores_get_product_content_types())) {
+    $vars['template_files'][] = 'magento-product-view';
+
+    // loading product
+    $vars['product'] = _magento_product_load_product($vars['node']->nid);
+  }
+}
+
+/**
+ * Implementation of hook_theme_registry_alter().
+ */
+function magento_product_theme_registry_alter($theme_registry) {
+  $original_path = array_shift($theme_registry['node']['theme paths']);
+  $module_path = drupal_get_path('module', 'magento_product');
+  array_unshift($theme_registry['node']['theme paths'], $original_path, $module_path);
+}
+
+/**
+ * Implementation of hook_theme().
+ */
+function magento_product_theme() {
+  return array(
+    'magento_product_image' => array(
+      'arguments' => array('image' => NULL, 'attributes' => NULL)
+    ),
+    'magento_product_price' => array(
+      'arguments' => array('product' => NULL, 'quantity' => NULL)
+    ),
+    'magento_product_format_price' => array(
+      'arguments' => array('price' => NULL, 'currency_symbol' => NULL)
+    ),
+  );
+}
+
+/**
+ * Implementation of hook_views_api().
+ */
+function magento_product_views_api() {
+  return array(
+    'api' => '2',
+  );
+}
+
+/**
+ * THEME FUNCTIONS
+ */
+
+/**
+ * Theming product image
+ *
+ * @param $image
+ *   Relative path to Magento image in media directory
+ *
+ * @return
+ *   <img ... /> tag with full path to Magento image
+ */
+function theme_magento_product_image($image, $attributes = array()) {
+  if (!($path = _magento_product_image_path($image))) {
+    $path = base_path() . drupal_get_path('module', 'magento_product') .'/images/no-image.png';
+  }
+
+  $img = '<img src="'. $path .'"' . drupal_attributes($attributes) . '/>';
+
+  return $img;
+}
+
+function theme_magento_product_price($product, $quantity = 1) {
+  $is_special = FALSE;
+  $current_date = new DateTime();
+  $from_date = new DateTime($product->field_special_from_date[0]['value']);
+  $to_date = new DateTime($product->field_special_to_date[0]['value']);
+
+  if ($current_date >= $from_date && $current_date <= $to_date && !empty($product->field_special_price[0]['value'])) {
+    $price = theme('magento_product_format_price', $product->field_special_price[0]['value']*$quantity) ." (<strike>". theme('magento_product_format_price', $product->field_price[0]['value']*$quantity) ."</strike>)\n";
+  }
+  else {
+    $price = theme('magento_product_format_price', $product->field_price[0]['value']*$quantity);
+  }
+
+  return $price;
+}
+
+/**
+ * Print price with coins.
+ *
+ * @param $price
+ *   Product price
+ * @param $currency_symbol
+ *   Currency symbol to use with for price formatting. If module "magento_currencies" is enabled current currency will be used instead.
+ */
+function theme_magento_product_format_price($price, $currency_symbol = '€' ) {
+  // Check if we can use curency module to respect rate.
+  if (function_exists('magento_currencies_get_current')) {
+    $current = magento_currencies_get_current();
+    $price *= $current['rate'];
+    $currency_symbol = $current['sign'];
+  }
+
+  // String price.
+  $price = number_format($price, 2, '.', ' ');
+
+  $money_format = '%s %s';
+  $price = sprintf($money_format, $price, $currency_symbol);
+
+  return $price;
+}
+
+/**
+ * COMMON HELPER_FUNCTIONS
+ */
+
+/**
+ * Returns path to the image in Magento media directory.
+ *
+ * @param $image
+ *   Relative path to image in Magento media directory, for example "/c/h/image1.png"
+ *
+ * @return
+ *   Full URL to image in Magento media folder or FALSE. Base Magento URL will be parsed from the configuration of magento_api
+ */
+function _magento_product_image_path($image) {
+  if (($parsed_url = parse_url(variable_get('magento_host_url', 0))) && !empty($image) && $image != 'no_selection') {
+    $parsed_url['path'] = str_replace('/api/xmlrpc', '', rtrim($parsed_url['path'], '/'));
+    return $parsed_url['scheme'] .'://'. $parsed_url['host'] . $parsed_url['path'] . '/media/catalog/product'. $image;
+  }
+
+  return FALSE;
+}
+
+/**
+ * Merge all product properties from node and all parent nodes
+ */
+function _magento_product_load_product($nid) {
+  // THIS is important <if> - cause it fix the index key of product in cart.
+  if (isset($nid) && is_string($nid)) {
+    $nid = intval($nid);
+  }
+
+  $node = node_load($nid);
+  if (isset($node->field__parent__) && ($parent = node_load($node->field__parent__[0]['nid']))) {
+    $parent->__expand__ = TRUE;
+    $parent = node_build_content($parent);
+    drupal_render($parent->content);
+    node_invoke_nodeapi($parent, 'alter', FALSE, FALSE);
+    foreach ($parent as $property => $value) {
+      if (!isset($node->$property)) {
+        $node->$property = $value;
+      }
+    }
+  }
+  if (isset($parent->field__parent__) && ($parent2 = node_load($parent->field__parent__[0]['nid']))) {
+    $parent2->__expand__ = TRUE;
+    $parent2 = node_build_content($parent2);
+    drupal_render($parent2->content);
+    node_invoke_nodeapi($parent2, 'alter', FALSE, FALSE);
+    foreach ($parent2 as $property => $value) {
+      if (!isset($node->$property)) {
+        $node->$property = $value;
+      }
+    }
+  }
+
+  return $node;
+}

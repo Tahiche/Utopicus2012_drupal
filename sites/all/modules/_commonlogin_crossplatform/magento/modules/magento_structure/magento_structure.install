@@ -1,0 +1,43 @@
+<?php
+// $Id$
+
+/**
+ * @file
+ * Module installation/uninstallation hooks.
+ */
+
+/**
+ * Implementation of hook_schema().
+ */
+function magento_structure_schema() {
+  $schema['magento_structure'] = array(
+    'fields' => array(
+      'ms_id'     => array('type' => 'serial',  'unsigned' => TRUE, 'not NULL' => TRUE),
+      'nid'       => array('type' => 'int', 'unsigned' => TRUE, 'not NULL' => TRUE),
+      'parent'    => array('type' => 'int', 'unsigned' => TRUE, 'not NULL' => TRUE),
+      'node_type' => array('type' => "varchar",  'length' => 20, 'not NULL' => TRUE),
+      'type'      => array('type' => "varchar", 'length' => 20, 'not NULL' => TRUE),
+      'condition' => array('type' => 'text', 'not NULL' => FALSE)
+    ),
+    'primary key' => array('ms_id'),
+    'unique keys' => array(
+      'nid' => array('nid')
+    ),
+  );
+
+  return $schema;
+}
+
+/**
+ * Implementation of hook_install().
+ */
+function magento_structure_install() {
+  drupal_install_schema('magento_structure');
+}
+
+/**
+ * Implementation of hook_uninstall().
+ */
+function magento_structure_uninstall() {
+  drupal_uninstall_schema('magento_structure');
+}

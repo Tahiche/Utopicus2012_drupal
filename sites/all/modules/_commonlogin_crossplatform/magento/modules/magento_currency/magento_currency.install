@@ -1,0 +1,61 @@
+<?php
+// $Id$
+/**
+ * @file
+ *   Install script for magento_currency module
+ */
+
+define('MAGENTO_CURRENCY_INSTALL_TABLE_RATES', 'magento_currency_rates');
+
+/**
+ * Implementation of hook_install();
+ */
+function magento_currency_install() {
+  drupal_install_schema('magento_currency');
+}
+
+/**
+ * Implementation of hook_uninstall();
+ */
+function magento_currency_uninstall() {
+  drupal_uninstall_schema('magento_currency');
+  variable_del('magento_currency_allowed');
+}
+
+/**
+ * Implementation of hook_schema();
+ */
+function magento_currency_schema() {
+
+  // Rates table.
+  $schema[MAGENTO_CURRENCY_INSTALL_TABLE_RATES] = array(
+    'fields' => array(
+      'currency_from' => array(
+        'description' => t('Currency from which cost will be converted.'),
+        'type' => 'varchar',
+        'length' => 3,
+        'not NULL' => TRUE,
+        'default' => ''
+      ),
+      'currency_to' => array(
+        'description' => t('Currency to which cost will be converted.'),
+        'type' => 'varchar',
+        'length' => 3,
+        'not NULL' => TRUE,
+        'default' => ''
+      ),
+      'rate' => array(
+        'description' => t('Currency Rate.'),
+        'type' => 'numeric',
+        'default' => 0,
+        'not null' => TRUE,
+        'size' => 'normal',
+        'precision' => 24,
+        'scale' => 12
+      ),
+    ),
+    'primary key' => array('currency_from', 'currency_to'),
+  );
+
+  return $schema;
+}

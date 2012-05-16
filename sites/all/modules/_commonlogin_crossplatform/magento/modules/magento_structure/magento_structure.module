@@ -1,0 +1,220 @@
+<?php
+// $Id$
+
+/**
+ * @file
+ * Magento Structure allows to bind Magento Websites/Stores/StoreViews to Drupal language, domain, PHP condition, etc
+ */
+
+/**
+ * Get current store nid and mid.
+ */
+function _magento_structure_current_store() {
+  $info = magento_structure_info();
+  if (!empty($info) && count(array_filter($info)) != 0) {
+    $ms_id = db_result(db_query('SELECT field_magento_id_value FROM {content_field_magento_id} WHERE nid = %d', $info['store']['nid']));
+    return array($info['store']['nid'] => $ms_id);
+  }
+  return array();
+}
+
+/**
+ * Implementation of hook_nodeapi().
+ */
+function magento_structure_nodeapi(&$node, $op, $a3 = NULL, $a4 = NULL) {
+  if ($op == "delete" &&
+          ($node->type == MAGENTO_STORES_CONTENT_TYPE_WEBSITE || $node->type == MAGENTO_STORES_CONTENT_TYPE_GROUP || $node->type == MAGENTO_STORES_CONTENT_TYPE_STORE)) {
+    db_query("DELETE FROM {magento_structure} WHERE nid=%d", $node->nid);
+  }
+}
+
+/**
+ * Implementation of hook_form_alter().
+ */
+function magento_structure_form_alter(&$form, &$form_state, $form_id) {
+  switch ($form_id) {
+    case MAGENTO_STORES_CONTENT_TYPE_WEBSITE . '_node_form':
+    case MAGENTO_STORES_CONTENT_TYPE_GROUP . '_node_form':
+    case MAGENTO_STORES_CONTENT_TYPE_STORE . '_node_form':
+      $row = db_fetch_array(db_query("SELECT * from {magento_structure} WHERE nid = %d", $form['nid']['#value']));
+
+      $form['magento_structure'] = array(
+        '#type' => 'fieldset',
+        '#title' => t('Magento structure binding'),
+        '#collapsible' => TRUE,
+        '#collapsed' => FALSE,
+        '#weight' => 10,
+      );
+      $form['magento_structure']['magento_structure_type'] = array(
+        '#type' => 'select',
+        '#required' => TRUE,
+        '#options' => array(
+          'false' => t('Disabled'),
+          'true' => t('Always true'),
+          'host' => t('Host name'),
+          'language' => t('Language'),
+          'php' => t('PHP Code'),
+        ),
+        '#default_value' => $row ? $row['type'] : 'disabled'
+      );
+      $form['magento_structure']['magento_structure_condition'] = array(
+        '#type' => 'textarea',
+        '#default_value' => $row ? $row['condition'] : ''
+      );
+      $form['#submit'][] = 'magento_structure_form_submit';
+  }
+}
+
+/**
+ * Custom form submit to hande storage of custom fields
+ */
+function magento_structure_form_submit($form, &$form_state) {
+  $nid = $form_state['values']['nid'];
+  db_query("DELETE FROM {magento_structure} WHERE nid=%d", $nid);
+  $parent = NULL;
+  switch ($form_state['values']['type']) {
+    case MAGENTO_STORES_CONTENT_TYPE_GROUP:
+      $parent = $form_state['values']['field__website__'][0]['nid'];
+      break;
+    case MAGENTO_STORES_CONTENT_TYPE_STORE:
+      $parent = $form_state['values']['field__store_group__'][0]['nid'];
+      break;
+  }
+  db_query("INSERT INTO {magento_structure}(`nid`, `parent`, `node_type`, `type`, `condition`) VALUES(%d, %d, '%s', '%s', '%s')", $nid, $parent, $form_state['values']['type'], $form_state['values']['magento_structure_type'], $form_state['values']['magento_structure_condition']);
+}
+
+/**
+ * Implementation of hook_init().
+ */
+function magento_structure_init() {
+  //Read all magento_structure infos from db
+  $sth = db_query("SELECT * FROM {magento_structure} WHERE type <> '%s'", 'FALSE');
+  $websites = $groups = $stores = array();
+  while ($row = db_fetch_array($sth)) {
+    if ($row['node_type'] == MAGENTO_STORES_CONTENT_TYPE_WEBSITE) {
+      $websites[] = $row;
+    }
+    elseif ($row['node_type'] == MAGENTO_STORES_CONTENT_TYPE_GROUP) {
+      $groups[] = $row;
+    }
+    elseif ($row['node_type'] == MAGENTO_STORES_CONTENT_TYPE_STORE) {
+      $stores[] = $row;
+    }
+  }
+  //Try to find correct structure
+  foreach ($websites as $website) {
+    if (_magento_structure_test($website['type'], $website['condition'])) {
+      foreach ($groups as $group) {
+        if (($group['parent'] == $website['nid']) &&  _magento_structure_test($group['type'], $group['condition'])) {
+          foreach ($stores as $store) {
+            if (($store['parent'] == $group['nid']) &&  _magento_structure_test($store['type'], $store['condition'])) {
+              $new_info = $website;
+              $new_info['group'] = $group;
+              $new_info['store'] = $store;
+              magento_structure_info($new_info);
+              return;
+            }
+          }
+        }
+      }
+    }
+  }
+}
+
+/**
+ * Return/set magento_structure info
+ *
+ * @return Array
+ */
+function magento_structure_info($new_info = FALSE) {
+  static $info;
+  if ($new_info) {
+    $info = $new_info;
+  }
+  elseif (!isset ($info)) {
+    $info = NULL;
+  }
+  return $info;
+}
+
+/**
+ * Return current website nid
+ *
+ * @return
+ *   Website nid
+ */
+function magento_structure_website_nid() {
+  $info = magento_structure_info();
+  if ($info) {
+    return $info['nid'];
+  }
+  else {
+    return NULL;
+  }
+}
+
+/**
+ * Return current group nid
+ *
+ * @return
+ *   Store group nid
+ */
+function magento_structure_group_nid() {
+  $info = magento_structure_info();
+  if ($info) {
+    return $info['group']['nid'];
+  }
+  else {
+    return NULL;
+  }
+}
+
+/**
+ * Return current store nid
+ *
+ * @return
+ *   Store nid
+ */
+function magento_structure_store_nid() {
+  $info = magento_structure_info();
+  if ($info) {
+    return $info['store']['nid'];
+  }
+  else {
+    return NULL;
+  }
+}
+
+/**
+ * Internal function for testing condition
+ */
+function _magento_structure_test($type, $condition) {
+  switch ($type) {
+    case 'false':
+      return FALSE;
+    case 'true':
+      return TRUE;
+    case 'host':
+      $host = $_SERVER['HTTP_HOST'];
+      $hosts = preg_split('/[\\s,;]+/', $condition);
+      return in_array($host, $hosts);
+    case 'language':
+      global $language;
+      $languages = preg_split('/[\\s,;]+/', $condition);
+      return in_array($language->language, $languages);
+    case 'php':
+      return drupal_eval($condition);
+    default:
+      return FALSE;
+  }
+}
+
+/**
+ * Implementation of hook_views_api().
+ */
+function magento_structure_views_api() {
+  return array(
+    'api' => '2.0',
+    'path' => drupal_get_path('module', 'magento_structure') . '/includes',
+  );
+}

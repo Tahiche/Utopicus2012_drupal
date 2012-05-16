@@ -1,0 +1,69 @@
+<?php
+// $Id$
+
+/**
+ * @file
+ * Integration with Magento Shipping Methods.
+ */
+
+/**
+ * Implements hook_magento_shipping_methods.
+ * @param $cart
+ *   Magento cart array.
+ * @return indexed array of allowed shipping systems, where index is shipping method name(code)
+ *   Sample return:
+ *         array(
+ *          'method_1_name' => array(
+ *              'select_string' => '<b>Flat Rate</b> Fixed: 10.00 EUR',
+ *              'price' => '10.00 EUR',
+ *              'raw_price' => '10.00',
+ *              'grand_total' => '30.00 EUR',
+ *              'raw_carrier' => 'Flat Rate',
+ *              'raw_method' => 'Fixed',
+ *            )).
+ */
+function magento_shipping_magento_shipping_methods($cart = NULL) {
+
+  $res = array();
+
+  if (empty($cart)) {
+    $cart = magento_cart_get();
+  }
+
+  if (empty($cart['quote']['shipping_rates']) || !is_array($cart['quote']['shipping_rates'])) {
+    // no methods is available
+    return array();
+  }
+
+  $rates = $cart['quote']['shipping_rates'];
+  foreach ($rates as $id => $rate) {
+    $list[$id] = (int) $rate['carrier_sort_order'];
+  }
+  asort($list);
+
+  foreach ($list as $id => $tmp) {
+    $shipping_method = $cart['quote']['shipping_rates'][$id];
+    $carrier = t($shipping_method['carrier_title']);
+    $method = t($shipping_method['method_title']);
+    $price = theme('magento_product_format_price', $shipping_method['price']);
+    $grand_total = $cart['quote']['grand_total']
+      - (float) $cart['quote']['shipping_amount']
+      + $shipping_method['price'];
+
+    $res[$shipping_method['code']] = array(
+      'select_string' => t('<b>!carrier</b> !method: !price', array(
+        '!carrier' => $carrier,
+        '!method' => $method,
+        '!price' => $price,
+      )),
+      'price' => $price,
+      'raw_price' => $shipping_method['price'],
+      'grand_total' => theme('magento_product_format_price', $grand_total),
+      'raw_grand_total' => $grand_total,
+      'raw_carrier' => $carrier,
+      'raw_method' => $method
+    );
+  }
+
+  return $res;
+}

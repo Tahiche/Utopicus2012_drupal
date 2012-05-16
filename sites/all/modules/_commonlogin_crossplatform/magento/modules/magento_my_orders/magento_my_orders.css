@@ -1,0 +1,10 @@
+.order-info-wrapper table.items-ordered caption {text-align:left; font-weight:bold;}
+.order-info-wrapper tr.grand_total {font-size:large; font-weight:bold;}
+.order-info-wrapper .box, .order-info-wrapper h3{border: 1px solid #edd;padding:5px;}
+.order-info-wrapper h3{margin-top:10px;font-size:smaller;}
+
+.shipping div.method, .billing div.method {float:right; width:50%;}
+.order-info-wrapper .shipping h4, .order-info-wrapper .billing h4{font-weight:bold;}
+.order-info-wrapper .order-date {margin-bottom:10px;}
+.order-info-wrapper .order-actions{float:right;margin-right: 50px;margin-top:-30px;}
+.order-info-wrapper .order-actions a{font-weight:bold;}

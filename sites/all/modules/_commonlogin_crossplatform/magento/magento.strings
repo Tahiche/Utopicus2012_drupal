@@ -1,0 +1,12 @@
+<?php
+// $Id$
+/**
+ * @file
+ * MAGENTO_COSTANTS
+ */
+// constants to describe OBJECTS
+define('MAGENTO_ATTRIBUTE_TYPE',       'type');
+define('MAGENTO_ATTRIBUTE_CODE',       'attribute_code');
+
+define('MAGENTO_ROLE',                 'magento user');
+define('MAGENTO_USER',                 'magento');

@@ -1,0 +1,930 @@
+<?php
+require_once 'magento_stores.strings';
+define('ONE_STEP_PRODUCTS_AMOUNT', 100);
+
+/////////////////// DRUPAL HOOKS ///////////////////////////////////////
+/**
+ * Implementation of hook_menu().
+ * Insert new menu items into Magento section.
+ */
+function magento_stores_menu() {
+  $items = array();
+
+  // settings management
+  $items['admin/settings/magento/stores'] = array(
+    'title'            => 'Stores',
+    'description'      => 'Configure Magento Stores.',
+    'page callback'    => 'drupal_get_form',
+    'page arguments'   => array('magento_stores_settings'),
+    'access arguments' => array('access administration pages'),
+    'file'             => 'magento_stores.settings.inc',
+    'type'             => MENU_LOCAL_TASK,
+  );
+
+  return $items;
+}
+
+
+/**
+ * Implementation of hook_theme().
+ */
+function magento_stores_theme() {
+  return array(
+    'magento_stores_content' => array(
+      'arguments' => array('form' => array()),
+    ),
+  );
+}
+
+/////////////////// MAGENTO_STORE HELPERS //////////////////////////////
+/**
+ * Get available options for given field.
+ *
+ * @param $field_name
+ *   (str) Name of the field for which you want to retrieve options.
+ * @param $store_id
+ *   (int) Magento's store id, will be used to get apropriate localisation.
+ *   if ommited then current store will be used, if current store id
+ *   is unretrieveble - first found store will be used (this will not
+ *   affect actual values, only localisation).
+ * @param $reset
+ *   (bool) If TRUE - will reset static cache.
+ *
+ * @return
+ *   (array) Array of options with labels suitable for CCK's allowed_values_php
+ */
+function _magento_store_option_values($field_name, $store_id = 0, $reset = FALSE) {
+  static $options = array();
+
+  // Reset cache if requested, or initialize cache.
+  if ( ($reset && !empty($options[$field_name])) || (empty($options[$field_name])) ) {
+    $options[$field_name] = array();
+  }
+
+  // Get current store id, optional dep for structure module
+  // We can't use hard dep as of dep loop.
+  if (empty($store_id) && function_exists('_magento_structure_current_store') ) {
+    $store_id = current(_magento_structure_current_store());
+  }
+
+  // Return cache if possible.
+  if (!empty($options[$field_name])) {
+
+    // Try to return values corresponding to $store_id.
+    if (!empty($options[$field_name][$store_id])) {
+      return $options[$field_name][$store_id];
+    }
+    // If not possible - first store available.
+    elseif (is_array(current($options[$field_name]))) {
+      current($options[$field_name]);
+    }
+    // If not possible - empty array();
+    else {
+      return array();
+    }
+  }
+
+  // If we got here - get labels from DB.
+  // We can't use store restriction here as we dont have "default" store records,
+  // and existing store IDs can be any number.
+  $attribute_code = array_pop(explode('field_', $field_name));
+  $query = "
+    SELECT
+      DISTINCT(CONCAT(options.object_id, '-|-', options.store)) as option_dist,
+      options.object_id as option_id,
+      options.label as option_label,
+      options.store as option_store
+    FROM
+      {". MAGENTO_STORES_TABLE_LABELS ."} options
+    LEFT JOIN
+      {". MAGENTO_STORES_TABLE_LABELS ."} sets ON (options.parent_id = sets.object_id)
+    LEFT JOIN
+      {". MAGENTO_STORES_TABLE_ATTRIBUTES ."} attr ON (sets.object_id = attr.attribute_id)
+    WHERE
+      (options.type = 'option') AND (options.object_id != '')
+      AND (attr.attribute_code = '%s')
+    ORDER BY options.object_id ASC
+    ";
+  $res = db_query($query, $attribute_code);
+
+  // Fetch result.
+  while ($item = db_fetch_array($res)) {
+    $options[$field_name][$item['option_store']][$item['option_id']] = $item['option_label'];
+  }
+
+  return !empty($options[$field_name][$store_id])
+    ? $options[$field_name][$store_id]
+    : (is_array(current($options[$field_name]))
+      ? current($options[$field_name])
+      : array());
+}
+
+/**
+ * Get all store attributes.
+ */
+function magento_stores_product_get_attributes() {
+  static $attributes = array();
+
+  // Cache
+  if (0 == count($attributes)) {
+    $query = db_query('SELECT a.'. MAGENTO_ATTRIBUTE_CODE .', a.'. MAGENTO_API_ATTRIBUTE_SCOPE .', a.backend_type, a.frontend_input, l.store, l.label FROM {'. MAGENTO_STORES_TABLE_ATTRIBUTES .'} a LEFT JOIN {'. MAGENTO_STORES_TABLE_LABELS ."} l ON a.attribute_id = l.object_id WHERE l.type = '". MAGENTO_STORES_TYPE_ATTRIBUTE . "'");
+    while ($attribute = db_fetch_array($query)) {
+      if (!isset($attributes[$attribute[MAGENTO_ATTRIBUTE_CODE]])) {
+        $cck = magento_type2cck($attribute['frontend_input'], $attribute['backend_type']);
+
+        $attributes[$attribute[MAGENTO_ATTRIBUTE_CODE]] = array(
+          MAGENTO_API_ATTRIBUTE_SCOPE => $attribute[MAGENTO_API_ATTRIBUTE_SCOPE],
+          MAGENTO_API_ATTRIBUTE_SCOPE => $attribute[MAGENTO_API_ATTRIBUTE_SCOPE],
+          'backend_type'              => $attribute['backend_type'],
+          'frontend_input'            => $attribute['frontend_input'],
+          'cck_fill_function'         => $cck['cck_fill_function'],
+          'labels' => array()
+        );
+      }
+      $attributes[$attribute[MAGENTO_ATTRIBUTE_CODE]]['labels'][$attribute['store']] = $attribute['label'];
+    }
+  }
+  return $attributes;
+}
+
+
+/**
+ * The idea is to synchronize selected objects, if the object wasn't changed - no update required
+ */
+function magento_stores_synchronize($tree) {
+  $success = TRUE;
+
+  foreach ($tree as $website) {
+    $rules = array(
+      'code'             => 'field_code',
+      'sort_order'       => 'field_sort_order',
+      'default_group_id' => 'field_default_group_id',
+      'is_default'       => 'field_is_default',
+    );
+    $website_node = magento_api_get_node($website['sync_type'], $website['website_id'], $website['name']);
+    magento_api_synchronize_node($website_node->nid, $website, $rules, $website_node);
+
+    foreach ($website[MAGENTO_STORES_GROUPS] as $store) {
+      $store_node = magento_api_get_node($store['sync_type'], $store['group_id'], $store['name']);
+//      magento_api_synchronize_node($nid, $object, $rules, $node = NULL) {
+      foreach ($store[MAGENTO_STORES_STORES] as $store_view) {
+        $store_view_node = magento_api_get_node($store_view['sync_type'], $store_view['store_id'], $store_view['name']);
+      }
+    }
+  }
+  return $success;
+}
+
+//
+function magento_stores_get_info($data) {
+  $infos = array();
+
+  // single value? => convert it into array
+  if (!is_array($data)) {
+    $data = array($data);
+  }
+
+  // unify
+  $names = array();
+  foreach ($data as $key => $value) {
+    if (!is_array($value)) {
+      $names[$value] = $value;
+    }
+    else {
+      $names[$key] = $value;
+    }
+  }
+
+  foreach ($names as $name => $value) {
+    $info = array();
+    $type = NULL;
+    switch ($name) {
+/*      case MAGENTO_STORES_LINKED_PRODUCT_TYPES:
+        $info['name'] = MAGENTO_STORES_T_LINKED_PRODUCT_TYPES;
+
+        break;*/
+      case MAGENTO_STORES_CATEGORIES:
+        $info['name'] = MAGENTO_STORES_VOCABULARY_CATEGORIES;
+        $type = 'vocabulary';
+        break;
+      case MAGENTO_STORES_MAGENTO_PRODUCT_TYPES:
+        $info['name'] = MAGENTO_STORES_VOCABULARY_PRODUCT_TYPES;
+        $type = 'vocabulary';
+        break;
+      case MAGENTO_STORES_PRODUCT_TYPES:
+        $info['name'] = MAGENTO_STORES_T_PRODUCT_TYPES;
+
+        $all      = db_result(db_query("SELECT COUNT(*) FROM {node_type} WHERE type LIKE '%s%%'", MAGENTO_STORES_CONTENT_TYPE_PRODUCT));
+        $globals  = db_result(db_query("SELECT COUNT(*) FROM {node_type} WHERE type LIKE '%s%%_global'", MAGENTO_STORES_CONTENT_TYPE_PRODUCT));
+        $websites = db_result(db_query("SELECT COUNT(*) FROM {node_type} WHERE type LIKE '%s%%_website'", MAGENTO_STORES_CONTENT_TYPE_PRODUCT));
+        $info['local_count'] = $all - $globals - $websites . " ($all)";
+
+        break;
+      case MAGENTO_STORES_PRODUCTS:
+        $info['name'] = MAGENTO_STORES_T_PRODUCTS;
+        $vocabulary = magento_get_vocabulary(MAGENTO_STORES_VOCABULARY_PRODUCT_TYPES);
+        $all      = db_result(db_query("SELECT COUNT(*) FROM {node} WHERE type LIKE '%s%%' OR type IS NULL OR type = ''", MAGENTO_STORES_CONTENT_TYPE_PRODUCT));
+        $globals  = db_result(db_query("SELECT COUNT(*) FROM {node} WHERE type LIKE '%s%%_global'", MAGENTO_STORES_CONTENT_TYPE_PRODUCT));
+        $websites = db_result(db_query("SELECT COUNT(*) FROM {node} WHERE type LIKE '%s%%_website'", MAGENTO_STORES_CONTENT_TYPE_PRODUCT));
+
+        $info['local_count'] = $all - $globals - $websites . " ($all)";
+        break;
+      case MAGENTO_STORES_GROUPS:
+        $info['name'] = MAGENTO_STORES_T_GROUPS;
+        $info['local_count'] = db_result(db_query("SELECT COUNT(*) FROM {node} n WHERE type = '". MAGENTO_STORES_CONTENT_TYPE_GROUP ."'"));
+        break;
+      case MAGENTO_STORES_ATTRIBUTES:
+        $info['name'] = MAGENTO_STORES_T_ATTRIBUTES;
+        $info['local_count'] = db_result(db_query("SELECT COUNT(*) FROM {". MAGENTO_STORES_TABLE_ATTRIBUTES ."}"));
+        break;
+      case MAGENTO_STORES_STORES:
+        $info['name'] = MAGENTO_STORES_T_STORES;
+        $info['local_count'] = db_result(db_query("SELECT COUNT(*) FROM {node} n WHERE type = '". MAGENTO_STORES_CONTENT_TYPE_STORE ."'"));
+        break;
+      case MAGENTO_STORES_WEBSITES:
+        $info['name'] = MAGENTO_STORES_T_WEBSITES;
+        $info['local_count'] = db_result(db_query("SELECT COUNT(*) FROM {node} n WHERE type = '". MAGENTO_STORES_CONTENT_TYPE_WEBSITE ."'"));
+        break;
+    }
+
+    switch ($type) {
+      case 'vocabulary':
+        $info['local_count'] = 0;
+
+        // Get the list of existing vocabularies
+        $vocabularies = taxonomy_get_vocabularies();
+        foreach ($vocabularies as $vocabulary) {
+          if (0 == strncmp($vocabulary->name, $info['name'], drupal_strlen($info['name']))) {
+            $info['local_count'] += db_result(db_query("SELECT COUNT(*) FROM {term_data} WHERE vid = %d", $vocabulary->vid));
+          }
+        }
+        break;
+    }
+
+/*    if ($function && module_exists('magento_api')) {
+      $result = $function(NULL, FALSE);
+      if ($result && is_array($result)) {
+        $info['remote_count'] = magento_stores_array_count($result);
+      }
+    }*/
+
+    $infos[$name] = $info;
+  } // e.o. foreach
+
+  if (module_exists('magento_api')) {
+    // convert our keys into magento keys
+    $values = array();
+    foreach ($names as $key => $value) {
+      switch ($key) {
+        case MAGENTO_STORES_PRODUCTS:
+          $key = MAGENTO_STORES_STORES;
+          break;
+      }
+
+      // do not duplicate the info
+      if (!in_array($key, $values)) {
+        $values[] = $key;
+      }
+    }
+    $statistics = magento_api_get_statistics($values);
+    if (is_array($statistics)) {
+    foreach ($statistics as $key => $data) {
+      if (!is_array($data)) {
+        // simple value
+        if (isset($infos[$key])) {
+          $infos[$key]['remote_count'] = $data;
+        }
+      }
+      else {
+        $no_arrays = TRUE;
+        foreach ($data as $item) {
+          if (is_array($item) && 1 < count($item)) {
+            $no_arrays = FALSE;
+            break;
+          }
+        }
+        if ($no_arrays) {
+          $infos[$key]['remote_count'] = count($data);
+        }
+        else switch ($key) {
+          case MAGENTO_STORES_LINKED_PRODUCT_TYPES:
+            $infos[MAGENTO_STORES_LINKED_PRODUCT_TYPES]['remote_data'] = $data;
+            break;
+
+          case MAGENTO_STORES_STORES:
+            // do we need products?
+            if (isset($infos[MAGENTO_STORES_PRODUCTS])) {
+              $value = $names[MAGENTO_STORES_PRODUCTS];
+              // count products
+              $products = 0;
+              foreach ($data as $store) {
+                // store value could be set
+                if (is_array($value) && isset($value[MAGENTO_STORES_STORE])) {
+                  if ($store[MAGENTO_STORES_STORE] == $value[MAGENTO_STORES_STORE]) {
+                    $products += $store[MAGENTO_STORES_PRODUCTS];
+                  }
+                }
+                else {
+                  $products += $store[MAGENTO_STORES_PRODUCTS];
+                }
+              }
+
+              $infos[MAGENTO_STORES_PRODUCTS]['remote_count'] = $products;
+            }
+            // do we need store views count?
+            if (isset($infos[MAGENTO_STORES_STORES])) {
+              $infos[MAGENTO_STORES_STORES]['remote_count'] = count($data);
+            }
+            break;
+          case MAGENTO_STORES_CATEGORIES:
+            // count categories
+            $categories = 0;
+            foreach ($data as $store) {
+              $categories += $store[MAGENTO_STORES_CATEGORIES];
+            }
+            $infos[MAGENTO_STORES_CATEGORIES]['remote_count'] = $categories;
+            break;
+        }
+      }
+    }
+    }
+    // Get statistics from Magento
+  }
+
+  return $infos;
+}
+
+function magento_stores_array_count($array) {
+  $is_object = 0;
+  $result = 0;
+  foreach ($array as $item) {
+    if (is_array($item)) {
+      $result += magento_stores_array_count($item);
+    }
+    else {
+      $is_object = 1;
+    }
+  }
+  return $is_object + $result;
+}
+
+/**
+ *
+ */
+function magento_stores_get_stores() {
+  $result = array();
+  $query = db_query("SELECT n.*, v.field_magento_id_value FROM {node} n LEFT JOIN {content_field_magento_id} v ON v.nid = n.nid WHERE n.type = '%s'", MAGENTO_STORES_CONTENT_TYPE_STORE);
+  while ($item = db_fetch_array($query)) {
+    // One batch operation for each store
+    $result[] = $item;
+  }
+  return $result;
+}
+
+function magento_stores_get_websites() {
+  $result = array();
+  $query = db_query("SELECT n.*, v.field_magento_id_value FROM {node} n LEFT JOIN {content_field_magento_id} v ON v.nid = n.nid WHERE n.type = '%s'", MAGENTO_STORES_CONTENT_TYPE_WEBSITE);
+  while ($item = db_fetch_array($query)) {
+    $result[] = $item;
+  }
+  return $result;
+}
+
+/**
+ * List all content types used for products
+ * @param boolean $all
+ * @return array
+ */
+function _magento_stores_get_product_content_types($all = FALSE, $with_names = FALSE, $flush_cache = FALSE) {
+  static $data = array();
+
+  if ($flush_cache) {
+    $data = array();
+  }
+
+  if (!isset($data[$all][$with_names])) {
+      // return all the types
+    $sql = "SELECT type, name FROM {node_type} WHERE type LIKE 'magento_product_%%'";
+    if (!$all) {
+    // return only top-level types
+    $sql .= " AND type NOT LIKE '%%_website' AND type NOT LIKE '%%_global'";
+    }
+
+    $result = array();
+    $query = db_query($sql, MAGENTO_STORES_CONTENT_TYPE_PRODUCT);
+    while ($item = db_fetch_array($query)) {
+      if ($with_names) {
+        $result[$item['type']] = $item['name'];
+      }
+      else {
+        $result[] = $item['type'];
+      }
+    }
+    $data[$all][$with_names] = $result;
+  }
+  return $data[$all][$with_names];
+}
+
+/**
+ * List all content types used for products
+ * 'Dummy' wrapper over _magento_stores_get_product_content_types.
+ */
+function magento_stores_get_product_content_types($all = FALSE, $with_names = FALSE) {
+  static $result;
+  if (!empty($result[$all])) {
+    return $result[$all];
+  }
+
+  $result[$all] = _magento_stores_get_product_content_types($all, $with_names);
+  return $result[$all];
+}
+
+/**
+ * Allowed bundles
+ */
+function magento_stores_allowed_bundles() {
+  static $bundles = array();
+
+  if (0 == count($bundles)) {
+    $bundles = explode("\n", variable_get('magento_stores_allow_bundles', ''));
+  }
+
+  return $bundles;
+}
+
+/**
+ * Allowed configurables
+ */
+function magento_stores_allowed_configurables() {
+  static $configurables = array();
+
+  if (0 == count($configurables)) {
+    $configurables = explode("\n", variable_get('magento_stores_allow_configurables', ''));
+  }
+
+  return $configurables;
+}
+
+/**
+ * Allowed CUSTOM OPTIONS for
+ */
+function magento_stores_allowed_custom_options() {
+  static $with_custom_options = array();
+
+  if (0 == count($with_custom_options)) {
+    $with_custom_options = explode("\n", variable_get('magento_stores_allow_custom_options', ''));
+  }
+
+  return $with_custom_options;
+}
+
+/**
+ * Return TRUE if $attribute_set is/canbe a BUNDLE, FALSE - otherwise
+ */
+function magento_stores_is_bundle($attribute_set) {
+  return in_array($attribute_set, magento_stores_allowed_bundles());
+}
+
+/**
+ * Return TRUE if $attribute_set is/canbe a CONFIGURABLE, FALSE - otherwise
+ */
+function magento_stores_is_configurable($attribute_set) {
+  return in_array($attribute_set, magento_stores_allowed_configurables());
+}
+
+/**
+ * Return TRUE if $attribute_set has CUSTOM OPTIONS, FALSE - otherwise
+ */
+function magento_stores_is_custom_options_allowed($attribute_set) {
+  return in_array($attribute_set, magento_stores_allowed_custom_options());
+}
+
+/**
+ * Magento get attribute label by magento store_id, option_id (object_id) and attribute_id (parent_id)
+ */
+function magento_stores_get_attribute_options_label($store_id, $option_id, $attribute_id = NULL) {
+  $res = _magento_stores_get_attribute_options_label($store_id, $option_id, $attribute_id);
+  return $res===FALSE ? '' : $res;
+}
+
+/**
+ * Magento get attribute label by magento store_id and option_id (object_id) and attribute_id (parent_id)
+ */
+function _magento_stores_get_attribute_options_label($store_id, $option_id, $attribute_id = NULL) {
+  static $options;
+  if (isset($options[$store_id][$option_id])) {
+    return $options[$store_id][$option_id];
+  }
+
+  if (empty($attribute_id)) {
+    //This leaved for back-compatibility, the $attribute_id should always be filled in.
+    $res = db_result(db_query("SELECT label FROM {" . MAGENTO_STORES_TABLE_LABELS . "} WHERE store = %d AND object_id = %d", array($store_id, $option_id)));
+  }
+  else {
+    $res = db_result(db_query("SELECT label FROM {" . MAGENTO_STORES_TABLE_LABELS . "} WHERE store = %d AND object_id = %d AND parent_id = %d", array($store_id, $option_id, $attribute_id)));
+  }
+
+  if ($res===FALSE) {
+    return FALSE;
+  }
+
+  $options[$store_id][$option_id] = $res;
+  return $options[$store_id][$option_id];
+}
+
+/**
+ * Helper that return CCK field name for given magento by given linked type
+ * @param linked_product_type
+ *   TYPE of relation with linked product.
+ * @return string
+ *   CCK field name
+ *  //field__related_links__
+ */
+function _magento_stores_get_linked_products_content_field_name($linked_product_type) {
+  //FIXED bug in MAGENTO - no need to - return "field__" . drupal_strtoupper("linked_products_type_" . $linked_product_type) . "_links__";
+  return "field__" . $linked_product_type . "_links__";
+}
+
+/////////////////// MAGENTO_STORE OPERATIONS ///////////////////////////
+/******************************************************************************
+  THE functions to update different types of Magento objects.
+
+  Each of this functions execute following hooks:
+    - 'before objecttype_update', ( for example, 'before group_update', 'before store_update' )
+    - 'after objecttype_update',  ( for example, 'after group_update',  'after store_update' )
+
+  //Available HOOKS: before, after
+ * *****************************************************************************/
+
+/**
+ * Update single Store Group
+ */
+function magento_stores_group_update($group = NULL) {
+  // hook before
+  magento_invoke('magento_stores', 'before group_update', $group);
+
+  $result = FALSE;
+  if ($group) {
+    $website_node = magento_get_node(MAGENTO_STORES_CONTENT_TYPE_WEBSITE, $group['website_id']);
+    $group_node   = magento_get_node(MAGENTO_STORES_CONTENT_TYPE_GROUP,   $group['group_id'],     $group['name']);
+
+    $group_node->status                       = 1; // should be always published
+    $group_node->field__website__             = array(array('nid'   => $website_node->nid));
+    $group_node->field_store_root_category_id = array(array('value' => $group['root_category_id']));
+    $group_node->field_default_store_id       = array(array('value' => $group['default_store_id']));
+
+    $result = node_save($group_node);
+  }
+
+  // hook after
+  magento_invoke('magento_stores', 'after group_update', $result);
+  return $result;
+}
+
+/**
+ * Update single Store
+ */
+function magento_stores_store_update($store = NULL) {
+  // hook before
+  magento_invoke('magento_stores', 'before store_update', $store);
+
+  $result = FALSE;
+  if ($store) {
+    $group_node = magento_get_node(MAGENTO_STORES_CONTENT_TYPE_GROUP, $store['group_id']);
+    $store_node = magento_get_node(MAGENTO_STORES_CONTENT_TYPE_STORE, $store['store_id'], $store['name']);
+
+    $store_node->status                 = 1; // should be always published
+    $store_node->field__store_group__   = array(array('nid'   => $group_node->nid));
+    $store_node->field_store_code       = array(array('value' => $store['code']));
+    $store_node->field_store_sort_order = array(array('value' => $store['sort_order']));
+    $store_node->field_store_is_active  = array(array('value' => $store['is_active']));
+
+    $result = node_save($store_node);
+  }
+
+  // hook after
+  magento_invoke('magento_stores', 'after store_update', $result);
+  return $result;
+}
+
+/**
+ * Update single Website
+ */
+function magento_stores_website_update($website = NULL) {
+  // hook before
+  magento_invoke('magento_stores', 'before website_update', $website);
+
+  $result = FALSE;
+  if ($website) {
+    $website_node = magento_get_node(MAGENTO_STORES_CONTENT_TYPE_WEBSITE, $website['website_id'], $website['name']);
+
+    $website_node->status                 = 1; // should be always published
+    $website_node->field_code             = array(array('value' => $website['code']));
+    $website_node->field_sort_order       = array(array('value' => $website['sort_order']));
+    $website_node->field_default_group_id = array(array('value' => $website['default_group_id']));
+    $website_node->field_is_default       = array(array('value' => $website['is_default']));
+
+    $result = node_save($website_node);
+  }
+
+  // hook after
+  magento_invoke('magento_stores', 'after website_update', $result);
+  return $result;
+}
+
+/**
+ * Update single Product
+ */
+function magento_stores_product_update($product = NULL, $store = NULL) {
+  // hook before
+  magento_invoke('magento_stores', 'before product_update', $product, $store);
+
+  $result = _magento_stores_product_update($product, $store);
+
+  // hook after
+  magento_invoke('magento_stores', 'after product_update', $result);
+  return $result;
+}
+
+/**
+ * Delete single Product
+ *   if $storeId is set, then product will be removed for this single store only, otherwise -
+ *   it will be removed for all stores
+ */
+function magento_stores_product_delete($productId = NULL, $storeId = NULL) {
+  // hook before
+  magento_invoke('magento_stores', 'before product_delete', $productId, $storeId);
+
+  // Remove from all stores
+
+  // if we use cache - then cleaning this cache is even more important then delete - so do it firstly
+  $use_cache = variable_get('magento_cache_settings', array());
+  if (isset($use_cache['selects']) && 0 < $use_cache['selects']) {
+    cache_set("magento_cache:{$productId}", NULL);
+  }
+
+  $result = _magento_stores_product_delete($productId, $storeId);
+
+  // hook after
+  magento_invoke('magento_stores', 'after product_update', $result);
+  return $result;
+}
+
+/**
+ * Create Product Type
+ */
+function magento_stores_product_type_update(&$attribute_set, &$current, &$total) {
+  if ($current == 0) {
+    // hook before
+    magento_invoke('magento_stores', 'before product_type_update', $attribute_set, $current, $total);
+  }
+
+  $result = _magento_stores_product_type_update($attribute_set, $current, $total);
+
+  if ($current == $total) {
+    // hook after
+    magento_invoke('magento_stores', 'after product_type_update', $attribute_set, $result);
+  }
+  return $result;
+}
+
+/**
+ * Delete Product Type
+ */
+function magento_stores_product_type_delete($type, $main_type) {
+  // hook before
+  magento_invoke('magento_stores', 'before product_type_delete', $type, $main_type);
+
+  magento_remove_content_type($type);
+  $result = db_query("DELETE FROM {". MAGENTO_STORES_TABLE_ATTRIBUTE_SETS . "} WHERE type = '%s'", $type);
+
+  // hook after
+  magento_invoke('magento_stores', 'after product_type_update', $result);
+  return $result;
+}
+
+/////////////////// MAGENTO_STORE BATCH OPERATIONS /////////////////////
+/**
+ * Sunchronize magento store attributes ( non - GUI)
+ */
+function magento_stores_synchronize_attributes() {
+  // * Fetch attributes
+  $batch = magento_stores_create_batch(MAGENTO_STORES_ATTRIBUTES, MAGENTO_STORES_OPERATION_FETCH);
+
+  // Batch info
+  $info = array(
+        'title'        => t('Attributes ReSynchronization'),
+        'init_message' => t('Start processing')
+  );
+
+  // Submit batch - we use non-GUI mode
+  magento_batch_process($info, $batch, FALSE);
+}
+
+/**
+ * Create batch to performe desired operation
+ *
+ * Allower objects:
+ *   MAGENTO_STORES_STORES
+ *   MAGENTO_STORES_PRODUCTS,
+ *   MAGENTO_STORES_CATEGORIES,
+ *   MAGENTO_STORES_PRODUCT_TYPES,
+ *
+ * Allowed operations:
+ *   MAGENTO_STORES_OPERATION_DELETE,
+ *   MAGENTO_STORES_OPERATION_FETCH
+ */
+function magento_stores_create_batch($objects, $operation, $args = NULL) {
+  $batch            = array();
+  $include          = drupal_get_path('module', 'magento_stores') ."/includes/magento_stores.{$objects}.inc";
+  $function_process = "magento_stores_{$objects}_{$operation}_batch_create";
+  $function_before  = "magento_stores_{$objects}_{$operation}_batch_get";
+
+  switch ($operation) {
+    case MAGENTO_STORES_OPERATION_REMOVE_SURPLUS:
+      switch ($objects) {
+        case MAGENTO_STORES_PRODUCTS:
+          $stores = magento_synchronize_get_stores_for_synchronization();
+          foreach ($stores as $store) {
+            // One batch operation for each store
+            $batch[] = array($include, $function_process, NULL, array(
+              'store'    => $store['title'],
+              'store_id' => $store['field_magento_id_value'])
+            );
+          }
+          break;
+      }
+      break;
+
+    case MAGENTO_STORES_OPERATION_SYNC_MISSED:
+      switch ($objects) {
+        case MAGENTO_STORES_PRODUCTS:
+          $stores = magento_synchronize_get_stores_for_synchronization();
+          foreach ($stores as $store) {
+            // One batch operation for each store
+            $batch[] = array($include, $function_process, NULL, array(
+              'store'    => $store['title'],
+              'store_id' => $store['field_magento_id_value'])
+            );
+          }
+          break;
+      }
+      break;
+
+    case MAGENTO_STORES_OPERATION_UPDATE:
+      switch ($objects) {
+        case MAGENTO_STORES_PRODUCTS:
+          $batch[] = array($include, $function_process, NULL, array(
+            'data' => $args)
+          );
+          break;
+        case MAGENTO_STORES_CATEGORIES:
+          $batch[] = array($include, $function_process, NULL, array(
+            'data' => $args)
+          );
+          break;
+      }
+      break;
+
+    case MAGENTO_STORES_OPERATION_DELETE:
+      switch ($objects) {
+        case MAGENTO_STORES_ATTRIBUTES:
+        case MAGENTO_STORES_MAGENTO_PRODUCT_TYPES:
+        case MAGENTO_STORES_STORES:
+        case MAGENTO_STORES_PRODUCT_TYPES:
+        case MAGENTO_STORES_CATEGORIES:
+          $batch[] = array($include, $function_process, NULL, NULL);
+          break;
+        case MAGENTO_STORES_PRODUCTS:
+          // As an argument we might get here an productId
+          $batch[] = array($include, $function_process, NULL, array(
+            'productId' => $args)
+          );
+          break;
+        // DEBUG
+        case MAGENTO_STORES_BROKEN_NODES:
+          $batch[] = array($include, $function_process, NULL, NULL);
+          break;
+      }
+      break;
+    case MAGENTO_STORES_OPERATION_FETCH:
+      switch ($objects) {
+        case MAGENTO_STORES_STORES:
+        case MAGENTO_STORES_ATTRIBUTES:
+        case MAGENTO_STORES_MAGENTO_PRODUCT_TYPES:
+          $batch[] = array($include, $function_process, $function_before, array(
+            'data'   => array())
+          );
+          break;
+        case MAGENTO_STORES_PRODUCT_TYPES:
+          $attribute_sets = magento_api_get_attribute_sets(NULL, FALSE);
+          foreach ($attribute_sets as $attribute_set) {
+            $batch[] = array($include, $function_process, $function_before, array(
+              'data' => $attribute_set)
+            );
+          }
+          break;
+        case MAGENTO_STORES_PRODUCTS:
+          // Get stores list
+          $local_stores = magento_stores_get_stores();
+          foreach ($local_stores as $store) {
+            // One batch operation for each store
+            $batch[] = array($include, $function_process, $function_before, array(
+              'store'    => $store['title'],
+              'store_id' => $store['field_magento_id_value'])
+            );
+          }
+          break;
+        case MAGENTO_STORES_CATEGORIES:
+          // Get stores list
+          $local_stores = magento_stores_get_stores();
+          foreach ($local_stores as $store) {
+            $stores[] = $store['field_magento_id_value'];
+          }
+          // One batch operation for all stores
+          $batch[] = array($include, $function_process, $function_before, array(
+            'stores'   => $stores)
+          );
+          break;
+      }
+      break;
+  }
+  return $batch;
+}
+
+/**
+ * @deprecated magento_stores_batch_operations().
+ */
+function magento_stores_batch_operations($operations) {
+  static $order = array(
+    /* 'operation' - operation name
+     * 'max'       - maximum elements in one iteration
+     */
+    array('operation' => 'delete', 'max' => 100),
+    array('operation' => 'update', 'max' =>  50),
+  );  // these operations should be executed in this order
+
+  $batch_operations = array();
+
+  // Reorder operations' list
+  if (is_array($operations)) {
+    foreach ($order as $item) {
+      $operation = $item['operation'];
+      if (isset($operations[$operation])) {
+        $objects = array();
+        foreach ($operations[$operation] as $type => $data) {
+          $objects[] = array('type' => $type, 'data' => $data);
+        }
+
+        $batch_operations[] = array(
+          'operation' => $operation,
+          'max'       => $item['max'],
+          'objects'   => $objects,
+        );
+        unset($operations[$operation]);
+      }
+    }
+    // ignore all unknown operations
+  }
+
+  // do we have something to execute?
+  if (0 < count($batch_operations)) {
+    // we don't really have to use batch if:
+    //    * there is only one operation
+    //    * we are not in GUI mode
+    if (1 == count($batch_operations)) {
+
+    }
+    foreach ($batch_operations as $item) {
+      switch ($item['operation']) {
+        // Update operation
+        case 'update':
+          foreach ($item['objects'] as $object) {
+            switch ($object['type']) {
+              // product
+              case MAGENTO_STORES_PRODUCTS:
+                foreach ($object['data'] as $item) {
+                  magento_stores_product_update($item);
+                }
+                break;
+            }
+          }
+          break;
+        case 'delete':
+          foreach ($item['objects'] as $object) {
+            switch ($object['type']) {
+              // product
+              case MAGENTO_STORES_PRODUCTS:
+                foreach ($object['data'] as $item) {
+                  magento_stores_product_delete($item);
+                }
+                break;
+            }
+          }
+          break;
+      }
+    }
+  }
+
+  return FALSE;
+}

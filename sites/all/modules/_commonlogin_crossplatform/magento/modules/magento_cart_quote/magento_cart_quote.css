@@ -1,0 +1,110 @@
+table.magento-cart-quote-table td.product-qty input.remove-product { 
+  background: url(images/cancel.png) no-repeat top left;
+  border: none;
+  cursor: pointer;
+  display: block;
+  margin: 0px 0 0 5px;
+  padding:0;
+  width: 29px;
+  height: 23px;
+  float: left;
+}
+.totals {
+  clear:both;
+  border-top:1px solid #C5C5C5;
+}
+
+/* #AHAH */
+div.ahah-progress.ahah-progress-throbber {
+  position:absolute;
+  width: 100%;
+  height: 200%;
+  bottom: 0;
+  top: 0;
+  left: 0;
+  z-index: 1001;
+  background: #fff;
+  opacity: .5;
+  filter: alpha(opacity=50)
+}
+
+div.ahah-progress.ahah-progress-throbber div.throbber {
+  position: absolute;
+  left: 50%;
+  top: 300px;
+  margin-left: -110px;
+  width: 220px;
+  height: 19px;
+  background: url(images/ajax-loader.gif) no-repeat;
+}
+
+.clear { clear: both; }
+
+ul.cart-nav-links{text-align:center;}
+ul.cart-nav-links li{display:inline-block;}
+ul.cart-nav-links li.current a {font-weight:bold;text-decoration:underline;}
+ul.cart-nav-links li.off a {color:gray;}
+
+ul.cart-errors {border: 1px #fee solid; background: #faa;}
+
+img.magento-product-tiny-image {
+  max-width: 80px;
+  max-height: 50px;
+}
+
+#magento-cart-quote-view-form input#edit-magento-cart-quote-view {
+  float: right;
+}
+
+/* Magento Cart table */
+table.magento-cart-quote-table th {
+  text-align: center;
+}
+
+table.magento-cart-quote-table th.product-image {
+  width: 10%;
+}
+
+table.magento-cart-quote-table th.product-name {
+  width: 50%;
+  text-align: left;
+}
+
+table.magento-cart-quote-table th.product-qty {
+  width: 110px;
+}
+
+table.magento-cart-quote-table th.product-price, table.magento-cart-quote-table th.product-subtotal {
+  width: 15%;
+}
+
+table.magento-cart-quote-table td {
+  text-align: center;
+}
+
+table.magento-cart-quote-table td a.product-image {
+  text-decoration: none;
+}
+
+table.magento-cart-quote-table td.product-name {
+  text-align: left;
+}
+
+table.magento-cart-quote-table td.product-name .item-list h3{
+  font-size: 100%;
+}
+
+table.magento-cart-quote-table td.product-qty div.form-item {
+  float: left;
+}
+/*
+table.magento-cart-quote-table td.product-qty input.remove-product {
+  float: left;
+  margin-left: 10px;
+}
+*/
+table.magento-cart-quote-table td.cart-subtotal-label, table.magento-cart-quote-table td.cart-grand-total-label {
+  text-align: right;
+}
+
+div.cart-product-row-error {color:red;}

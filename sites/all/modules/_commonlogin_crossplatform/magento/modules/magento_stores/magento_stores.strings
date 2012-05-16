@@ -1,0 +1,67 @@
+<?php
+// $Id$
+module_load_include('strings', 'magento_api', 'magento_api');
+/**
+ * @file
+ * These constants are visible to the user in the Admin area, feel free to change
+ * any of them.
+*/
+define('MAGENTO_STORES_T_ATTRIBUTES',              t('Attributes'));
+define('MAGENTO_STORES_T_CATEGORIES',              t('Magento Categories'));
+define('MAGENTO_STORES_T_GROUPS',                  t('Store Groups'));
+define('MAGENTO_STORES_T_MAGENTO_PRODUCT_TYPES',   t('Magento Product Types'));
+define('MAGENTO_STORES_T_PRODUCT_TYPES',           t('Product Types'));
+define('MAGENTO_STORES_T_PRODUCTS',                t('Products'));
+define('MAGENTO_STORES_T_STORES',                  t('Stores'));
+define('MAGENTO_STORES_T_WEBSITES',                t('Websites'));
+
+define('MAGENTO_STORES_CONTENT_TYPE_GROUP',          'magento_group');
+define('MAGENTO_STORES_CONTENT_TYPE_STORE',          'magento_store');
+define('MAGENTO_STORES_CONTENT_TYPE_WEBSITE',        'magento_website');
+define('MAGENTO_STORES_CONTENT_TYPE_PRODUCT',        'magento_product_');
+
+/**
+* Module-relative defines, these constants should be used inside any 3d party modules
+*
+* WARNING! Do not rename any of these values
+*/
+define('MAGENTO_STORES_ATTRIBUTES',                  MAGENTO_API_ATTRIBUTES);
+define('MAGENTO_STORES_CATEGORIES',                  'categories');
+define('MAGENTO_STORES_MAGENTO_PRODUCT_TYPES',       MAGENTO_API_PRODUCT_TYPES);
+define('MAGENTO_STORES_PRODUCT_TYPES',               MAGENTO_API_ATTRIBUTE_SETS);
+define('MAGENTO_STORES_PRODUCTS',                    'products');
+define('MAGENTO_STORES_GROUPS',                      MAGENTO_API_GROUPS);
+define('MAGENTO_STORES_STORE',                       'store');
+define('MAGENTO_STORES_STORES',                      MAGENTO_API_STORES);
+define('MAGENTO_STORES_WEBSITES',                    MAGENTO_API_WEBSITES);
+define('MAGENTO_STORES_WEBSITES_TREE',               'magento_websites_tree');
+define('MAGENTO_STORES_LINKED_PRODUCT_TYPES',        'linked_product_types');
+define('MAGENTO_STORES_LINKED_PRODUCTS',             'linked_products');
+define('MAGENTO_STORES_PARENT_PRODUCTS',             'parent');
+
+// DEBUG
+define('MAGENTO_STORES_BROKEN_NODES',                'broken_nodes');
+
+/**
+* Taxonomy human-readable vocabulary names
+*/
+define('MAGENTO_STORES_VOCABULARY_CATEGORIES',    'Magento Categories');
+define('MAGENTO_STORES_VOCABULARY_PRODUCT_TYPES', 'Magento Product Types');
+
+/**
+* Local Drupal table names - change them only if its confilict with your DB shchema
+*/
+define('MAGENTO_STORES_TABLE_ATTRIBUTES',        'magento_stores_attributes');
+define('MAGENTO_STORES_TABLE_LABELS',            'magento_stores_labels');
+define('MAGENTO_STORES_TABLE_ATTRIBUTE_SETS',    'magento_stores_attribute_sets');
+
+define('MAGENTO_STORES_TYPE_ATTRIBUTE',         'attribute');
+define('MAGENTO_STORES_TYPE_OPTION',            'option');
+define('MAGENTO_STORES_TYPE',                   'type');
+
+
+define('MAGENTO_STORES_OPERATION_DELETE',         'delete');
+define('MAGENTO_STORES_OPERATION_FETCH',          'fetch');
+define('MAGENTO_STORES_OPERATION_UPDATE',         'update');
+define('MAGENTO_STORES_OPERATION_REMOVE_SURPLUS', 'remove_surplus');
+define('MAGENTO_STORES_OPERATION_SYNC_MISSED', 'sync_missed');

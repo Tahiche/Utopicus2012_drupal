@@ -1,0 +1,1350 @@
+<?php
+// $Id$
+
+/**
+ * @file
+ * Basic Magento Shopping Cart.
+ */
+
+define ('MAGENTO_CART_SHIPPING_METHOD_OPTION_DEFAULT', 'standard');
+
+/**
+ * Insert new menu items into Magento section.
+ */
+function magento_cart_menu() {
+  $items = array();
+
+  // content management
+  $items['admin/settings/magento/cart'] = array(
+    'title'            => 'Cart',
+    'description'      => 'Configure Magento Cart.',
+    'page callback'    => 'drupal_get_form',
+    'page arguments'   => array('magento_cart_settings'),
+    'access arguments' => array('access administration pages'),
+    'file'             => 'magento_cart.settings.inc',
+    'type'             => MENU_LOCAL_TASK,
+  );
+
+  // cart
+  $items['cart'] = array(
+    'title'            => 'Cart',
+    'description'      => 'Cart',
+    'access arguments' => array('access content'),
+    'page callback'    => 'magento_cart_page',
+    'type' => MENU_CALLBACK,
+  );
+
+  $items['cart/%'] = array(
+    'title'            => 'Cart',
+    'description'      => 'Cart',
+    'page arguments'   => array(1),
+    'access arguments' => array('access content'),
+    'page callback'    => 'magento_cart_page',
+    'type' => MENU_CALLBACK,
+  );
+
+  $items['cart/add/%'] = array(
+    'title'            => 'Add to cart',
+    'page callback'    => 'magento_cart_add_single_item_form',
+    'page arguments'   => array(2),
+    'access arguments' => array('access content'),
+    'type' => MENU_CALLBACK,
+  );
+
+  /* Load magento_cart_header_block via AJAX */
+  $items['cart/block'] = array(
+    'page callback'    => 'magento_my_cart_block',
+    'access arguments' => array('access content'),
+    'type' => MENU_CALLBACK,
+  );
+  return $items;
+}
+
+/**
+ * Display the cart view page.
+ *
+ * Show the products in the cart with a form to adjust cart contents or go to
+ * checkout.
+ */
+function magento_cart_page($state = NULL) {
+
+  magento_invoke('magento_cart', 'show_state', $state);
+
+  $steps = magento_cart_get_steps();
+  $cart = magento_cart_get();
+  $cart_state = $cart['state']; //dpm($cart, $cart_state);
+  magento_invoke('magento_cart', 'show_state', $cart_state);
+
+  $this_step = magento_cart_get_step();
+  $this_state = $this_step['step_id'];
+
+  $cart_pos = array_search($cart_state, array_keys($steps));
+  $this_pos = array_search($this_state, array_keys($steps));
+
+  // If we have larger step than state - move to cart state.
+  if ($this_pos > $cart_pos) {
+    drupal_set_message(t('Your cart is not ready for that step, you are redirected to apropriate cart step. This may be the result of another checkout process in separate window.'), 'error');
+    magento_cart_goto_step($cart_state);
+  }
+  // In opposite situation - set cart state back to step.
+  elseif ($this_pos < $cart_pos) {
+    magento_cart_update_state($this_state);
+  }
+  // Render step (at this point both state and step should be equal).
+  if (function_exists($this_step['callback'])) {
+    drupal_set_title($this_step['title']);
+    return $this_step['callback']();
+  }
+  else {
+    return t('Step callback not found, contact site administator.');
+  }
+}
+
+/**
+ * Implementation of hook_theme().
+ */
+function magento_cart_theme() {
+  return array(
+    'magento_cart_empty' => array(
+      'template' => 'magento_cart_empty',
+    ),
+    'magento_cart_validate' => array(
+      'template' => 'magento-cart-validate',
+      'arguments' => array('form' => NULL),
+    ),
+    'magento_cart_block' => array(
+      'template' => 'magento-cart',
+      'arguments' => array('state' => 'view', 'cart' => NULL),
+    ),
+    'magento_cart_confirmation' => array(
+      'template' => 'magento-cart-confirmation',
+      'arguments' => array('product' => NULL),
+    ),
+    'magento_cart_block_cart' => array(
+      'template' => 'magento_cart_block_cart',
+      'arguments' => array(),
+    ),
+    'magento_cart_state' => array(
+      'template' => 'magento_cart_state',
+      'arguments' => array('total_items' => NULL ),
+    ),
+  );
+}
+
+/**
+ * Implementation of hook_user().
+ *
+ * Implements user redirect after login.
+ */
+function magento_cart_user($op, &$edit, &$account, $category = NULL) {
+    // If login and not during an installation profile
+    if ($op == 'login' && (!defined('MAINTENANCE_MODE') || MAINTENANCE_MODE != "install")) {
+        $cart = magento_cart_get();
+        if (isset($cart['state']) && 'delivery' == $cart['state']) {
+            // redirect
+            drupal_goto('cart/delivery');
+        }
+    }
+}
+
+/**
+ * Implementation of hook_block().
+ * Add cart block
+ * Adds `Magento Cart block`
+ */
+function magento_cart_block($op = 'list', $delta = 0, $edit = array()) {
+  switch ($op) {
+    case 'list':
+      // List all the module related blocks
+      $blocks = array(
+        // Add the sort block.
+        'magento_cart' => array(
+          'info'   => t('Magento Cart'),
+          'cache'  => BLOCK_CACHE_PER_USER,
+          'pages'  => 'cart',
+          'region' => 'content top',
+          'status' => 1,
+          ),
+        'magento_cart_block_cart' => array(
+          'info'   => t('Magento Cart block'),
+          'cache'  => BLOCK_NO_CACHE,
+          ),
+        );
+      return $blocks;
+    case 'configure':
+      return $form;
+    case 'save':
+      break;
+    case 'view':
+      switch ($delta) {
+        case 'magento_cart':
+          $block['content'] = theme('magento_cart_block');
+          return $block;
+        case 'magento_cart_block_cart':
+          $block['content'] = theme('magento_cart_block_cart');
+          return $block;
+      }
+      break;
+  }
+}
+
+/**
+ * Return magento_cart_header_block content for AJAX
+ */
+function magento_my_cart_block() {
+  print theme('magento_cart_state');
+  exit();
+}
+
+/**
+ * Get clients IP
+ */
+function _magento_cart_get_user_ip() {
+  if (isset($_SERVER['HTTP_CLIENT_IP'])) {
+    return $_SERVER['HTTP_CLIENT_IP'];
+  }
+
+  if (isset($_SERVER['HTTP_X_FORWARDED_FOR']) AND preg_match_all('#\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}#s', $_SERVER['HTTP_X_FORWARDED_FOR'], $matches)) {
+    $ranges = array(
+                '10.0.0.0/8' => array(ip2long('10.0.0.0'), ip2long('10.255.255.255')),
+                '127.0.0.0/8' => array(ip2long('127.0.0.0'), ip2long('127.255.255.255')),
+                '169.254.0.0/16' => array(ip2long('169.254.0.0'), ip2long('169.254.255.255')),
+                '172.16.0.0/12' => array(ip2long('172.16.0.0'), ip2long('172.31.255.255')),
+                '192.168.0.0/16' => array(ip2long('192.168.0.0'), ip2long('192.168.255.255')),
+        );
+
+    foreach ($matches[0] AS $ip) {
+      $ip_long = ip2long($ip);
+      if ($ip_long === FALSE) {
+        continue;
+      }
+
+      $private_ip = FALSE;
+      foreach ($ranges AS $range) {
+        if ($ip_long >= $range[0] AND $ip_long <= $range[1]) {
+          $private_ip = TRUE;
+          break;
+        }
+      }
+
+      if (!$private_ip) {
+        return $ip;
+      }
+    }
+  }
+
+  if (isset($_SERVER['HTTP_FROM'])) {
+    return $_SERVER['HTTP_FROM'];
+  }
+
+  return $_SERVER['REMOTE_ADDR'];
+}
+
+/////////////////// OPERATIONS WITH CART ///////////////////////////////
+/**
+ * Flush old errors stored in cart.
+ */
+function magento_cart_clear_errors() {
+    $cart = &magento_cart_get();
+    if (isset($cart['errors'])) {
+        unset($cart['errors']);
+        magento_cart_save($cart);
+    }
+}
+
+/**
+ * Return the last time cart was changed.
+ */
+function magento_cart_last_changed() {
+  $cart = magento_cart_get();
+  return $cart['last_access'];
+}
+
+/**
+ * Update cart state to a specified $state and inform other modules about changing cart state.
+ */
+function magento_cart_update_state($state, $cart_light = NULL, $cart_id = NULL) {
+    $result = FALSE;
+
+    // hook before
+    if (!magento_invoke('magento_cart', 'before update_state', $state, $cart_light, $cart_id)) {
+        $cart = magento_cart_get();
+
+        $cart['state'] = $state;
+        magento_cart_save($cart);
+        $result = TRUE;
+    }
+
+    // hook after
+    magento_invoke('magento_cart', 'after update_state', $result);
+    return $result;
+}
+
+
+/**
+ * Returns stored cart or creates a new one
+ */
+function &magento_cart_get($updated_cart = NULL) {
+    global $user, $__magento_cart_lock_lost;
+
+    // If lock lost - prevent any modification on the cart.
+    if ($__magento_cart_lock_lost) {
+      $updated_cart = NULL;
+    }
+
+    static $cart = array();
+
+    if (is_array($updated_cart)) {
+        $cart = $updated_cart;
+
+        $cart['last_access'] = time();
+        if (0 < $user->uid) {
+            user_save($user, array('magento_cart' => serialize($cart)));
+            unset($_SESSION['magento_cart']);
+        }
+        else {
+            $_SESSION['magento_cart'] = serialize($cart);
+        }
+    }
+    else {
+        // If the cart is empty - try to get it from:
+        if (2 >= count($cart)) { /* quote, state */
+            if (0 < $user->uid) {
+                if (isset($_SESSION['magento_cart'])) {
+                    $user = user_save($user, array('magento_cart' => $_SESSION['magento_cart']));
+                    unset($_SESSION['magento_cart']);
+                }
+
+                if (isset($user->magento_cart)) {
+                    $cart = unserialize($user->magento_cart);
+                }
+
+                if (empty($user->customer['customer_id'])) {
+                    $fake = array(); // we don't need this - just to call the function
+                    $new_user = magento_customers_update_magento_customer($user, $fake);
+                    $user = $new_user ? $new_user : $user;
+                }
+
+                $cart['customer'] = array(
+                  'id'                => $user->customer['customer_id'],
+                  'uid'               => $user->uid,
+                  'customer_group_id' => $user->customer['group_id'],
+                  'customer_id'       => $user->customer['customer_id'],
+                  'birth_date'        => isset($user->customer['dob']) ? $user->customer['dob'] : NULL,
+                );
+            } else { // For anonymous user
+                if (isset($_SESSION['magento_cart'])) {
+                    $cart = unserialize($_SESSION['magento_cart']);
+                } elseif (empty($cart['custom_data']) && $customer_group_id = _magento_customers_get_group_for_anonym()) {
+                  $cart['custom_data'] = array(
+                    'customer_group_id' => $customer_group_id,
+                    'customer_id'       => -1,
+                  );
+                }
+            }
+            if (!isset($cart['state'])) {
+
+              // Set cart state to the first step available.
+              $steps = magento_cart_get_steps();
+              $steps_keys = array_keys($steps);
+              $cart['state'] = array_shift($steps_keys);
+
+                //$cart['state'] = 'view';
+            }
+            if (!isset($cart['quote'])) {
+                $cart['quote'] = array();
+            }
+        }
+
+        if (isset($cart['last_access'])) {
+            // control TTL
+            $now = time();
+            $ttl = variable_get('magento_cart_ttl', 48);
+            if ($now - $ttl * 60 * 60 > $cart['last_access']) {
+                magento_cart_clear($cart);
+            }
+        }
+    }
+    return $cart;
+}
+
+/**
+ * Just a wrapper with pretty name
+ */
+function &magento_cart_save($cart) {
+    return magento_cart_get($cart);
+}
+
+/**
+ * Validate cart
+ * @deprecated.
+ */
+function magento_cart_validate() {
+    $cart   = magento_cart_get();
+    $result = NULL;
+
+    // hook before
+    if (!magento_invoke('magento_cart', 'before validate', $cart)) {
+
+
+    }
+
+    // hook after
+    magento_invoke('magento_cart', 'after validate', $result);
+    return $result;
+}
+
+/**
+ * Clear cart
+ */
+function magento_cart_clear() {
+    $result = TRUE;
+
+    // hook before
+    magento_invoke('magento_cart', 'before clear');
+
+    magento_cart_save(array());
+
+    // hook after
+    magento_invoke('magento_cart', 'after clear', $result);
+    return $result;
+}
+
+/**
+ * Recalculates totals and other values
+ *    QUOTE structure:
+ *      [products][]
+ *         [id]  => Magento Product ID
+ *         [qty] => Quantity
+ *      [shipping]
+ *         [id]  => Magento Address ID
+ *      [customer]
+ *         [id]  => Magento Customer ID
+ */
+function _magento_cart_update(&$cart, $update_quote) {
+  // Added try catch for cactching magento update error
+  try {
+
+    $cart['quote'] = array();
+
+    if ($update_quote) {
+      // flush old errors before update
+      unset($cart['errors']);
+
+      if (!isset($cart['products']) || !is_array($cart['products']) || 0 == count($cart['products'])) {
+        // there is no products - just remove the quote
+        if (isset($cart['store_id']) && isset($cart['id'])) {
+          magento_api_delete_quote($cart['store_id'], $cart['id']);
+        }
+      }
+      else {
+        // if product count = 0 - then remove it
+        foreach ($cart['products'] as $nid => $product) {
+          if (0 >= $product['qty']) {
+            unset($cart['products'][$nid]);
+          }
+          unset($cart['products'][$nid]['errors']);
+        }
+
+        $quote = magento_cart_get_quote($cart, TRUE); // rebuild quote
+
+        $response = magento_api_update_quote($cart['store_id'], $quote);
+
+        magento_merge_arrays($cart['quote'], $response);
+
+        /* errors */
+        $error = FALSE;
+        if (is_array($response['products'])) foreach ($response['products'] as $id => $product) {
+            if (isset($product['errors'])) {
+              $error = TRUE;
+              /* set parent product errors */
+              if (isset($cart['products'][$id])) {
+                $cart['products'][$id]['errors'] = $product['errors'];
+
+                $node = node_load($cart['products'][$id]['nid']);
+                $cart['errors']['product-'. $node->nid] = t("Product '%name' :<br/>- %error", array('%name' => $node->title, '%error' => implode("<br/>- ", $product['errors'])));
+              }
+              else {
+                $cart['errors'] = array_merge($cart['errors'], $product['errors']);
+              }
+            }
+        }
+
+        /* set totals */
+        $cart['subtotal']    = $response['subtotal'];
+        $cart['grand_total'] = $response['grand_total'];
+        $cart['id']          = $response['id'];
+
+        /* coupon */
+        if (isset($response['coupon'])) {
+          $cart['coupon']  = $response['coupon'];
+        }
+        if ($error) {
+          //        $cart['errors'][] = t('Cart contains errors');
+        }
+      }
+    }
+  }
+  catch (Exception $e) {
+    $cartDump = print_r($cart, TRUE);
+    $errorMsg = $e->getMessage();
+    watchdog('_magento_cart_update', 'An exception occured in _magento_cart_update function<br />Description:<br />%1<br />Cart variable:<br />%2', array('%1' => $errorMsg, '%2' => $cartDump), WATCHDOG_ERROR);
+    $msgError = array('to' => 'gthognard@ventadis.fr', 'subject' => '_magento_cart_update Error', 'body' => 'An exception occured in _magento_cart_update function<br />Description:<br />' . $e->getMessage() . '<br />Cart variable:<br />' . print_r($cart, TRUE));
+    drupal_mail_send($msgError);
+  }
+    return $cart;
+}
+
+/**
+ * Add products into the cart
+ *
+ *  [nid] =>
+ *  [qty] =>
+ */
+function magento_cart_add($products_to_add = array(), $update_quote = FALSE) {
+    // hook before
+    magento_invoke('magento_cart', 'before add', $products_to_add, $update_quote);
+
+    // WARNING! the idea of creating a copy of the Cart - is to not save the changes if any errors accure
+    $cart = magento_cart_get();
+    if (!isset($cart['products'])) {
+        $cart['products'] = array();
+    }
+
+    $products = &$cart['products'];
+    $invalid_node_ids = array();
+    foreach ($products_to_add as &$product_to_add) {
+        $product_key = $product_to_add['nid'];
+        if (!empty($product_to_add['options'])) {
+          $product_key .= '_' . time();
+        }
+        if (!isset($products[$product_to_add['nid']])) {
+            /* first of all we have to validate this new product */
+            $item = _magento_cart_validate_item($product_to_add['nid']);
+
+            if (is_array($item)) {
+                if ($item['status'] > 0) {
+                    // add new product
+                    $product = $product_to_add;
+                    $product['qty']  = 0;
+                    $product['id']   = $item['field_magento_id_value'];
+                    $product['type'] = $item['type'];
+                    $product['shipping_method_option'] = MAGENTO_CART_SHIPPING_METHOD_OPTION_DEFAULT;
+
+                    if (!empty($product_to_add['options'])) {
+                      $product['options'] = $product_to_add['options'];
+                    }
+
+                    $products[$product_key] = $product;
+                }
+                else {
+                    // this node exists but is unpublished
+                    $invalid_node_ids[$product_to_add['nid']] = t("Node #%node can't be bought - it is unpublished.", array('%node' => $product_to_add['nid']));
+                    continue;
+                }
+            }
+            else {
+                // this node is invalid
+                $invalid_node_ids[$product_to_add['nid']] = t("Node #%node doesn't exist.", array('%node' => $product_to_add['nid']));
+                continue;
+            }
+        }
+
+        // update the amount of this product
+        $products[$product_key]['qty'] += $product_to_add['qty'];
+    }
+
+    if (empty($products_to_add)) {
+      $result = array('errors' => array(t("Can't add products.")));
+    }
+    elseif (0 == count($invalid_node_ids)) {
+        $cart = _magento_cart_update($cart, $update_quote);
+
+        if (is_array($cart['errors'])) {
+            $result = $cart;
+        }
+        else {
+            $result = magento_cart_save($cart);
+        }
+    }
+    else {
+        $result = array('errors' => $invalid_node_ids);
+    }
+
+    // hook after
+    magento_invoke('magento_cart', 'after add', $result);
+    return $result;
+}
+
+/**
+ * Remove products with these IDs from Cart
+ */
+function magento_cart_remove($products_to_remove = array(), $update_quote = FALSE) {
+    // hook before
+    magento_invoke('magento_cart', 'before remove', $products_to_remove);
+
+    // WARNING! the idea of creating a copy of the Cart - is to not save the changes if any errors accure
+    $cart = magento_cart_get();
+
+    $result = TRUE;
+    $recalculation = FALSE;
+    $products = &$cart['products'];
+    foreach ($products_to_remove as &$product_to_remove) {
+        if (isset($products[$product_to_remove['nid']])) {
+            unset($products[$product_to_remove['nid']]);
+            $recalculation = TRUE;
+        }
+    }
+
+    if ($recalculation) {
+        $result = magento_cart_save(_magento_cart_update($cart, $update_quote));
+    }
+
+    // hook after
+    magento_invoke('magento_cart', 'after remove', $result);
+    return $result;
+}
+
+/**
+ * Quote is a light copy of our Cart - without errors and some other fields
+ */
+function magento_cart_get_quote(&$cart, $rebuild = FALSE) {
+    if (0 == count($cart['quote']) || $rebuild) {
+        // create light copy for magento
+        $quote = array(
+        'products' => array(),
+        'customer' => array(),
+        );
+
+        /* dump user IP */
+        $quote['ip'] = _magento_cart_get_user_ip();
+        /* coupon */
+        if (isset($cart['coupon'])) {
+            $quote['coupon'] = $cart['coupon'];
+        }
+
+        /* custom data */
+        if (isset($cart['custom_data'])) {
+            $quote['data'] = $cart['custom_data'];
+        }
+
+        /* club_cards */
+        if (isset($cart['club_cards'])) {
+            $quote['club_cards'] = $cart['club_cards'];
+        }
+
+        if (isset($cart['products']) && is_array($cart['products'])) {
+            foreach ($cart['products'] as $key => $data) {
+                $data['data']['additional_data'] = $key;
+                $quote['products'][$key] = array(
+                'qty'                     => $data['qty'],
+                'id'                      => $data['id'],
+                'data'                    => empty($data['data'])? NULL : $data['data'],
+                );
+                if (!empty($data['options'])) {
+                  $quote['products'][$key]['options'] = $data['options'];
+                }
+
+                $quote['products'][$key]['data']['has_club_card'] = empty($cart['club_cards'])? 0 : 1;
+
+                if (!empty($data['data']['shipping_method_option'])) {
+                  $quote['products'][$key]['data']['is_express_delivery'] = ($data['data']['shipping_method_option'] == 'express') ? 1 : 0;
+                }
+                /*
+                if (!empty($data['shipping_method_option'])) {
+                    $quote['products'][$key]['data']['shipping_method_option'] = $data['shipping_method_option'];
+                }
+                */
+            }
+        }
+
+        // TODO: remove this hardcode
+        if (isset($cart['shipping']['address']) && !isset($cart['shipping']['address']['country_id'])) {
+            $cart['shipping']['address']['country_id'] = 'AD';
+        }
+        // eo TODO
+
+        if (isset($cart['customer']['customer_id'])) {
+            $quote['customer']['id'] = $cart['customer']['customer_id'];
+            $quote['birth_date'] = $cart['customer']['birth_date'];
+        } else {
+            $quote['customer']['id'] = -1;
+        }
+        /*
+        else {
+         unset($quote['customer']);
+        }
+        */
+
+
+        if (isset($cart['id'])) {
+            $quote['id'] = $cart['id'];
+        }
+
+        if (!isset($cart['store_id'])) {
+            // try to get if from products
+            if (isset($cart['products']) && is_array($cart['products'])) foreach ($cart['products'] as $id => $data) {
+                    if (isset($data['nid'])) {
+                        $node = node_load($data['nid']);
+                        if ($node) {
+                            $cart['store_id'] = $node->field_level_id[0]['value'];//field_store_id renamed into field_level_id
+                            break;
+                        }
+                    }
+            }
+        }
+
+        /* Set billing address */
+        if (isset($cart['billing'])) {
+            $quote['billing'] = $cart['billing'];
+        }
+
+        /* Set shipping address */
+        if (isset($cart['shipping'])) {
+            $quote['shipping'] = $cart['shipping'];
+            $quote['shipping']['data']['has_club_card'] = empty($cart['club_cards'])? 0 : 1;
+        }
+
+        /* ORDER INFO */
+        if (isset($cart['payment'])) {
+          $quote['payment'] = $cart['payment'];
+        }
+
+        $cart['quote'] = $quote;
+    }
+
+    return $cart['quote'];
+}
+
+/**
+ * Update products or cart info
+ */
+function magento_cart_update($partial_cart = array(), $update_quote = FALSE) {
+    $cart = magento_cart_get();
+
+    // hook before
+    magento_invoke('magento_cart', 'before update', $partial_cart, $update_quote);
+
+    magento_merge_arrays($cart, $partial_cart);
+
+    // do we need to update the quote at Magento?
+    $result = magento_cart_save(_magento_cart_update($cart, $update_quote));
+
+    // hook after
+    magento_invoke('magento_cart', 'after update', $result);
+    return $result;
+}
+
+/**
+ * create or update Order
+ */
+function magento_cart_order_update(&$partial_cart = NULL, $options = array()) {
+    $result = FALSE;
+
+    $cart = ($partial_cart) ? $partial_cart : magento_cart_get();
+
+    // hook before
+    magento_invoke('magento_cart', 'before order_update', $cart, $options);
+
+    // TODO: remove
+    if (isset($cart['order'])) {
+        unset($cart['order']);
+    }
+
+    if (!isset($cart['order'])) {
+        // WARNING: this should be the first line!
+        $quote    = magento_cart_get_quote($cart);
+        $store_id = (isset($cart['store_id']))        ? $cart['store_id']        : NULL;
+        $uid      = (isset($cart['customer']['uid'])) ? $cart['customer']['uid'] : NULL;
+
+        // create a new one
+        $result = _magento_cart_create_order($quote, $store_id, $uid);
+        if ($result) {
+            $cart['order'] = $result;
+            /*      if ($cart != $partial_cart) {
+            magento_cart_save($cart);
+            }*/
+        }
+    }
+    else {
+        // TODO: implement
+    }
+
+    // hook after
+    magento_invoke('magento_cart', 'after update', $result);
+    return $result;
+}
+
+/**
+ * @deprecated
+ * Updates our cart with the data, received from Magento, it might contain new values and errors
+ */
+/*
+function _magento_cart_updated($response) {
+    $cart = &magento_get_cart();
+
+    // parse response and update existing fields or create some new ones
+    if (is_array($response)) {
+        foreach ($response as $key => $data) {
+            if (is_array($data)) {
+
+            }
+            else {
+                $cart[$key] = $data;
+            }
+        }
+    }
+}
+ */
+
+/**
+ * Return allowed Magento's Order states.
+ * (States are hardcoded)
+ */
+function _magento_cart_order_alowed_states() {
+    return array('new', 'pending_payment', 'processing', 'complete', 'closed', 'canceled', 'holded');
+    /*
+    *   const STATE_NEW                  = 'new';
+    *   const STATE_PENDING_PAYMENT      = 'pending_payment';
+    *   const STATE_PROCESSING           = 'processing';
+    *   const STATE_COMPLETE             = 'complete';
+    *   const STATE_CLOSED               = 'closed';
+    *   const STATE_CANCELED             = 'canceled';
+    *   const STATE_HOLDED               = 'holded';
+    */
+}
+
+/**
+ * update Order state
+ */
+function _magento_cart_update_order($order, $store_id, $state = 'new') {
+    if (!in_array($state, _magento_cart_order_alowed_states())) {
+      return FALSE;
+    }
+    //dd($order,'_magento_cart_update_order');
+    if (!empty($order['custom_data'])) {
+      $orderData = array_merge($order['custom_data'], array('status' => $state));
+      return magento_api_order_update($store_id, $order['increment_id'], $orderData);
+    }
+    return magento_api_order_update_state($store_id, $order['increment_id'], $state);
+}
+
+/**
+ * Count total qty of all products in cart
+ */
+function _magento_cart_count_products_total_qty() {
+  $cart = magento_cart_get();
+  if (empty($cart['products'])) {
+    return 0;
+  }
+
+  $total_qty = 0;
+  foreach ($cart['products'] as &$product_in_cart) {
+    if (!empty($product_in_cart['is_warranty'])) {
+      continue;
+    }
+
+    $total_qty+=$product_in_cart['qty'];
+  }
+  return $total_qty;
+}
+
+/**
+ * Validate insert data
+ */
+function _magento_cart_validate_item($node_id, $qty = 1) {
+    // simply check that this node exists, is published, and has magento id
+    return db_fetch_array(db_query(<<<QUERY
+SELECT
+  f.field_magento_id_value,
+  n.type,
+  n.status
+FROM
+  {node} n LEFT JOIN {content_field_magento_id} f ON n.nid = f.nid
+WHERE
+  n.nid = %d AND
+  n.type LIKE 'magento_product_%%' AND n.type NOT LIKE '%%_website' AND n.type NOT LIKE '%%_global' AND
+  f.field_magento_id_value > 0
+QUERY
+    , $node_id));
+}
+
+/**
+ * Add single product
+ */
+function magento_cart_add_single_item_form($node_id) {
+  // prepare product description structure
+  $products = array(
+    array(
+      'nid' => $node_id,
+      'qty' => 1
+    )
+  );
+
+  $cart = magento_cart_add($products, TRUE);
+  // Final rendering callback.
+  if (!empty($cart['errors'])) {
+    drupal_set_message(join('', $cart['errors']), 'error');
+    $msg = theme_status_messages();
+    $content_area = variable_get('magento_cart_content_selector', '#node-' . $node_id);
+
+    $cart = magento_cart_get();
+    print drupal_json(array(
+        'status' => FALSE,
+        'data' => '<a href="'. base_path() . 'cart">' . format_plural(_magento_cart_count_products_total_qty(), '1 item', '@count items') . '</a><script>$("' . $content_area . ' div.messages").remove();$("' . $content_area . '").prepend(' . drupal_to_js($msg) . ');</script>',
+        ));
+    return;
+  }
+
+  drupal_set_message(t('Product has been added'), 'ok');
+  $msg = theme_status_messages();
+  $content_area = variable_get('magento_cart_content_selector', '#node-' . $node_id);
+
+  //reload_cart_page
+  preg_match('/\/cart$/i', $_SERVER['HTTP_REFERER'], $result);
+  $reload_cart_page = empty($result[0]) ? '' : 'location.reload()';
+
+  print drupal_json(array(
+      'status' => FALSE,
+      'data' => '<a href="'. base_path() . 'cart">' . format_plural(_magento_cart_count_products_total_qty(), '1 item', '@count items') . '</a><script>$("' . $content_area . ' div.messages").remove();$("' . $content_area . '").prepend(' . drupal_to_js($msg) . ');' . $reload_cart_page . '</script>',
+    ));
+  //drupal_goto();
+}
+
+/**
+ * Get product in Cart by its $nid.
+ */
+function magento_cart_get_product($nid) {
+    $product = NULL;
+
+    $cart = magento_cart_get();
+    if (isset($cart['products'][$nid])) {
+        $product = $cart['products'][$nid];
+    }
+
+    return $product;
+}
+
+/**
+ * Сreate Order
+ * This is a wrapper around magento_api_create_order().
+ * NOTE! ORDER CAN be created for anonymous. We have added support for anonymous checkout Drupal-Magento.
+ *
+ * @param $quote
+ *   Array of Order data.
+ * @param $store_id
+ *   ID of the Magento Store.
+ * @param $uid is @deprecated
+ *   This param is deprecated since we have added support for anonymous checkout Drupal-Magento.
+ *
+ * @return order data from Magento API
+ *
+ * @see magento_api_create_order()
+ */
+function _magento_cart_create_order($quote, $store_id, $uid = NULL) {
+    // NOTE! ORDER CAN be created for anonymous. We have added support for anonymous checkout Drupal-Magento.
+
+    // this could be a quote reference or new data - but we expect here to have at least Qoute Id
+    return magento_api_create_order($store_id, $quote, $quote['id']);
+}
+
+/////////////////// CART STEPS /////////////////////////////////////////
+/**
+ * Get info about cart steps.
+ */
+function magento_cart_get_steps() {
+  static $steps = array();
+  if (empty($steps)) {
+    $steps = module_invoke_all('magento_cart_steps');
+    drupal_alter('magento_cart_steps', $steps);
+    foreach ($steps as $key => $step) {
+      $index[$key] = $step['weight'];
+    }
+    if (!empty($index)) {
+      array_multisort($index, $steps);
+    }
+  }
+  return $steps;
+}
+
+/**
+ * Match path with widechars.
+ * @see _magento_cart_get_step_id()
+ */
+function _magento_cart_match_path($pattern, $path) {
+  $pattern = explode('/', $pattern);
+  $path = explode('/', $path);
+
+  $matched = TRUE;
+  while ($bit = drupal_strtolower(trim(array_shift($pattern)))) {
+    $check = drupal_strtolower(trim(array_shift($path)));
+    $last = $bit;
+    $matched = $matched && ( ($check == $bit) || (!empty($check) && ($bit == '*')) );
+    if (!$matched) {
+      return FALSE;
+    }
+  }
+
+  // If path longer that pattern but pattern has last * = match.
+  if (($last != '*') && (!empty($path))) {
+    return FALSE;
+  }
+
+  return TRUE;
+}
+
+/**
+ * Get step id.
+ */
+function _magento_cart_get_step_id($tmp_id = '') {
+
+  $ajax_id = !empty($tmp_id)
+    ? $tmp_id
+    : $_GET['q'];
+
+  $step_id = !empty($tmp_id)
+    ? $tmp_id
+    : ((arg(0) == 'cart') ? arg(1) : '');
+
+  $steps = magento_cart_get_steps();
+  $sids = array_keys($steps);
+  $result = FALSE;
+
+  // If key in step keys - return it.
+  if (in_array($step_id, $sids)) {
+    $result = $step_id;
+  }
+  else { // Search through ajax properties.
+    foreach ($steps as $id => $step) {
+      if (!empty($step['ajax'])) {
+        foreach ($step['ajax'] as $pattern) {
+          if (_magento_cart_match_path($pattern, $ajax_id)) {
+            $result = $id;
+            break;
+          }
+        }
+      }
+    }
+  }
+
+  // If not found and we in cart root - use first step.
+  if (empty($result) && (arg(0) == 'cart')) {
+    $result = array_shift($sids);
+  }
+  return $result;
+}
+
+
+/**
+ * Get info about step.
+ *
+ * @param string $sid
+ *   Step name (id).
+ *
+ * @return array()
+ *   Given step's info or current step info.
+ */
+function magento_cart_get_step($sid = '') {
+
+  // Get step id.
+  $steps = magento_cart_get_steps();
+  $sid = _magento_cart_get_step_id($sid);
+
+  // If we got sid - return step.
+  $result = ($sid !== FALSE)
+    ? $steps[$sid]
+    : array();
+
+  // Add step id key.
+  if (!empty($result)) {
+    $result['step_id'] = $sid;
+  }
+  return $result;
+}
+
+/**
+ * Get info about prev step.
+ *
+ * @param string $sid
+ *   Step name (id).
+ *
+ * @return array()
+ *   Info for step previouse to given(current).
+ */
+function magento_cart_get_step_prev($sid = '') {
+
+  $steps = magento_cart_get_steps();
+  $ids = array_keys($steps);
+
+  $this_step = is_array($sid)
+    ? $sid
+    : magento_cart_get_step($sid);
+
+  if (!empty($this_step['step_id'])) {
+    $pos = array_search($this_step['step_id'], $ids);
+    $id_next = !empty($ids[$pos - 1]) ? $ids[$pos - 1] : FALSE;
+  }
+
+  $result = ($id_next !== FALSE)
+    ? $steps[$id_next]
+    : array();
+
+  if (!empty($result)) {
+    $result['step_id'] = $id_next;
+  }
+
+  return $result;
+}
+
+/**
+ * Create a backlink for a given/current path.
+ */
+function magento_cart_get_back_link($title = 'Back', $step = '') {
+
+  // Get first non hidden step.
+  while ($step = magento_cart_get_step_prev($step)) {
+    if (empty($step['hidden'])) {
+      break;
+    }
+  }
+
+  // Path for "back link";
+  if (!empty($step)) {
+    return l(t($title), magento_cart_get_step_path($step));
+  }
+}
+
+/**
+ * Get info about next step.
+ *
+ * @param string $sid
+ *   Step name (id).
+ *
+ * @return array()
+ *   Info for step next to given(current).
+ */
+function magento_cart_get_step_next($sid = '') {
+
+  $steps = magento_cart_get_steps();
+  $ids = array_keys($steps);
+
+  $this_step = is_array($sid)
+    ? $sid
+    : magento_cart_get_step($sid);
+
+  if (!empty($this_step['step_id'])) {
+    $pos = array_search($this_step['step_id'], $ids);
+    $id_next = !empty($ids[$pos + 1]) ? $ids[$pos + 1] : FALSE;
+  }
+
+  $result = ($id_next !== FALSE)
+    ? $steps[$id_next]
+    : array();
+
+  if (!empty($result)) {
+    $result['step_id'] = $id_next;
+  }
+
+  return $result;
+}
+
+/**
+ * Get step path.
+ */
+function magento_cart_get_step_path($sid) {
+  $sid = is_array($sid) ? $sid['step_id'] : $sid;
+
+  $path = 'cart/'. $sid;
+  drupal_alter('magento_cart_step_path', $path, $sid);
+  return $path;
+}
+
+
+/**
+ * Small wrapper just for clarity.
+ * Will navigate given step.
+ */
+function magento_cart_goto_step($sid, $trail = '', $query = array(), $update = TRUE) {
+  $sid = is_array($sid) ? $sid['step_id'] : $sid;
+
+  // Update magento cart state.
+  if ($update) {
+    magento_cart_update_state($sid);
+  }
+
+  // Get step path and navigate it.
+  $path = magento_cart_get_step_path($sid);
+  drupal_goto(implode('/', array_filter(array($path, $trail))), $query);
+}
+
+/////////////////// PREPROCESS FUNCTIONS ///////////////////////////////
+/**
+ * Process variables for magento_cart_state.tpl.php.
+ *
+ * @see magento_cart_state.tpl.php
+ */
+function template_preprocess_magento_cart_state(&$variables) {
+  $total_items = _magento_cart_count_products_total_qty();
+  $variables['total_items_num'] = $total_items;
+  $variables['total_items'] = t('No items');
+
+  if (!empty($total_items)) {
+    $variables['total_items'] = l(format_plural($total_items, '1 item', '@count items'), 'cart', array('attributes' => array('title' => t('View cart'))));
+  }
+}
+
+/**
+ * ***************************************************
+ *                     F O R M S
+ * ***************************************************
+ */
+/* product
+ *   [nid]
+ *   [qty]
+ */
+/**
+ * Implementation of hook_forms().
+ */
+function magento_cart_forms($form_id, $args) {
+    if (strpos($form_id, 'magento_cart_remove_product') !== FALSE) {
+        $forms[$form_id] = array(
+        'callback' => 'magento_cart_remove_product_form',
+        );
+        return $forms;
+    }
+    elseif (strpos($form_id, 'magento_cart_add_product') !== FALSE) {
+            $forms[$form_id] = array(
+            'callback' => 'magento_cart_add_product_form',
+            );
+            return $forms;
+        }
+}
+
+/**
+ *  Add product form
+ */
+function magento_cart_add_product_form(&$form_state, $product = array(), $ahah = FALSE) {
+    $form = array();
+    if (isset($product['nid'])) {
+        $form['magento_cart_add_product_nid'] = array('#type' => 'value',
+        '#value' => $product['nid'],
+        );
+
+        if (isset($product['qty']) && 0 < $product['qty']) {
+            $form['magento_cart_add_product_qty'] = array('#type' => 'textfield',
+            '#title'         => t('Quantity'),
+            '#default_value' => $product['qty']
+            );
+        }
+
+        $form['magento_cart_add_product_submit'] = array('#type' => 'submit',
+        '#value' => isset($product['btn_txt']) ? $product['btn_txt'] : t('Add to cart'),
+        );
+
+        if (is_array($ahah)) {
+            $form['magento_cart_add_product_submit']['#ahah'] = array_merge(
+            array('path' => "cart/add/{$product['nid']}"),
+            $ahah
+            );
+        }
+    }
+
+    $form['#validate'][] = 'magento_cart_add_product_form_validate';
+    $form['#submit'][] = 'magento_cart_add_product_form_submit';
+
+    return $form;
+}
+
+/**
+ * Validate Add product form
+ */
+function magento_cart_add_product_form_validate($form, &$form_state) {
+    if (isset($form_state['values']['magento_cart_add_product_nid'])) {
+        if (db_result(db_query("SELECT COUNT(*) FROM {node} WHERE nid = %d AND type LIKE '%s%%'", $form_state['values']['magento_cart_add_product_nid'], MAGENTO_STORES_CONTENT_TYPE_PRODUCT)) == 0) {
+            form_set_error('magento_cart_add_product_nid', t('Unknown product'));
+        }
+    }
+
+    $qty = (isset($form_state['values']['magento_cart_add_product_qty'])) ? $form_state['values']['magento_cart_add_product_qty'] : 1;
+    if ($qty != intval($qty) || 0 >= $qty) {
+        form_set_error('magento_cart_add_product_qty', t('Invalid quantity'));
+    }
+}
+
+/**
+ * Submit Add product form and add products to Cart
+ */
+function magento_cart_add_product_form_submit($form, &$form_state) {
+    $nid = $form_state['values']['magento_cart_add_product_nid'];
+    $qty = (isset($form_state['values']['magento_cart_add_product_qty'])) ? $form_state['values']['magento_cart_add_product_qty'] : 1;
+
+    // prepare product description structure
+    $products = array(
+      array(
+        'nid' => $nid,
+        'qty' => $qty
+      )
+    );
+
+    $result = magento_cart_add($products, TRUE);
+    if (is_array($result['errors'])) {
+        foreach ($result['errors'] as $error) {
+            drupal_set_message($error, 'error');
+            $form_state['errors'][] = $error;
+        }
+    }
+    else {
+        drupal_set_message(t('Product has been added'), 'ok');
+    }
+}
+
+
+/**
+ *  Remove product form
+ */
+function magento_cart_remove_product_form(&$form_state, $product = array()) {
+    $form = array();
+
+    if (isset($product['nid'])) {
+        $form['magento_cart_remove_product_nid'] = array('#type' => 'value',
+        '#value' => $product['nid'],
+        );
+
+        $form['magento_cart_remove_product_submit'] = array('#type' => 'submit',
+        '#value' => isset($product['btn_txt']) ? $product['btn_txt'] : t('Remove'),
+        );
+    }
+
+    $form['#validate'][] = 'magento_cart_remove_product_form_validate';
+    $form['#submit'][] = 'magento_cart_remove_product_form_submit';
+
+    return $form;
+}
+
+/**
+ * Validate Remove product form
+ */
+function magento_cart_remove_product_form_validate($form, &$form_state) {
+    if (isset($form_state['values']['magento_cart_remove_product_nid'])) {
+        if (db_result(db_query("SELECT COUNT(*) FROM {node} WHERE nid = %d AND type LIKE '%s%%'", $form_state['values']['magento_cart_remove_product_nid'], MAGENTO_STORES_CONTENT_TYPE_PRODUCT)) == 0) {
+            form_set_error('magento_cart_remove_product_nid', t('Unknown product'));
+        }
+    }
+}
+
+/**
+ * Submit Remove product form
+ */
+function magento_cart_remove_product_form_submit($form, &$form_state) {
+    $nid = $form_state['values']['magento_cart_remove_product_nid'];
+
+    // prepare product description structure
+    $products = array(
+    array(
+    'nid' => $nid,
+    )
+    );
+
+    $result = magento_cart_remove($products, TRUE);
+    drupal_set_message(t('Products have been removed'), 'ok');
+}

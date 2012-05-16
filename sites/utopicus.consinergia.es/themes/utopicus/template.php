@@ -196,6 +196,26 @@ function utopicus_preprocess_node(&$vars, $hook) {
     $vars['template_files'][] = 'node-page';
     $vars['template_files'][] = 'node-'.$vars['node']->type.'-page';
     $vars['template_files'][] = 'node-'.$vars['node']->nid.'-page';
+	
+	// según lo elegido en el campo template de la Pagina Utopicus asignamos un template para el nodo
+  if($vars['type']=="pageutopicus"){
+	  
+	  switch($vars['field_tipotemplate'][0]['value']){
+		  case '111':
+		   $vars['template_files'][] = 'node-template-article';
+		  break;
+		  case '112':
+		  $vars['template_files'][] = 'node-template-content-a-page-ca';
+		  break;
+		  case '113':
+		   $vars['template_files'][] = 'node-template-content-b-page-cb';
+		  break;
+		  default:
+		  break;
+		  }
+	  // krumo($vars);
+	  } // fin -- if($vars['type']=="pageutopicus
+	  
   }
   //multiple nodes being displayed on one page in either teaser
   //or full view
@@ -209,27 +229,11 @@ function utopicus_preprocess_node(&$vars, $hook) {
     if($vars['teaser']) {
       $vars['template_files'][] = 'node-'.$vars['node']->type.'-teaser';
       $vars['template_files'][] = 'node-'.$vars['node']->nid.'-teaser';
+	  $vars['template_files'][] = 'node-teaser';
     }
   }
  
-  // según lo elegido en el campo template de la Pagina Utopicus asignamos un template para el nodo
-  if($vars['type']=="pageutopicus"){
-	  
-	  switch($vars['field_tipotemplate'][0]['value']){
-		  case '111':
-		   $vars['template_files'][] = 'node-template-article-page-a';
-		  break;
-		  case '112':
-		  $vars['template_files'][] = 'node-template-content-a-page-ca';
-		  break;
-		  case '113':
-		   $vars['template_files'][] = 'node-template-content-b-page-cb';
-		  break;
-		  default:
-		  break;
-		  }
-	  // krumo($vars);
-	  } // fin -- if($vars['type']=="pageutopicus
+  
 	  
   // To remove a class from $classes_array, use array_diff().
   //$vars['classes_array'] = array_diff($vars['classes_array'], array('class-to-remove'));

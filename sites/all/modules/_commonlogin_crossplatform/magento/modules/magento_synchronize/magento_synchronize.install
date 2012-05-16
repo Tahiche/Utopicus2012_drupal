@@ -1,0 +1,33 @@
+<?php
+// $Id$
+/**
+ * @file
+ * Install/ uninstall hooks
+ */
+// Create required content types
+module_load_include('module',  'magento',        'magento');
+module_load_include('inc',     'magento',        'magento.node_helper');
+module_load_include('strings', 'magento_stores', 'magento_stores');
+
+/**
+ * Implementation of hook_install().
+ */
+function magento_synchronize_install() {
+  // By default all available stores should be autosynchronized
+  variable_set('magento_synchronize_authosynchronize_default', 1);
+
+  // alter STORE VIEW content type
+  magento_add_cck_field_onoff(MAGENTO_STORES_CONTENT_TYPE_STORE, 'field__autosynch__',           'Autosynchronize',                'number_integer', 'optionwidgets_onoff', FALSE, FALSE, array('default_value' => TRUE));
+  magento_add_cck_field(MAGENTO_STORES_CONTENT_TYPE_STORE, 'field__last_autosynch_magento_id__', 'Last authosynchronization id',   'number_integer', 'number',              TRUE);
+  magento_add_cck_field(MAGENTO_STORES_CONTENT_TYPE_STORE, 'field__last_autosynch_time__',       'Last authosynchronization time', 'text',           'text_textfield',      TRUE);
+}
+
+/**
+ * Implementation of hook_uninstall().
+ */
+function magento_synchronize_uninstall() {
+  // alter STORE VIEW content type
+  magento_remove_cck_field(MAGENTO_STORES_CONTENT_TYPE_STORE, 'field__last_autosynch_time__');
+  magento_remove_cck_field(MAGENTO_STORES_CONTENT_TYPE_STORE, 'field__last_autosynch_magento_id__');
+  magento_remove_cck_field(MAGENTO_STORES_CONTENT_TYPE_STORE, 'field__autosynch__');
+}

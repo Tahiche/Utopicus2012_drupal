@@ -1,0 +1,368 @@
+<?php
+// $Id$
+
+/**
+ * @file
+ * Basics functions for data manipulation.
+ */
+
+require_once 'magento.strings';
+require_once 'magento.node_helper.inc';
+
+/**
+ * Implementation of hook_help().
+ */
+function magento_help($section) {
+  switch ($section) {
+    case 'admin/modules#description':
+      return t('Core of the Magento integration modules. Provides batch processes and helpers to work with CCK.');
+  }
+}
+
+/**
+ * Helper function to execute magento batch operations
+ * @param $info 
+ *  array with information about the batch `title`, `init_message`
+ * @param $batches
+ *  array of operations to run
+ * @param $gui
+ *  if TRUE - run batch operations in GUI mode, otherwise run in background (in background mode, batch may fail if exceed `max_execution_time`)
+ *
+ * @TODO: "'error_message' => t('Batch has encountered an error.')" - this should be replaced with meaningful error message
+ */
+function magento_batch_process($info, $batches, $gui = TRUE) {
+  $operations = array();
+  foreach ($batches as $operation) {
+    $operations[] = array('magento_batch', $operation);
+  }
+
+  if ($gui) {
+    // GUI mode
+
+    if (count($operations)) {
+      $batch = array(
+        'operations'       => $operations,
+        'finished'         => 'magento_batch_finished',
+        'title'            => $info['title'],
+        'init_message'     => $info['init_message'],
+        'progress_message' => t('Processed @current out of @total.'),
+        'error_message'    => t('Batch has encountered an error.'),
+        'file' => drupal_get_path('module', 'magento') . '/magento.module',
+      );
+
+        batch_set($batch);
+        cache_clear_all();
+    }
+  }
+  else {
+    // no GUI
+    foreach ($operations as $operation) {
+      $context = array('finished' => 0);
+      $params = $operation[1];
+
+      //Prevent debug output.
+      $_is_debug_output_enabled = variable_get('magento_batch_debug_output', FALSE);//!('services' === arg(0) && 'xmlrpc' === arg(1)) ;
+
+      while ($context['finished'] < 1) {
+        $operation[0]($params[0], $params[1], $params[2], $params[3], $context);
+
+        if ($_is_debug_output_enabled) {
+          print "<p>{$context['message']}</p>";
+          flush();
+        }
+      }
+    }
+  }
+
+  return '';
+}
+
+/**
+ * Executes magento batch operation ($function_process, $function_get)
+ *
+ * @param $file - File to include
+ * @param $function_process - Function to execute in batch
+ * @param $function_get - Function to execute before batch (reexecute)
+ * @param $params - array with params data for batch operation
+ * @param $context - array with contect data of batch operatoin
+ */
+function magento_batch($file, $function_process, $function_get, $params, &$context) {
+  require_once $file;
+
+  if (!isset($context['sandbox']) || 0 == count($context['sandbox'])) {
+    $params['finished'] = 0;
+    $context['sandbox'] = $params;
+  }
+
+  try{
+    if ($function_get) {
+      $function_get($context['sandbox']);
+    }
+
+    // Required function
+    $function_process($context['sandbox']);
+
+    $context['message'] = isset($context['sandbox']['message']) ? $context['sandbox']['message'] : '';
+  } catch (Exception $e) {
+    drupal_set_message($e->getMessage(), 'error');
+  }
+
+  $context['finished'] = $context['sandbox']['finished'];
+}
+
+/**
+ * Dumb callback function to execute when magento batch finished
+ */
+function magento_batch_finished($success, $results, $operations) {
+}
+
+/**
+ * Find or create default user for magento node's operations
+ */
+function magento_get_default_user() {
+  static $default_uid = 0; // simple cache implementation
+
+  if (!$default_uid) {
+    // Check user for existance
+    $user = user_load(array('name' => MAGENTO_USER));
+    if (!$user) {
+      // Yes, we have to create it, but firstly let's check for role existance
+      $role_exists = FALSE;
+      $roles = user_roles();
+      foreach ($roles as $id => $role) if ($role == MAGENTO_ROLE) {
+        $role_exists = $id;
+        break;
+      }
+      if (!$role_exists) {
+        // the role is also missing
+        module_load_include('inc', 'user', 'user.admin');
+
+        // Let's create it
+        $form_state = array('values' => array(
+          'op'   => t('Add role'),
+          'name' => MAGENTO_ROLE
+        ));
+
+        user_admin_role_submit(NULL, $form_state);
+      }
+
+      // Now we can add a new user
+      $user = array(
+        'name'   => MAGENTO_USER,
+        'pass'   => '', // with empty password this user won't be able to login
+        'mail'   => '',
+        'status' => 1,
+        'init'   => '',
+        'roles'  => array($role_exists => MAGENTO_ROLE),
+      );
+      $user = user_save(NULL, $user);
+    }
+    $default_uid = $user->uid;
+  }
+  return $default_uid;
+}
+
+/**
+ * Switch user: possible values 'default', 'restore'
+ */
+function magento_switch_user($state) {
+  global $user;
+
+  static $restore = NULL;
+
+  $magento_uid = magento_get_default_user();
+
+  switch ($state) {
+    case 'default':
+      if ($user->uid == $magento_uid) {
+        // nothing to do, current user is aready the one we need
+      }
+      else {
+        // save current user
+        $restore = $user;
+        $user = user_load($magento_uid);
+      }
+      break;
+    case 'restore':
+      if ($restore) {
+        $user = $restore;
+        $restore = NULL;
+      }
+      break;
+  }
+}
+
+/**
+ * Merges two multidimentional arrays
+ */
+function magento_merge_arrays(&$array, $second) {
+  if (is_array($second)) {
+    foreach ($second as $key => $item) if (is_array($item) && 0 < count($item)) {
+      if (!isset($array[$key])) {
+        $array[$key] = array();
+      }
+
+      magento_merge_arrays($array[$key], $item);
+    }
+    else {
+      $array[$key] = $item;
+    }
+  }
+}
+
+/**
+ * Return current Unix timestamp with microseconds as float
+ */
+function magento_microtime_float() {
+  return microtime(true);
+}
+
+/**
+ * Translate Magento Type into Drupal CCK field type + widget.
+ * This function is used to map between "Magento attributes type" and "Drupal CCK field type + widget"
+ *
+ * @param $frontend_input
+ *  string Magento attribute frontend_input type
+ * @param $backend_type
+ *  string Magento attribute backend_type type
+ */
+function magento_type2cck($frontend_input, $backend_type) {
+  // hook before
+  magento_invoke('magento', 'before type2cck', $frontend_input, $backend_type);
+
+  $result = NULL;
+  switch ($frontend_input) {
+    case 'boolean':
+      $result = array('number_integer', 'optionwidgets_onoff', 'magento_fill_text', 'magento_add_cck_field_onoff');
+      break;
+    case 'text':
+      $result = array('text', 'text_textfield', 'magento_fill_text', 'magento_add_cck_field');
+      break;
+    case 'multiselect':
+      switch ($backend_type) {
+        case 'int':
+          $result = array('number_integer', 'optionwidgets_select', 'magento_fill_multiselect_text', 'magento_add_cck_field');
+          break;
+        default:
+          $result = array('text', 'optionwidgets_select', 'magento_fill_multiselect_text', 'magento_add_cck_field_multiselect');
+      }
+      break;
+    case 'select':
+      switch ($backend_type) {
+        case 'int':
+          $result = array('number_integer', 'optionwidgets_select', 'magento_fill_text', 'magento_add_cck_field');
+          break;
+        default:
+          $result = array('text', 'optionwidgets_select', 'magento_fill_text', 'magento_add_cck_field');
+      }
+      break;
+    case 'date':
+      $result = array('text', 'text_textfield', 'magento_fill_text', 'magento_add_cck_field');
+      break;
+    case 'price':
+      $result = array('number_decimal', 'number', 'magento_fill_decimal', 'magento_add_cck_field_decimal');
+      break;
+    case 'textarea':
+    default:
+      $result = array('text', 'text_textarea', 'magento_fill_text', 'magento_add_cck_field');
+  }
+
+  // Convert into
+  $result = array(
+    'cck_type'            => $result[0],
+    'cck_widjet_type'     => $result[1],
+    'cck_fill_function'   => $result[2],
+    'cck_create_function' => $result[3],
+  );
+
+  // hook after
+  magento_invoke('magento', 'after type2cck', $result);
+  return $result;
+}
+
+/****************** Field FILL callbacks ******************/
+
+/**
+ * Helper function to fill $field (of type text) with text $value
+ */
+function magento_fill_text(&$field, $value) {
+  if (is_array($field) && array_key_exists('value', $field[0]) && (0 != strcmp($field[0]['value'], $value))) {
+    $field[0]['value'] = $value;
+    return TRUE;
+  }
+  return FALSE;
+}
+
+/**
+ * Helper function to fill $field (of type integer) with decimal $value
+ */
+function magento_fill_decimal(&$field, $value) {
+  if (!(empty($field[0]['value']) && empty($value)) && ((floatval($field[0]['value']) != floatval($value)))) {
+    $field[0]['value'] = $value;
+    return TRUE;
+  }
+  return FALSE;
+}
+
+/**
+ * Helper function to fill $field (of type checkbox) with on/off $value
+ */
+function magento_add_cck_field_onoff($content_type, $field_name, $label, $type, $widget_type, $rebuild = FALSE, $multiple = FALSE, $options = array()) {
+  $message = magento_add_cck_field($content_type, $field_name, $label, $type, $widget_type, $rebuild, $multiple);
+
+  $data = array('allowed_values' => '0|'. t('No') ."\n1|". t('Yes'), 'widget' => array('description' => $label, 'allowed_values' => '0|'. t('No') ."\n1|". t('Yes') ));
+  if (isset($options['default_value'])) {
+    magento_merge_arrays($data, array('widget' => array('default_value' => array(array('value' => $options['default_value'])))));
+  }
+  magento_field_instance_update($field_name, $data);
+
+  return $message;
+}
+
+/**
+ * Helper function to add $field of type decimal to specified Content Type
+ */
+function magento_add_cck_field_decimal($content_type, $field_name, $label, $type, $widget_type, $rebuild = FALSE, $multiple = FALSE) {
+  $message = magento_add_cck_field($content_type, $field_name, $label, $type, $widget_type, $rebuild, $multiple);
+
+  $data = array('precision' => 10, 'scale' => 2, 'decimal' => '.');
+  magento_field_instance_update($field_name, $data);
+
+  return $message;
+}
+
+/**
+ * Helper function to add $field of type multiselect to specified Content Type
+ */
+function magento_add_cck_field_multiselect($content_type, $field_name, $label, $type, $widget_type, $rebuild = FALSE, $multiple = TRUE) {
+  $message = magento_add_cck_field($content_type, $field_name, $label, $type, $widget_type, $rebuild, $multiple);
+
+  return $message;
+}
+
+/**
+ * Helper function to fill $field (of type multiselect) with options value
+ */
+function magento_fill_multiselect_text(&$field, $value) {
+  // FROM magento
+  $magento_side = explode(',', $value);
+
+  // FROM drupal
+  $drupal_side = array();
+  foreach ($field as $item) {
+    $drupal_side[] = $item['value'];
+  }
+
+  // compare arrays - they should be the same to skip update
+  $diff = array_diff($magento_side, $drupal_side);
+
+  if (0 < count($diff)) {
+    $field = array();
+
+    foreach ($magento_side as $item) {
+      $field[] = array('value' => $item);
+    }
+    return TRUE;
+  }
+  return FALSE;
+}

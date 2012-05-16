@@ -1,0 +1,87 @@
+<?php
+// $Id$
+
+/**
+ * @file
+ * Integration with Magento Orders Information for Customers.
+ */
+
+/**
+ * Implementation of hook_menu().
+ */
+function magento_my_orders_menu() {
+  $items = array();
+  $items['user/%user_category/orders'] = array(
+    'title' => 'Orders',
+    'page callback' => 'magento_my_orders_list',
+    'page arguments' => array(1),
+    'access callback' => 'magento_my_orders_view_access',
+    'access arguments' => array(1),
+    'type' => MENU_LOCAL_TASK,
+    'load arguments' => array('%map', '%index'),
+    'file' => 'magento_my_orders.pages.inc',
+  );
+  $items['user/%user_category/order/%'] = array(
+    'title' => 'Order info',
+    'page callback' => 'magento_my_orders_order_info',
+    'page arguments' => array(1, 3),
+    'access callback' => 'magento_my_orders_view_access',
+    'access arguments' => array(1),
+    'type' => MENU_CALLBACK,
+    'load arguments' => array('%map', '%index'),
+    'file' => 'magento_my_orders.pages.inc',
+  );
+  return $items;
+}
+
+/**
+ * Implementation of hook_perm().
+ */
+function magento_my_orders_perm() {
+  return array('view own orders', 'view any orders');
+}
+
+/**
+ * Access callback for displaying Orders Information.
+ */
+function magento_my_orders_view_access($account) {
+  return ((($GLOBALS['user']->uid == $account->uid) && user_access('view own orders')) || user_access('view any orders')) && $account->uid > 0;
+}
+
+/**
+ * Implementation of hook_theme().
+ */
+function magento_my_orders_theme() {
+  $theme = array();
+
+  $theme['magento_no_orders'] = array(
+    'arguments' => array(),
+    'function' => 'theme_magento_no_orders',
+    'file' => 'magento_my_orders.pages.inc',
+  );
+  $theme['magento_my_orders_list'] = array(
+    'arguments' => array(
+      'account' => NULL,
+      'orders' => NULL,
+    ),
+    'template' => 'magento_my_orders_list',
+    'file' => 'magento_my_orders.pages.inc',
+  );
+  $theme['magento_order_info'] = array(
+    'arguments' => array(
+      'account' => NULL,
+      'order' => NULL,
+    ),
+    'template' => 'magento_my_orders_order_info',
+    'file' => 'magento_my_orders.pages.inc',
+  );
+  $theme['magento_my_orders_address'] = array(
+    'arguments' => array(
+      'address' => NULL,
+    ),
+    'template' => 'magento_my_orders_address',
+    'file' => 'magento_my_orders.pages.inc',
+  );
+
+  return $theme;
+}

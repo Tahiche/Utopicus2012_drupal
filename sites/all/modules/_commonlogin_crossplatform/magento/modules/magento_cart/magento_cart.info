@@ -1,0 +1,16 @@
+name =  Magento Cart
+description = Basic Magento Shopping Cart
+
+package = "Magento"
+
+dependencies[] = magento_api
+
+version = "6.x-1.0"
+core = 6.x
+
+; Information added by drupal.org packaging script on 2011-11-11
+version = "6.x-2.x-dev"
+core = "6.x"
+project = "magento"
+datestamp = "1321014079"
+
