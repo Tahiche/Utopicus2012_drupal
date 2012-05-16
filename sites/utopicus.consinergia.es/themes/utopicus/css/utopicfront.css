@@ -45,3 +45,19 @@ ul.load-more-pager li.pager-next a.views-throbbing{
 	background: url("../images/loadingspinner.gif") no-repeat scroll 0 0 transparent;
 	margin: 8px 0 0 8px;
 	}
+	
+	
+
+.terms-inline ul{
+	 border: medium none;
+    font-size: 1em;
+    line-height: 1.583em;
+    padding: 0 0 9px;
+	font-style:italic;
+	
+	}
+.terms-inline ul li{
+	float: left;
+    padding: 0 13px 0 0;
+	text-transform:capitalize;	
+	}

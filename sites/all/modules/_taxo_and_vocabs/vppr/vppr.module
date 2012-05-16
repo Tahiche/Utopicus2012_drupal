@@ -1,0 +1,184 @@
+<?php
+// $Id: vppr.module,v 1.1 2011/01/27 15:02:41 boobaa Exp $
+
+/**
+ * @file
+ * Vocabulary Permissions Per Role
+ *
+ * Allows adding to/editing terms of/removing terms from vocabularies per role.
+ */
+
+/**
+ * Implementation of hook_menu_alter().
+ */
+function vppr_menu_alter(&$items) {
+	
+ // Check taxonomy admin page:
+ $items['admin/content/taxonomy']['access callback'] = '_vppr_access_taxonomy';
+
+ $items['admin/content/taxonomy_manager']['access callback'] = '_vppr_access_taxonomy';
+ 
+  // Add terms: http://d6.l/admin/content/taxonomy/$vid/add/term
+  $items['admin/content/taxonomy/%taxonomy_vocabulary/add/term']['access callback'] = '_vppr_access_vocabulary';
+  $items['admin/content/taxonomy/%taxonomy_vocabulary/add/term']['access arguments'] = array(3);
+  // Reorder terms: http://d6.l/admin/content/taxonomy/$vid
+  $items['admin/content/taxonomy/%taxonomy_vocabulary']['access callback'] = '_vppr_access_vocabulary';
+  $items['admin/content/taxonomy/%taxonomy_vocabulary']['access arguments'] = array(3);
+  // Edit and delete terms: http://d6.l/admin/content/taxonomy/edit/term/$tid - warning: there's only a tid arg!
+  $items['admin/content/taxonomy/edit/term']['access callback'] = '_vppr_access_term';
+  $items['admin/content/taxonomy/edit/term']['access arguments'] = array(5);
+}
+
+/**
+ * VPPR's access callback for vocabularies (add and reorder terms).
+ */
+function _vppr_access_vocabulary($vocab) {
+  if (user_access('administer taxonomy')) {
+    return TRUE;
+  }
+  global $user;
+  $perms = variable_get('vppr_perms', array(array()));
+  foreach ($user->roles as $rid => $role) {
+    if ($perms[$vocab->vid][$rid]) {
+      return TRUE;
+    }
+  }
+  return FALSE;
+}
+
+
+function _vppr_access_taxonomy() { 
+  if (user_access('administer taxonomy')) {
+    return TRUE;
+  }
+
+  global $user;
+  $perms = variable_get('vppr_perms', array(array()));
+  // miKrumo( $perms );
+  foreach ($perms as $perm) {
+    $diff = array_intersect(array_keys($perm), array_keys($user->roles));
+    if (!empty($diff)) {
+      return TRUE;
+    }
+  }
+
+  return FALSE;
+}
+
+/**
+ * Alter taxonomy_overview_vocabularies so it will only show VPPR accessible vocabularies
+ */
+function vppr_form_taxonomy_overview_vocabularies_alter(&$form, &$form_state) {
+  foreach (element_children($form) as $vid) {
+    if (is_numeric($vid)) {
+      if (_vppr_access_vocabulary((object)$form[$vid]['#vocabulary']) === FALSE) {
+        unset($form[$vid]);
+      } else {
+        if (!user_access('administer taxonomy')) {
+          unset($form[$vid]['edit']);
+          if (!isset($form['#theme'])) {
+            $form['#theme'] = 'vppr_overview_vocabularies';          
+          }
+        }
+      }
+    }
+  }
+}
+
+/**
+ * Theme override for theme_taxonomy_overview_vocabularies
+ * Ugly since we're overtaking core functionality, but it's needed to avoid rendering issues
+ */
+function theme_vppr_overview_vocabularies($form) {
+  $rows = array();
+  foreach (element_children($form) as $key) {
+    if (isset($form[$key]['name'])) {
+      $vocabulary = &$form[$key];
+
+      $row = array();
+      $row[] = drupal_render($vocabulary['name']);
+      $row[] = drupal_render($vocabulary['types']);
+      if (isset($vocabulary['weight'])) {
+        $vocabulary['weight']['#attributes']['class'] = 'vocabulary-weight';
+        $row[] = drupal_render($vocabulary['weight']);
+      }
+      $row[] = drupal_render($vocabulary['list']); // removed the 'edit' row here because it's unset
+      $row[] = drupal_render($vocabulary['add']);
+      $rows[] = array('data' => $row, 'class' => 'draggable');
+    }
+  }
+  if (empty($rows)) {
+    $rows[] = array(array('data' => t('No vocabularies available.'), 'colspan' => '5'));
+  }
+
+  $header = array(t('Name'), t('Type'));
+  if (isset($form['submit'])) {
+    $header[] = t('Weight');
+    drupal_add_tabledrag('taxonomy', 'order', 'sibling', 'vocabulary-weight');
+  }
+  $header[] = array('data' => t('Operations'), 'colspan' => '3');
+  return theme('table', $header, $rows, array('id' => 'taxonomy')) . drupal_render($form);
+}
+
+
+
+/**
+ * VPPR's access callback for term ID's (edit and delete terms).
+ */
+function _vppr_access_term($tid) {
+  if (user_access('administer taxonomy')) {
+    return TRUE;
+  }
+  $term = taxonomy_get_term($tid);
+  // Speed up things if there is no such term.
+  if (!$term) {
+    return FALSE;
+  }
+  global $user;
+  $perms = variable_get('vppr_perms', array(array()));
+  foreach ($user->roles as $rid => $role) {
+    if ($perms[$term->vid][$rid]) {
+      return TRUE;
+    }
+  }
+  return FALSE;
+}
+
+/**
+ * Implementation of hook_perm().
+ */
+function vppr_perm() {
+  return array('administer VPPR');
+}
+
+/**
+ * Implementation of hook_menu().
+ */
+function vppr_menu() {
+  $items = array();
+  $items['admin/settings/vppr'] = array(
+    'title' => 'Vocabulary permissions',
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('vppr_form_admin_settings_vppr'),
+    'access arguments' => array('administer VPPR'),
+    'file' => 'vppr.admin.inc',
+    'type' => MENU_NORMAL_ITEM,
+  );
+  return $items;
+}
+
+/**
+ * Implementation of hook_theme().
+ */
+function vppr_theme() {
+  return array(
+    'vppr_form_admin_settings_vppr' => array(
+      'arguments' => array('form' => array()),
+      'file' => 'vppr.admin.inc',
+    ),
+	 'vppr_overview_vocabularies' => array(
+      'arguments' => array('form' => array()),
+    ),
+  );
+}
+

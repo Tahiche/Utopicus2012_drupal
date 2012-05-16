@@ -1,0 +1,628 @@
+<?php
+// $Id$
+
+/**
+ * @file
+ *   Magento currency module hooks and logic.
+ */
+
+define('MAGENTO_CURRENCY_TABLE_RATES', 'magento_currency_rates');
+define('MAGENTO_CURRENCY_TTL_RATES', 10);
+define('MAGENTO_CURRENCY_TTL_ALLOWED', 10);
+define('MAGENTO_CURRENCY_MENU_ROOT', 'admin/settings/magento/currency');
+define('MAGENTO_CURRENCY_CT_STORE', 'magento_store');
+
+/**
+ * Implementation of hook_perm();
+ */
+function magento_currency_perm() {
+  return array('magento currency: admin');
+}
+
+
+/**
+ * Implementation of hook_menu();
+ */
+function magento_currency_menu() {
+  $items[MAGENTO_CURRENCY_MENU_ROOT] = array(
+    'title' => 'Currency',
+    'description' => 'Manage currencies and rates',
+    'page callback' => 'magento_currency_page_view',
+    'access arguments' => array('magento currency: admin'),
+    'type' => MENU_NORMAL_ITEM,
+  );
+  $items[MAGENTO_CURRENCY_MENU_ROOT .'/rates'] = array(
+    'title' => 'View rates',
+    'description' => 'View rates',
+    'type' => MENU_DEFAULT_LOCAL_TASK,
+  );
+  $items[MAGENTO_CURRENCY_MENU_ROOT .'/config'] = array(
+    'title' => 'Config',
+    'description' => 'Configuration of currencies and rates',
+    'page callback' => 'magento_currency_page_config',
+    'access arguments' => array('magento currency: manage'),
+    'type' => MENU_LOCAL_TASK,
+    'weight' => 10
+  );
+  return $items;
+}
+
+/**
+ * Implementation of hook_magento_api_get_config_meta();
+ */
+function magento_currency_magento_api_get_config_meta() {
+  return array(
+    'magento_currency/allowed' => 'magento_currency_config_currency_allowed',
+    'magento_currency/rates' => 'magento_currency_config_currency_rates',
+  );
+}
+
+/**
+ * Implementation of hook_block();
+ */
+function magento_currency_block($op = 'list', $delta = 0, $edit = array()) {
+  switch ($op) {
+    case 'list':
+      $blocks['magento_currency_block_select'] = array(
+        'info' => t('Magento Currency: Select'),
+      );
+
+      return $blocks;
+    break;
+    case 'view':
+      module_load_include('block.inc', 'magento_currency');
+      if (function_exists($delta) && (strpos($delta, 'magento_currency_block') !== FALSE)) {
+        $block = $delta();
+      }
+      else {
+        $block = array(
+          'subject' => t('Unsuppoterd delta'),
+          'content' => t('Unsuppoterd delta'),
+        );
+      }
+      return $block;
+    break;
+  }
+}
+
+/**
+ * Implementation of hook_cronapi() for Elysia Cron.
+ */
+function magento_currency_cronapi($op, $job = NULL) {
+  switch ($op) {
+    case 'list' :
+      return array(
+        'magento_currency_sync' => t('Sync currencies and rates from magento.'),
+      );
+    break;
+    case 'rule' :
+      switch ($job) {
+        case 'magento_currency_sync' : return '0 0 * * *';
+      }
+    break;
+  }
+}
+
+/**
+ * Get store names and magento ids.
+ *
+ * @return
+ *   Array of $item = array(
+ *     'title' => {string: Store title},
+ *     'mid' => {int: Magento id}
+ *   );
+ */
+function _magento_currency_store_list() {
+  $res = db_query("SELECT
+      DISTINCT(node.nid) as nid,
+      node.title as title,
+      content_field_magento_id.field_magento_id_value as mid
+    FROM
+      {node} node
+    LEFT JOIN {content_field_magento_id} content_field_magento_id
+      ON (node.vid = content_field_magento_id.vid)
+    WHERE
+      type = '%s'", MAGENTO_CURRENCY_CT_STORE
+  );
+  $list = array();
+  while ($item = db_fetch_object($res)) {
+    $list[$item->nid] = array(
+      'title' => $item->title,
+      'mid' => $item->mid,
+    );
+  }
+  return $list;
+}
+
+/**
+ * Config callback for "magento_currency/allowed"
+ * Never called directly.
+ *
+ * @param $store_is
+ *   int(1) or NULL(2) or empty array(3) - Magento's store id.
+ *
+ * @return
+ *   Array of allowed currencies for given store(1), or for all site(2)
+ *   if empty array(3) is given this will fetch All currency info from
+ *   magento in one request.
+ *   Example array('EUR', 'USD').
+ */
+function magento_currency_config_currency_allowed($store_id = NULL) {
+  if ($store_id !== NULL) {
+    $result = _magento_api_call('config.getAllowedCurrency', array($store_id));
+  }
+  else {
+    $result = _magento_api_call('config.getAllowedCurrency');
+  }
+  return $result;
+}
+
+/**
+ * Config callback for "magento_currency/rates"
+ *
+ *
+ * @param $store_is
+ *   Magento's store id
+ *
+ * @return
+ *   Array keyed by store default currency and values rates to all available for
+ *   this store currencies.
+ *   Example array('EUR' => array('USD' => 1.1)).
+ */
+function magento_currency_config_currency_rates($store_id = NULL) {
+  if ($store_id !== NULL) {
+    $result = _magento_api_call('config.getCurrencyRates', array($store_id));
+  }
+  else {
+    $result = _magento_api_call('config.getCurrencyRates');
+  }
+  return $result;
+}
+
+/**
+ * Preform full currency sync for all stores.
+ */
+function magento_currency_sync() {
+
+  // Get list of allowed currencies and rates in one request.
+  $list = magento_api_get_config_info('magento_currency/allowed', array(), MAGENTO_CURRENCY_TTL_ALLOWED);
+
+  // Saving rates into database.
+  foreach ($list as $store_id => $store_info) {
+    $base = array_shift(array_keys($store_info));
+    $struct[$store_id][$base] = array_keys($store_info[$base]);
+    foreach ($store_info[$base] as $to => $rate) {
+      db_query("INSERT INTO {". MAGENTO_CURRENCY_TABLE_RATES ."} (currency_from, currency_to, rate)
+        VALUES ('%s', '%s', '%f') ON DUPLICATE KEY UPDATE rate = '%f'",
+        $base, $to, $rate, $rate
+      );
+    }
+  }
+  variable_set('magento_currency_allowed', $struct);
+}
+
+/**
+ * Get base currency for store.
+ *
+ * @param $store_id
+ *   Store id or 0 for default scope.
+ *
+ * @return
+ *   (str) Currency code for base currency of given store.
+ */
+function magento_currency_get_base($store_id = 0) {
+  $values = variable_get('magento_currency_allowed', array());
+  $result = !empty($values[$store_id])
+    ? array_shift(array_keys($values[$store_id]))
+    : NULL;
+  return $result;
+}
+
+/**
+ * Get allowed currency for store.
+ *
+ * @param $store_id
+ *   Store id or 0 for default scope.
+ *
+ * @return
+ *   Array of allowed currencies for given store.
+ */
+function magento_currency_get_allowed($store_id = 0) {
+  $values = variable_get('magento_currency_allowed', array());
+  $result = !empty($values[$store_id])
+    ? array_shift($values[$store_id])
+    : array();
+  return $result;
+}
+
+/**
+ * Get rates for given store.
+ *
+ * @param $currency_code
+ *   (str) Base currency code.
+ *
+ * @param $reset
+ *   (bool) If TRUE will reset static cache.
+ */
+function magento_currency_get_rates($currency_code, $reset = FALSE) {
+  static $rates = array();
+
+  // Reset rate if asked.
+  if ($reset && !empty($rates[$currency_code])) {
+    unset($rates[$currency_code]);
+  }
+
+  // Check if we have static cache.
+  if (!empty($rates[$currency_code])) {
+    $result = $rates[$currency_code];
+  }
+  else { // If not - request DB.
+    $res = db_query("SELECT currency_to, rate FROM {". MAGENTO_CURRENCY_TABLE_RATES ."} WHERE currency_from = '%s' ORDER BY currency_to", $currency_code);
+    $result = array();
+    while ($item = db_fetch_array($res)) {
+      $result[$item['currency_to']] = $item['rate'];
+    }
+    $rates[$currency_code] = $result;
+  }
+
+  return $result;
+}
+
+/**
+ * Get currency display info.
+ *
+ * @param $currency_code
+ *   (str) Currency code.
+ *
+ * @return
+ *   Array with keys 'name' => {str: currency name}, 'sign' => {str: currency sign}
+ */
+function magento_currency_get_info($currency_code) {
+  $currency_code = trim(drupal_strtoupper($currency_code));
+  static $info = array();
+  if (!empty($info[$currency_code])) {
+    return $info[$currency_code];
+  }
+  else {
+    $values = variable_get('magento_currency_config', array('signs' => _magento_currency_default_currency_info()));
+    $signs = $values['signs'];
+    $rows = explode(PHP_EOL, $signs);
+    foreach ($rows as $row) {
+      $parts = explode('|', trim($row));
+      $code = trim(drupal_strtoupper($parts[0]));
+      $info[$code] = array(
+        'name' => !empty($parts['1']) ? $parts[1] : $parts[0],
+        'sign' => !empty($parts['2']) ? $parts[2] : $parts[0],
+      );
+    }
+  }
+  return !empty($info[$currency_code])
+    ? $info[$currency_code]
+    : array('name' => $currency_code, 'sign' => $currency_code);
+}
+
+/**
+ * Return current currency info.
+ *
+ * @param $base_currency
+ *   (str) Base currency, if ommited - base currency for current store will be used.
+ *
+ * @return
+ *   Array with keys 'code', 'name', 'sign', 'rate' that will contain info for
+ *   user's current currency (selected via currency selection block) related to
+ *   the base currency (usually base currency for current store).
+ *   Example: array('code' => 'USD', 'name' => 'US Dollar', 'sign' => '$', 'rate' => 1.1).
+ */
+function magento_currencies_get_current($base_currency = NULL) {
+
+  // Get currenct store.
+  $mid = array_shift(_magento_structure_current_store());
+
+  // Get base currency if not specified.
+  $base_currency = !empty($base_currency)
+    ? $base_currency
+    : magento_currency_get_base($mid);
+
+  // Get currenct currency.
+  $current = !empty($_SESSION['magento_currency_current'][$mid])
+    ? $_SESSION['magento_currency_current'][$mid]
+    : magento_currency_get_base($mid);
+
+  // Get rate and info.
+
+  if (!empty($base_currency) && !empty($current)) {
+    $rates = magento_currency_get_rates($base_currency);
+    $info = magento_currency_get_info($current);
+  }
+
+  if (!empty($info) && !empty($rates[$current])) {
+    $result = $info + array(
+      'code' => $current,
+      'rate' => $rates[$current]
+    );
+  }
+  else {
+    $result = array(
+      'code' => '',
+      'name' => '',
+      'sign' => '',
+      'rate' => 1,
+    );
+  }
+
+  return $result;
+}
+
+/** ==================================== FORM ================================ */
+
+/**
+ * Save handler.
+ * Currency select block form.
+ */
+function magento_currency_form_select_submit($form, $form_state) {
+  $allowed = array_keys($form['#magento_currency_options']);
+  $selected = $form_state['values']['currency'];
+  if (in_array($selected, $allowed)) {
+    $mid = array_shift(_magento_structure_current_store());
+    $_SESSION['magento_currency_current'][$mid] = $selected;
+  }
+}
+
+/**
+ * Form builder.
+ * Currency select block form.
+ */
+function magento_currency_form_select($form_state, $options, $current) {
+
+  $form['#magento_currency_options'] = $options;
+
+  $form['currency'] = array(
+    '#type' => 'select',
+    '#title' => '',
+    '#options' => $options,
+    '#default_value' => $current
+  );
+
+  $form['select'] = array(
+    '#prefix' => '<div style="display:none;">',
+    '#type' => 'submit',
+    '#value' => 'select',
+    '#suffix' => '</div>',
+  );
+  return $form;
+}
+
+/**
+ * Form builder.
+ * Config form.
+ */
+function magento_currency_form_config() {
+  $values = variable_get('magento_currency_config', array('signs' => _magento_currency_default_currency_info()));
+  $form['magento_currency_config'] = array(
+    '#tree' => TRUE,
+  );
+  $form['magento_currency_config']['signs'] = array(
+    '#type' => 'textarea',
+    '#title' => t('Curency display'),
+    '#description' => t('Enter currency display settings in form of a list as follows [cur_code]|[name]|[sign], example: EUR|Eoru|€'),
+    '#default_value' => $values['signs']
+  );
+
+  return system_settings_form($form);
+}
+
+/** ==================================== PAGE ================================ */
+
+/**
+ * Callback for currency list page.
+ */
+function magento_currency_page_view() {
+  $stores = _magento_currency_store_list();
+
+  // Shortcut if no stores.
+  if (empty($stores)) {
+    return t('No stores available.');
+    return;
+  }
+
+  // Get base curency and rates.
+  foreach ($stores as $key => $store) {
+    $stores[$key]['base'] = magento_currency_get_base($store['mid']);
+    $stores[$key]['allowed'] = magento_currency_get_allowed($store['mid']);
+    $stores[$key]['rates'] = magento_currency_get_rates($stores[$key]['base']);
+  }
+
+  // Render.
+  $output = '';
+  $header = array(t('Base'), t('Allowed'), t('Rate'));
+  foreach ($stores as $store) {
+    $title = t('Store: !title (magento ID: !id)', array('!title' => $store['title'], '!id' => $store['mid']));
+    $rows = array();
+    foreach ($store['allowed'] as $allowed)
+    $rows[] = array(
+      $store['base'],
+      $allowed,
+      $store['rates'][$allowed],
+    );
+    $output .= theme_table($header, $rows, array(), $title);
+  }
+  return $output;
+}
+
+/**
+ * Callback for currency config page.
+ */
+function magento_currency_page_config() {
+  return drupal_get_form('magento_currency_form_config');
+}
+
+/**
+ * Return default currency info.
+ */
+function _magento_currency_default_currency_info() {
+$data = 'AFN|Afghan Afghani|Af
+ANG|Netherlands Antillean Guilder|NAf.
+AOA|Angolan Kwanza|Kz
+ARA|ARA|₳
+ARL|ARL|$L
+ARM|ARM|m$n
+ARS|Argentine Peso|AR$
+AUD|Australian Dollar|AU$
+AWG|Aruban Florin|Afl.
+AZN|Azerbaijani Manat|man.
+BAM|Bosnia-Herzegovina Convertible Mark|KM
+BBD|Barbadian Dollar|Bds$
+BDT|Bangladeshi Taka|Tk
+BEF|BEF|BF
+BHD|Bahraini Dinar|BD
+BIF|Burundian Franc|FBu
+BMD|Bermudan Dollar|BD$
+BND|Brunei Dollar|BN$
+BOB|Bolivian Boliviano|Bs
+BOP|BOP|$b.
+BRL|Brazilian Real|R$
+BSD|Bahamian Dollar|BS$
+BTN|Bhutanese Ngultrum|Nu.
+BWP|Botswanan Pula|BWP
+BZD|Belize Dollar|BZ$
+CAD|Canadian Dollar|CA$
+CDF|Congolese Franc|CDF
+CHF|Swiss Franc|Fr.
+CLE|CLE|Eº
+CLP|Chilean Peso|CL$
+CNY|Chinese Yuan Renminbi|CN¥
+COP|Colombian Peso|CO$
+CRC|Costa Rican Colón|₡
+CUC|CUC|CUC$
+CUP|Cuban Peso|CU$
+CVE|Cape Verdean Escudo|CV$
+CYP|CYP|CY£
+CZK|Czech Republic Koruna|Kč
+DEM|DEM|DM
+DJF|Djiboutian Franc|Fdj
+DKK|Danish Krone|Dkr
+DOP|Dominican Peso|RD$
+DZD|Algerian Dinar|DA
+EEK|Estonian Kroon|Ekr
+EGP|Egyptian Pound|EG£
+ERN|Eritrean Nakfa|Nfk
+ESP|ESP|Pts
+ETB|Ethiopian Birr|Br
+EUR|Euro|€
+FIM|FIM|mk
+FJD|Fijian Dollar|FJ$
+FKP|Falkland Islands Pound|FK£
+FRF|FRF|₣
+GBP|British Pound Sterling|£
+GHC|GHC|₵
+GHS|Ghanaian Cedi|GH₵
+GIP|Gibraltar Pound|GI£
+GMD|Gambian Dalasi|GMD
+GNF|Guinean Franc|FG
+GRD|GRD|₯
+GTQ|Guatemalan Quetzal|GTQ
+GYD|Guyanaese Dollar|GY$
+HKD|Hong Kong Dollar|HK$
+HNL|Honduran Lempira|HNL
+HRK|Croatian Kuna|kn
+HTG|Haitian Gourde|HTG
+HUF|Hungarian Forint|Ft
+IDR|Indonesian Rupiah|Rp
+IEP|IEP|IR£
+ILP|ILP|I£
+ILS|Israeli New Sheqel|₪
+INR|Indian Rupee|Rs
+ISK|Icelandic Króna|Ikr
+ITL|ITL|IT₤
+JMD|Jamaican Dollar|J$
+JOD|Jordanian Dinar|JD
+JPY|Japanese Yen|JP¥
+KES|Kenyan Shilling|Ksh
+KMF|Comorian Franc|CF
+KRW|South Korean Won|₩
+KWD|Kuwaiti Dinar|KD
+KYD|Cayman Islands Dollar|KY$
+LAK|Laotian Kip|₭
+LBP|Lebanese Pound|LB£
+LKR|Sri Lanka Rupee|SLRs
+LRD|Liberian Dollar|L$
+LSL|Lesotho Loti|LSL
+LTL|Lithuanian Litas|Lt
+LVL|Latvian Lats|Ls
+LYD|Libyan Dinar|LD
+MMK|Myanma Kyat|MMK
+MNT|Mongolian Tugrik|₮
+MOP|Macanese Pataca|MOP$
+MRO|Mauritanian Ouguiya|UM
+MTL|MTL|Lm
+MTP|MTP|MT£
+MUR|Mauritian Rupee|MURs
+MXP|MXP|MX$
+MYR|Malaysian Ringgit|RM
+MZM|MZM|Mt
+MZN|Mozambican Metical|MTn
+NAD|Namibian Dollar|N$
+NGN|Nigerian Naira|₦
+NIO|NIO|C$
+NLG|NLG|fl
+NOK|Norwegian Krone|Nkr
+NPR|Nepalese Rupee|NPRs
+NZD|New Zealand Dollar|NZ$
+PAB|Panamanian Balboa|B/.
+PEI|PEI|I/.
+PEN|Peruvian Nuevo Sol|S/.
+PGK|Papua New Guinean Kina|PGK
+PHP|Philippine Peso|₱
+PKR|Pakistani Rupee|PKRs
+PLN|Polish Zloty|zł
+PTE|PTE|Esc
+PYG|Paraguayan Guarani|₲
+QAR|Qatari Rial|QR
+RHD|Rhodesian Dollar|RH$
+RON|Romanian Leu|RON
+RSD|Serbian Dinar|din.
+SAR|Saudi Riyal|SR
+SBD|Solomon Islands Dollar|SI$
+SCR|Seychellois Rupee|SRe
+SDD|SDD|LSd
+SEK|Swedish Krona|Skr
+SGD|Singapore Dollar|S$
+SHP|Saint Helena Pound|SH£
+SKK|Slovak Koruna|Sk
+SLL|Sierra Leonean Leone|Le
+SOS|Somali Shilling|Ssh
+SRD|Surinamese Dollar|SR$
+SRG|SRG|Sf
+STD|São Tomé and Príncipe Dobra|Db
+SVC|Salvadoran Colón|SV₡
+SYP|Syrian Pound|SY£
+SZL|Swazi Lilangeni|SZL
+THB|Thai Baht|฿
+TMM|Turkmenistani Manat|TMM
+TND|Tunisian Dinar|DT
+TOP|Tongan Paʻanga|T$
+TRL|Old Turkish Lira|TRL
+TRY|Turkish Lira|TL
+TTD|Trinidad and Tobago Dollar|TT$
+TWD|New Taiwan Dollar|NT$
+TZS|Tanzanian Shilling|TSh
+UAH|Ukrainian Hryvnia|₴
+UGX|Ugandan Shilling|USh
+USD|US Dollar|US$
+UYU|Uruguayan Peso|$U
+VEF|Venezuelan Bolívar Fuerte|Bs.F.
+VND|Vietnamese Dong|₫
+VUV|Vanuatu Vatu|VT
+WST|Samoan Tala|WS$
+XAF|XAF|FCFA
+XCD|East Caribbean Dollar|EC$
+XOF|CFA Franc BCEAO|CFA
+XPF|CFP Franc|CFPF
+YER|Yemeni Rial|YR
+ZAR|South African Rand|R
+ZMK|Zambian Kwacha|ZK
+ZRN|ZRN|NZ
+ZRZ|ZRZ|ZRZ
+ZWD|Zimbabwean Dollar|Z$';
+  return $data;
+}

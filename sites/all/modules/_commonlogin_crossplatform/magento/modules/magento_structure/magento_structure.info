@@ -1,0 +1,19 @@
+;$Id:$
+
+name = Magento Structure
+description = Mapping of Magento Website/Store/StoreView to Drupal.
+package = "Magento Core"
+
+dependencies[] = magento
+dependencies[] = magento_stores
+dependencies[] = magento_synchronize
+
+version = "6.x-2.0-dev"
+core = 6.x
+
+; Information added by drupal.org packaging script on 2011-11-11
+version = "6.x-2.x-dev"
+core = "6.x"
+project = "magento"
+datestamp = "1321014079"
+

@@ -109,7 +109,7 @@ function utopicus_get_tab_value(){
 function utopicus_get_cajas_value(){
 	global $token_filter_node;
 	//
-	if(!$token_filter_node->field_tabtitle[0]['value']) return;
+	if(!$token_filter_node->field_caja[0]['value']) return;
 	
 	// miKrumo($token_filter_node);
 	

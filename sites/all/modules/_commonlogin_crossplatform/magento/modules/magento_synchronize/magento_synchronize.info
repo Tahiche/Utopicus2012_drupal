@@ -1,0 +1,20 @@
+name =  Magento Synchronization
+description = Synchronize websites, stores, store views, products, users and orders with Magento eCommerce
+
+package = "Magento Core"
+
+dependencies[] = date
+dependencies[] = elysia_cron
+dependencies[] = magento
+dependencies[] = magento_stores
+
+version = "6.x-1.0"
+core = 6.x
+datestamp = "1227116719"
+
+; Information added by drupal.org packaging script on 2011-11-11
+version = "6.x-2.x-dev"
+core = "6.x"
+project = "magento"
+datestamp = "1321014079"
+

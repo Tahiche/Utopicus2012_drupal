@@ -1,0 +1,246 @@
+<?php
+// $Id$
+/**
+ * @file
+ * Implements install hooks
+ */
+// Create required content types
+module_load_include('inc', 'magento', 'magento.node_helper');
+module_load_include('inc', 'magento_customers', 'magento_customers.strings');
+
+/**
+ * Implementation of hook_install().
+ */
+function magento_customers_install() {
+  $ret = array();
+
+  variable_set('MAGENTO_CUSTOMERS_PROFILE_NAME_COMBINE', array('firstname', 'lastname'));
+
+  variable_set('MAGENTO_CUSTOMERS_ADDRESS_TITLE_COMBINE', array('firstname', 'lastname', 'postcode', 'street'));
+  //add table for roles propagations
+  drupal_install_schema('magento_customers');
+  // assign Drupal 'anonymous user' role with Magento 'NOT LOGGED IN' group.
+  db_query("INSERT INTO {magento_groups} (role_id,group_id) VALUES ('%d','%d')", 1, 0);
+  drupal_set_message(st('Table have been configured.'));
+
+  //create Customer Address content type
+
+//  $msg = magento_add_content_type(MAGENTO_CUSTOMER_ADDRESS_CONTENT_TYPE, 'Customer Address', 'Magento Customer Address object (required for synchronization)');
+  //configuring Address content type
+
+  variable_set('MAGENTO_CUSTOMERS_PROFILE_FIELDS', array(
+    'customer_id' => 'field_magento_id',
+    'store_id' => 'field_magento_store_id',
+    'website_id' => 'field_magento_website_id',
+    'firstname' => 'field_magento_firstname',
+    'group_id' => 'field_magento_group_id',
+    'lastname' => 'field_magento_lastname',
+    'middlename' => 'field_magento_middlename',
+    'prefix' => 'field_magento_prefix',
+    'suffix' => 'field_magento_suffix',
+    'taxvat' => 'field_magento_taxvat',
+    'created_in' => 'field_magento_created_in',
+  ));
+
+  variable_set('MAGENTO_CUSTOMERS_ADDRESS_FIELDS', array(
+    //'customer_address_id' => 'field_magento_id',
+    'prefix' => 'field_magento_prefix',
+    'firstname' => 'field_magento_firstname',
+    'lastname' => 'field_magento_lastname',
+    'middlename' => 'field_magento_middlename',
+    'suffix' => 'field_magento_suffix',
+    'street' => 'field_magento_street',
+    'postcode' => 'field_magento_postcode',
+    'city' => 'field_magento_city',
+    'telephone' => 'field_magento_telephone',
+    'country_id' => 'field_magento_country_id',
+    'company' => 'field_magento_company',
+    'region_id' => 'field_magento_region_id',
+    'region' => 'field_magento_region',
+    'fax' => 'field_magento_fax',
+
+  //'' => 'field_magento_created_at', //need to be parsed from string, example: '2010-03-30 09:51:04'
+  //'' => 'field_magento_updated_at', //need to be parsed from string
+    'parent_id' => 'field_parent_id',
+    'is_default_billing' => 'field_is_default_billing',
+    'is_default_shipping' => 'field_is_default_shipping',
+
+  ));
+
+  // Add an extra fields to users table
+  db_add_field($ret, 'users', 'customer_id',
+    array(
+      'type' => 'int',
+      'size' => 'big',
+      'not null' => FALSE,
+      'description' => 'Customer User ID from remote Magento system.',
+    ),
+    array('indexes' => array(
+      'customer_id' => array('customer_id'))
+  ));
+
+}
+
+/**
+ * Implementation of hook_uninstall().
+ */
+function magento_customers_uninstall() {
+  $ret = array();
+  // alter STORE VIEW content type
+  variable_del('MAGENTO_CUSTOMERS_PROFILE_FIELDS');
+  variable_del('MAGENTO_CUSTOMERS_PROFILE_NAME_COMBINE');
+  variable_del('MAGENTO_CUSTOMERS_ADDRESS_FIELDS');
+  drupal_uninstall_schema('magento_customers');
+  //magento_remove_content_type(MAGENTO_CUSTOMER_ADDRESS_CONTENT_TYPE);
+
+  // Remove extra fields from users table
+  db_drop_field($ret, 'users', 'customer_id');
+}
+
+/**
+ * Implementation of hook_schema().
+ */
+function magento_customers_schema() {
+  $schema['magento_groups'] = array(
+    'fields' => array(
+      'rid' => array('type' => 'serial', 'unsigned' => TRUE, 'not null' => TRUE),
+      'role_id' => array('type' => 'int', 'unsigned' => TRUE, 'not null' => TRUE),
+      'group_id' => array('type' => 'int', 'unsigned' => TRUE, 'not null' => TRUE),
+  ),
+    'primary key' => array('rid'),
+  );
+
+  $schema['magento_country'] = array(
+    'description' => t('Countries from Magento'),
+    'fields' => array(
+      'country_id' => array(
+        'description' => t('Country code'),
+        'type' => 'varchar',
+        'length' => '4',
+        'not null' => TRUE,
+      ),
+      'name' => array(
+        'description' => t('Country name'),
+        'type' => 'varchar',
+        'length' => '64',
+        'not null' => TRUE,
+      ),
+    ),
+    'primary key' => array('country_id'),
+  );
+
+  $schema['magento_region'] = array(
+    'description' => t('Regions from Magento'),
+    'fields' => array(
+      'region_id' => array(
+        'description' => t('Region ID'),
+        'type' => 'int',
+        'size' => 'medium',
+        'not null' => TRUE,
+      ),
+      'country_id' => array(
+        'description' => t('Country code'),
+        'type' => 'varchar',
+        'length' => '4',
+        'not null' => TRUE,
+      ),
+      'code' => array(
+        'description' => t('Region code'),
+        'type' => 'varchar',
+        'length' => '32',
+        'not null' => TRUE,
+      ),
+      'name' => array(
+        'description' => t('Region name'),
+        'type' => 'varchar',
+        'length' => '255',
+        'not null' => TRUE,
+      ),
+    ),
+    'primary key' => array('region_id'),
+  );
+
+  return $schema;
+}
+/**
+ * Install extra tables for customer's address data. (Magento countries and regions)
+ */
+function magento_customers_update_6001() {
+  $schema = array();
+  $schema['magento_country'] = array(
+    'description' => t('Countries from Magento'),
+    'fields' => array(
+      'country_id' => array(
+        'description' => t('Country code'),
+        'type' => 'varchar',
+        'length' => '4',
+        'not null' => TRUE,
+      ),
+      'name' => array(
+        'description' => t('Country name'),
+        'type' => 'varchar',
+        'length' => '64',
+        'not null' => TRUE,
+      ),
+    ),
+    'primary key' => array('country_id'),
+  );
+
+  $schema['magento_region'] = array(
+    'description' => t('Regions from Magento'),
+    'fields' => array(
+      'region_id' => array(
+        'description' => t('Region ID'),
+        'type' => 'int',
+        'size' => 'medium',
+        'not null' => TRUE,
+      ),
+      'country_id' => array(
+        'description' => t('Country code'),
+        'type' => 'varchar',
+        'length' => '4',
+        'not null' => TRUE,
+      ),
+      'code' => array(
+        'description' => t('Region code'),
+        'type' => 'varchar',
+        'length' => '32',
+        'not null' => TRUE,
+      ),
+      'name' => array(
+        'description' => t('Region name'),
+        'type' => 'varchar',
+        'length' => '255',
+        'not null' => TRUE,
+      ),
+    ),
+    'primary key' => array('region_id'),
+  );
+
+  _drupal_initialize_schema('magento_customers', $schema);
+
+  $ret = array();
+  foreach ($schema as $name => $table) {
+    db_create_table($ret, $name, $table);
+  }
+  return $ret;
+}
+
+/**
+ * Provide extended user info fir synchronization with Magento
+ */
+function magento_customers_update_6003() {
+  $ret = array();
+  db_add_field($ret, 'users', 'customer_id',
+    array(
+      'type' => 'int',
+      'size' => 'big',
+      'not null' => FALSE,
+      'description' => 'Customer User ID from remote Magento system.',
+    ),
+    array('indexes' => array(
+      'customer_id' => array('customer_id'))
+  ));
+
+  return $ret;
+}

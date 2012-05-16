@@ -1,0 +1,91 @@
+<?php
+// $Id$
+/**
+ * @file
+ * Implements install hooks
+ */
+
+/**
+ * Implementation of hook_schema().
+ */
+function magento_cart_quote_schema() {
+  $schema['cart_quotes'] = array(
+    'fields' => array(
+      'quote_id' => array('type' => 'serial', 'unsigned' => TRUE, 'not null' => TRUE),
+      'uid' => array(
+        'type' => 'int',
+        'not null' => TRUE,
+        'unsigned' => TRUE,
+        'default' => 0,
+        'description' => 'The {users}.uid that created this quote.',
+      ),
+      'type' => array('type' => 'varchar', 'length' => 64, 'not null' => TRUE),
+      'cart' => array('type' => 'text', 'not null' => TRUE, 'size' => 'big', 'description' => 'The snapshot of the users magento_cart when quote was created.'),
+      'status' => array('type' => 'varchar', 'length' => 64, 'not null' => TRUE, 'default' => 'PENDING'),
+      'created_at' => array('type' => 'int', 'unsigned' => TRUE, 'not null' => TRUE, 'default' => 0),
+      'updated_at' => array('type' => 'int', 'unsigned' => TRUE, 'not null' => TRUE, 'default' => 0),
+      'order_id' => array(
+        'type' => 'int',
+        'not null' => TRUE,
+        'unsigned' => TRUE,
+        'default' => 0,
+        'description' => 'The order id created in magento.',
+      ),
+    ),
+    'primary key' => array('quote_id'),
+ /*   'indexes' => array(
+      '' => array(''),
+    ),
+ */
+  );
+  return $schema;
+}
+
+/**
+ * Implementation of hook_install().
+ */
+function magento_cart_quote_install() {
+  // Create table
+  drupal_install_schema('magento_cart_quote');
+}
+
+/*
+ * Implementation of hook_uninstall().
+ */
+function magento_cart_quote_uninstall() {
+  // Drop table
+  drupal_uninstall_schema('magento_cart_quote');
+}
+
+/*
+ * Implementation of hook_update_N().
+ */
+function magento_cart_quote_update_6001() {
+  // Create table
+  drupal_install_schema('magento_cart_quote');
+}
+
+/*
+ * Implementation of hook_update_N().
+ */
+function magento_cart_quote_update_6002() {
+  // Add payment `type` field ( method )
+  $res = array();
+  db_add_field($res, 'cart_quotes', 'type', array('type' => 'varchar', 'length' => 64, 'not null' => TRUE, 'initial' => 'paybycheck'));
+}
+
+/*
+ * Implementation of hook_update_N().
+ */
+function magento_cart_quote_update_6003() {
+  // Add `order_id` field
+  $res = array();
+  db_add_field($res, 'cart_quotes', 'order_id', array(
+        'type' => 'int',
+        'not null' => TRUE,
+        'unsigned' => TRUE,
+        'default' => 0,
+        'description' => 'The order id created in magento.',
+      )
+      );
+}

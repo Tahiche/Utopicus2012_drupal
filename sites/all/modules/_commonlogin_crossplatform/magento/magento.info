@@ -1,0 +1,15 @@
+name = Magento
+description = Magento basic functions for data manipulation. It requires Magento API module to connect to the remote Magento backend.
+package = "Magento Core"
+
+dependencies[] = content
+
+version = "6.x-2.0-dev"
+core = 6.x
+
+; Information added by drupal.org packaging script on 2011-11-11
+version = "6.x-2.x-dev"
+core = "6.x"
+project = "magento"
+datestamp = "1321014079"
+

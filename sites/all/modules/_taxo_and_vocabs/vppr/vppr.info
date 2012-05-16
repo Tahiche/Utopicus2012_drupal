@@ -1,0 +1,13 @@
+; $Id: vppr.info,v 1.1 2011/01/27 15:02:41 boobaa Exp $
+name = Vocabulary Permissions Per Role
+description = "Allow adding to/editing terms of/removing terms from vocabularies per role."
+core = 6.x
+dependencies[] = taxonomy
+
+
+; Information added by drupal.org packaging script on January 1, 1970 - 00:00
+version = "6.x-1.0"
+core = "6.x"
+project = "vppr"
+datestamp = "1296141136"
+

@@ -1,0 +1,1282 @@
+<?php
+module_load_include('inc', 'magento_cart_quote', 'magento_cart_quote.payment');
+
+/////////////////// DRUPAL HOOKS ///////////////////////////////////////
+/**
+ * Implementation of hook_menu().
+ */
+function  magento_cart_quote_menu() {
+  $items['cart/clear'] = array(
+    'page callback'    => 'magento_cart_quote_cart_clear',
+    'access arguments' => array('access content'),
+    'type' => MENU_CALLBACK,
+  );
+  /* AHAH */
+  $items['cart/remove-product/%'] = array(
+    'page arguments'   => array(2, TRUE),
+    'page callback'    => 'magento_cart_quote_update',
+    'access arguments' => array('access content'),
+    'type' => MENU_CALLBACK,
+  );
+
+  $items['cart/update/%'] = array(
+    'page arguments'   => array(2),
+    'page callback'    => 'magento_cart_quote_update',
+    'access arguments' => array('access content'),
+    'type' => MENU_CALLBACK,
+  );
+
+  // Cart settings
+  $items['admin/settings/magento/magento_cart_quote'] = array(
+    'title' => 'Magento Cart Quote',
+    'access arguments' => array('administer domains'),
+    'type' => MENU_LOCAL_TASK,
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('magento_cart_quote_payment_settings_form'),
+  );
+
+  /* PRE-PAIMENT (AHAH)*/
+  $items['cart/payment_update'] = array(
+    'page callback'    => 'magento_cart_quote_payment_update',
+    'access arguments' => array('access content'),
+    'type' => MENU_CALLBACK,
+  );
+
+  return $items;
+}
+
+/**
+ * Implementation of hook_theme().
+ */
+function magento_cart_quote_theme() {
+  $theme['magento_cart_quote_content_wrapper'] = array(
+    'arguments' => array(
+      'cart_content'  => NULL,
+    ),
+    'template' => 'magento_cart_quote_content_wrapper',
+  );
+  /* Cart navigation */
+  $theme['magento_cart_nav'] = array(
+    'arguments' => array(
+      'state' => 'view',
+      'cart'  => NULL,
+    ),
+    'template' => 'magento_cart_quote_nav',
+    'file' => 'magento_cart_quote.themes.inc',
+  );
+  /* Address */
+  $theme['magento_cart_quote_address_item'] = array(
+    'arguments' => array(
+      'account' => NULL,
+      'address' => NULL,
+    ),
+    'template' => 'magento_cart_quote_address_item',
+  );
+
+  /* View */
+  $theme['magento_cart_view'] = array(
+    'function' => 'magento_cart_quote_magento_cart_view'
+  );
+  $theme['magento_cart_quote_view_form'] = array(
+    'template' => 'magento_cart_quote_view',
+    'arguments' => array('form' => NULL),
+    'file' => 'magento_cart_quote.themes.inc',
+  );
+
+  /* Delivery */
+  $theme['magento_cart_delivery'] = array(
+    'function' => 'magento_cart_quote_magento_cart_delivery'
+  );
+  $theme['magento_cart_quote_delivery_form'] = array(
+    'template' => 'magento_cart_quote_delivery',
+    'arguments' => array('form' => NULL),
+    'file' => 'magento_cart_quote.themes.inc',
+  );
+
+  /* Shipping method */
+  $theme['magento_cart_shipping_method'] = array(
+    'function' => 'magento_cart_quote_magento_cart_shipping_method'
+  );
+  $theme['magento_cart_quote_shipping_method_form'] = array(
+    'template' => 'magento_cart_quote_shipping_method',
+    'arguments' => array('form' => NULL),
+    'file' => 'magento_cart_quote.themes.inc',
+  );
+
+  /* Payment */
+  $theme['magento_cart_payment'] = array(
+    'function' => 'magento_cart_quote_magento_cart_payment'
+  );
+  $theme['magento_cart_quote_payment_form'] = array(
+    'template' => 'magento_cart_quote_payment',
+    'arguments' => array('form' => NULL),
+    'file' => 'magento_cart_quote.themes.inc',
+  );
+
+  /* Review */
+  $theme['magento_cart_quote_review_form'] = array(
+    'template' => 'magento_cart_quote_review_form',
+    'file' => 'magento_cart_quote.themes.inc',
+    'arguments' => array('form' => NULL),
+  );
+
+  /* Confirmation */
+  $theme['magento_cart_payment-succeeded'] = array(
+    'function' => 'magento_cart_quote_magento_cart_payment_succeeded'
+  );
+  $theme['magento_cart_quote_payment_succeeded_form'] = array(
+    'template' => 'magento_cart_quote_payment_succeeded',
+    'file' => 'magento_cart_quote.themes.inc',
+    'arguments' => array('form' => NULL),
+  );
+
+  return $theme;
+}
+
+/**
+ * Implementation of hook_magento_cart_steps();
+ *
+ * @return
+ *   array of [stepname] => array('weight' => (float), 'title' => (string), 'callback' => (callback));
+ */
+function magento_cart_quote_magento_cart_steps() {
+  global $user;
+  return array(
+    'view' => array(
+      'weight' => -1,
+      'title' => t('My Cart'),
+      'ajax' => array('cart/remove-product/*', 'cart/update/*'),
+      'callback' => 'magento_cart_quote_step_view',
+    ),
+    'identification' => array(
+      'weight' => 1,
+      'title' => t('Identification'),
+      'hidden' => !empty($user->uid),
+      'callback' => 'magento_cart_quote_step_identification',
+    ),
+    'delivery' => array(
+      'weight' => 10,
+      'title' => t('Billing and Shipping'),
+      'callback' => 'magento_cart_quote_step_delivery',
+    ),
+    'shipping_method' => array(
+      'weight' => 20,
+      'title' => t('Shipping method'),
+      'ajax' => array('cart/delivery_update'),
+      'callback' => 'magento_cart_quote_step_shipping_method',
+    ),
+    'payment' => array(
+      'weight' => 30,
+      'title' => t('Payment Information'),
+      'ajax' => array('cart/payment_update'),
+      'callback' => 'magento_cart_quote_step_payment',
+    ),
+    'review' => array(
+      'weight' => 40,
+      'title' => t('Order Review'),
+      'callback' => 'magento_cart_quote_step_review',
+    ),
+    'payment-succeeded' => array(
+      'weight' => 100,
+      'title' => t('Confirmation'),
+      'open' => TRUE,
+      'callback' => 'magento_cart_quote_step_payment_succeeded',
+    )
+  );
+}
+
+/////////////////// CART_QUOTE OPERATIONS //////////////////////////////
+/**
+ * Returns the id of content area element.
+ */
+function magento_cart_quote_content_wrapper_id() {
+  $content_area = variable_get('magento_cart_content_id', 'cart-wrapper');
+  return $content_area;
+}
+
+/**
+ * Available shipping methods
+ * @param $cart
+ *   Magento cart array.
+ *
+ * @returns `Flat Rate` by default - if there is no registered shipping methods.
+ */
+function magento_cart_quote_shipping_methods($cart = NULL) {
+  $res = _magento_cart_quote_shipping_registered_methods($cart);
+
+  if (!empty($res)) {
+    return $res;
+  }
+
+  return array();
+}
+
+/**
+ * Return all registered magento shipping systems
+ * @param $cart
+ *   Magento cart array.
+ *
+ * NOTE! To register your module as shipping system implement hook_magento_shipping_methods() in your module.
+ * The hook_magento_shipping_methods should return indexed array of shipping system's friendly name, array('method_1_name' => 'method_1_label').
+ */
+function _magento_cart_quote_shipping_registered_methods($cart = NULL) {
+  $res=array();
+  foreach (module_implements('magento_shipping_methods') as $module) {
+    $func = $module . '_magento_shipping_methods';
+    $methods = $func($cart);
+    if (!empty($methods) && is_array($methods)) {
+      $res =  array_merge($res, $methods);
+    }
+  }
+  return $res;
+}
+
+function magento_cart_quote_shipping_method_options() {
+  // FIXME: hardcode
+  return array();
+}
+
+/**
+ * Debugging function for clearing cart.
+ */
+function magento_cart_quote_cart_clear() {
+  magento_cart_clear();
+  drupal_goto('cart');
+}
+
+/**
+ * Update products in cart.
+ */
+function magento_cart_quote_update($product_nid, $remove = FALSE) {
+
+  $form_id = 'magento_cart_quote_view_form';
+  $form_state = array('storage' => NULL, 'submitted' => FALSE, 'process_input' => 1);
+  $form_build_id = $_POST['form_build_id'];
+
+  // Retrieve form from cache.
+  $form = form_get_cache($form_build_id, $form_state);
+
+  // If we loast cart lock - drop error, and return original form.
+  if ($form['#mclc'] != magento_cart_last_changed()) {
+    form_set_error('', t('Your Cart was modified outside of this checkout process, you can\'t continue.'));
+    $output = t('Maybe you have your cart open in another browser window?');
+  }
+  else { // Update cart and rebuild form.
+
+    // If product nid = -1 we applying coupon code.
+    if ($product_nid == -1) {
+
+      // Loading cart.
+      $cart = magento_cart_get();
+      $orderData = $cart;
+      $orderData['data'] = $orderData['custom_data'];
+
+      // Check if coupon code present and valid.
+      if (isset($_POST['magento_cart_coupon']['code'])) {
+
+        $orderData['coupon']['code'] = $_POST['magento_cart_coupon']['code'];
+        $res = magento_api_validate_coupon($cart['store_id'], $orderData);
+
+        // If coupon valid - add it to the cart, and save it.
+        if (empty($res['errors'])) {
+          $cart['coupon']['code'] = $orderData['coupon']['code'];
+          $cart = magento_cart_update($cart, TRUE);
+        }
+
+        // If not - show errors.
+        else {
+          $err_msg = array_pop($res['errors']);
+          form_set_error('magento_cart_coupon][code', t($err_msg));
+        }
+      }
+      else { // Remove coupon
+        if (!empty($cart['coupon'])) {
+          unset($cart['coupon']['code']);
+          $cart = magento_cart_update($cart, TRUE);
+        }
+      }
+    }
+
+    // Change product qty.
+    else {
+      $cart = magento_cart_quote_update_helper($product_nid, ($remove) ? 0 : $_POST["magento_cart_quote_product_{$product_nid}"]);
+    }
+
+    // Rebuild form.
+    $form_state['post'] = $form['#post'] = $_POST;
+    $form = drupal_rebuild_form($form_id, $form_state, array($form_state, $cart), $form_build_id);
+
+    $this_step = magento_cart_get_step();
+    $form['#action'] = url(magento_cart_get_step_path($this_step));
+
+    $output = drupal_render_form($form_id, $form);
+  }
+
+  $output = theme_status_messages() . $output;
+  $output .= '<script>$("div#magento_cart_state").html(' . drupal_to_js(theme('magento_cart_state')) . ');</script>';
+
+  print drupal_json(array('status' => TRUE, 'data' => $output));
+}
+
+/**
+ * Update products in cart helper.
+ */
+function magento_cart_quote_update_helper($product_nid, $new_count) {
+  $cart = magento_cart_get();
+
+  // prepare product description structure
+  $products = array($product_nid =>
+    array(
+      'nid' => $product_nid,
+      'qty' => $new_count,
+    )
+  );
+
+  // hook before
+  magento_invoke('magento_cart', 'before add', $products, $update_quote, $changing_product_qty = TRUE);
+
+  if (empty($products)) {
+    return $cart;
+  }
+
+  return magento_cart_update(array('products' => $products), TRUE);
+}
+
+/**
+ * Some cleaning of address data.
+ */
+function _magento_cart_quote_pure_address_data($address) {
+  return $address;
+}
+
+/**
+ * Fix street name  - Remove street name duplication from address `street` field
+ */
+function magento_cart_quote_prepare_address($address) {
+  $address['street'] = $address['street_name'];
+  return $address;
+}
+
+/////////////////// CART PAGES /////////////////////////////////////////
+/**
+ * Cart VIEW page
+ */
+function magento_cart_quote_magento_cart_view() {
+  drupal_add_css(drupal_get_path('module', 'magento_cart_quote') .'/magento_cart_quote.css', 'module', 'all', FALSE);
+
+  $cart = magento_cart_get();
+  $output = drupal_get_form('magento_cart_quote_view_form', $cart);
+
+  return theme('magento_cart_quote_content_wrapper', $output);
+}
+
+/**
+ * Cart DELIVERY page
+ */
+function magento_cart_quote_magento_cart_delivery() {
+  drupal_add_css(drupal_get_path('module', 'magento_cart_quote') .'/magento_cart_quote.css', 'module', 'all', FALSE);
+
+  $cart = magento_cart_get();
+  $output = drupal_get_form('magento_cart_quote_delivery_form', $cart);
+
+  return theme('magento_cart_quote_content_wrapper', $output);
+}
+
+/**
+ * Render VIEW step.
+ */
+function magento_cart_quote_step_view() {
+
+  // Prepare cart.
+  $cart = magento_cart_get();
+  $refresh_required = FALSE;
+  if (!empty($cart['products'])) {
+    foreach ($cart['products'] as &$product) {
+      if (isset($product['data'])) {
+        unset($product['data']);
+        $refresh_required = TRUE;
+      }
+    }
+  }
+  if (isset($cart['shipping']) || $refresh_required) {
+    unset($cart['shipping']);
+    unset($cart['billing']);
+    unset($cart['payment']);
+    unset($cart['custom_data']);
+    unset($cart['payment_forms']);
+    magento_cart_save($cart);
+    $cart = magento_cart_update($cart, TRUE);
+  }
+
+  return theme(array('magento_cart_view', 'magento_cart_block'));
+}
+
+/**
+ * Render IDENTIFICATION step.
+ */
+function magento_cart_quote_step_identification() {
+  global $user;
+
+  // Get next step path.
+  $next_step = magento_cart_get_step_next();
+  $next_path = magento_cart_get_step_path($next_step);
+
+  // Goto /user if uid=0 or to the next step.
+  if (FALSE && $user->uid == 0) {
+    drupal_goto('user', array('destination' => $_GET['q']));
+  }
+  else {
+    magento_cart_goto_step($next_step);
+  }
+}
+
+/**
+ * Render DELIVERY step.
+ */
+function magento_cart_quote_step_delivery() {
+  $cart = magento_cart_get();
+
+  $changed = FALSE;
+
+  // Remove all payment information.
+  if (!empty($cart['custom_data'])) {
+    unset($cart['payment']);
+    unset($cart['custom_data']);
+    unset($cart['payment_forms']);
+    $changed = TRUE;
+  }
+
+  // Remove shipping method info.
+  if (!empty($cart['shipping']['method'])) {
+    unset($cart['shipping']['method']);
+    $changed = TRUE;
+  }
+
+  // Update cart if needed.
+  if ($changed) {
+    magento_cart_save($cart);
+    $cart = magento_cart_update($cart, TRUE);
+  }
+
+  return theme(array('magento_cart_delivery', 'magento_cart_block'));
+}
+
+/**
+ * Render SHIPING step.
+ */
+function magento_cart_quote_step_shipping_method() {
+  $cart = magento_cart_get();
+
+  // Remove all payment information.
+  if (!empty($cart['custom_data'])) {
+    unset($cart['payment']);
+    unset($cart['custom_data']);
+    unset($cart['payment_forms']);
+    magento_cart_save($cart);
+    $cart = magento_cart_update($cart, TRUE);
+  }
+
+  return theme(array('magento_cart_shipping_method', 'magento_cart_block'));
+}
+
+/**
+ * Redner PAYMENT step.
+ */
+function magento_cart_quote_step_payment() {
+  return theme(array('magento_cart_payment', 'magento_cart_block'));
+}
+
+/**
+ * Redner PAYMENT_SUCCEEDED step, and clear cart.
+ */
+function magento_cart_quote_step_payment_succeeded() {
+  $cart = magento_cart_get();
+  $quote_id = intval(arg(2));
+  if ($quote_id > 0) {
+    $payed_cart = _magento_cart_payment_quote($quote_id);
+    if (!empty($cart['quote']['id']) && ($cart['quote']['id'] == $payed_cart['quote']['id'])) {
+      magento_cart_clear();
+    }
+  }
+  return theme(array('magento_cart_payment-succeeded', 'magento_cart_block'));
+}
+
+/**
+ * Order Review step.
+ */
+function magento_cart_quote_step_review() {
+  drupal_add_css(drupal_get_path('module', 'magento_cart_quote') .'/magento_cart_quote.css', 'module', 'all', FALSE);
+
+  $cart = magento_cart_get();
+  $output = drupal_get_form('magento_cart_quote_step_review_form', $cart);
+
+  return theme('magento_cart_quote_content_wrapper', $output);
+}
+
+/**
+ * Shipping method step.
+ */
+function magento_cart_quote_magento_cart_shipping_method() {
+  drupal_add_css(drupal_get_path('module', 'magento_cart_quote') .'/magento_cart_quote.css', 'module', 'all', FALSE);
+
+  $cart = magento_cart_get();
+  $output = drupal_get_form('magento_cart_quote_shipping_method_form', $cart);
+
+  return theme('magento_cart_quote_content_wrapper', $output);
+}
+
+/////////////////// FORMS //////////////////////////////////////////////
+/**
+ * Cart/view
+ */
+function magento_cart_quote_view_form($form_state, $cart) {
+
+  $form = array();
+
+  // Get coupon code if any.
+  $coupon_code = !empty($cart['quote']['quote']['coupon_code'])
+    ? $cart['quote']['quote']['coupon_code']
+    : '';
+
+  if (!isset($cart['products']) || 0 == count($cart['products'])) {
+    return $form;
+  }
+
+  if (!empty($cart['products']) && empty($cart['quote']['id']))  {
+    form_set_error('magento_cart_quote_view', t("Your quote cannot be calculated. Please try again later."));
+  }
+
+  if (is_array($cart['products'])) foreach ($cart['products'] as $key => $product) {
+    $content_wrapper = magento_cart_quote_content_wrapper_id();
+    /* show quantity */
+    for ($i = 1; $i <= 20; $i++) {
+      $qty_array[] = $i;
+    }
+    $form["magento_cart_quote_product_$key"] = array(
+      '#type' => 'select',
+      '#options' => array_combine($qty_array,  $qty_array),
+      '#default_value' => $product['qty'],
+      '#size' => 1,
+      '#required' => TRUE,
+      '#ahah' => array(
+        'path' => "cart/update/{$key}",
+        'wrapper' => $content_wrapper, //"content-area",
+        'method' => 'replace',
+        'effect' => 'fade',
+      ),
+    );
+
+    /* remove button */
+    $form["magento_cart_quote_remove_$key"] = array('#type' => 'submit',
+      '#default_value' => '',
+      '#ahah' => array(
+        'path' => "cart/remove-product/{$key}",
+        'wrapper' => $content_wrapper, //"content-area",
+        'method' => 'replace',
+        'effect' => 'fade',
+      ),
+      '#attributes' => array('class' => 'remove-product'),
+    );
+  }
+
+  $form['magento_cart_coupon'] = array(
+    '#type' => 'fieldset',
+    '#title' => t('Discount Codes'),
+    '#tree' => TRUE,
+  );
+
+  if (empty($coupon_code)) {
+    $form['magento_cart_coupon']['code'] = array(
+      '#type' => 'textfield',
+      '#title' => t('Coupon code'),
+      '#description' => t('Enter your coupon code if you have one.'),
+    );
+  }
+  else {
+    $form['magento_cart_coupon']['_code'] = array(
+      '#type' => 'item',
+      '#title' => t('Coupon code'),
+      '#value' => '<i>'. $coupon_code .'</i>',
+      '#description' => t('This coupon code is applied to your cart.'),
+    );
+  }
+
+  $form['magento_cart_coupon']['add'] = array(
+    '#type' => 'submit',
+    '#value' => (empty($coupon_code)) ? t('Apply Coupon') : t('Remove Coupon'),
+    '#sbid' => (empty($coupon_code)) ? 'apply_coupon' : 'remove_coupon',
+    '#ahah' => array(
+      'path' => "cart/update/-1",
+      'wrapper' => $content_wrapper, //"content-area",
+      'method' => 'replace',
+      'effect' => 'fade',
+    ),
+  );
+
+
+/*    $form['magento_cart_coupon']['remove'] = array(
+      '#type' => 'submit',
+      '#value' => t('Remove Coupon'),
+      '#sbid' => 'remove_coupon',
+      '#ahah' => array(
+        'path' => "cart/update/-1",
+        'wrapper' => $content_wrapper, //"content-area",
+        'method' => 'replace',
+        'effect' => 'fade',
+      ),
+    );*/
+
+  $form['magento_cart_quote_view'] = array(
+    '#type' => 'submit',
+    '#value' => t('Continue'),
+    '#sbid' => 'continue',
+  );
+
+  $form['#mclc'] = magento_cart_last_changed();
+  $form['mclc'] = array(
+    '#type' => 'value',
+    '#default_value' => magento_cart_last_changed()
+  );
+  $form['#validate'][] = 'magento_cart_quote_view_form_validate';
+  $form['#submit'][]   = 'magento_cart_quote_view_form_submit';
+
+  return $form;
+}
+
+/**
+ * Cart Validate Form Submit
+ */
+function magento_cart_quote_view_form_validate($form, &$form_state) {
+  global $user;
+
+  // If we loast cart lock - drop error.
+  if ($form_state['values']['mclc'] != magento_cart_last_changed()) {
+    global $__magento_cart_lock_lost;
+    $__magento_cart_lock_lost = TRUE;
+    form_set_error('', t('Your Cart was modified outside of this checkout process, you can\'t continue.'));
+    return FALSE;
+  }
+
+  if (!magento_cart_quote_view_form_validate_cart($form, $form_state)) {
+    return FALSE;
+  }
+
+  // Set products errors if we have any.
+  $cart = magento_cart_get();
+  foreach ($cart['products'] as $key => $product) {
+    if (!empty($product['errors'])) {
+      foreach ((array) $product['errors'] as $error) {
+        form_set_error("magento_cart_quote_product_{$key}", $error);
+      }
+    }
+  }
+
+}
+
+/**
+ * Helper for magento_cart_quote_view_form_validate
+ */
+function magento_cart_quote_view_form_validate_cart($form, &$form_state) {
+  $cart = magento_cart_get();
+  $validate = TRUE;
+
+  foreach ($form_state['values'] as $key => $value) {
+      // Update quantity and try to validate
+      if (strpos($key, 'magento_cart_quote_product_') !== FALSE) {
+        // it has to be a number
+        if ((string) $value !== (string)(int) $value) {
+          form_set_error($key, t('Not a number'));
+          $validate = FALSE;
+        }
+
+        /* yep, it's a product */
+        $nid = drupal_substr($key, 27);
+        $cart['products'][$nid]['qty'] = $value;
+      }
+  }
+
+  if (!$validate) {
+    return FALSE;
+  }
+
+  magento_cart_save($cart);
+  //UPDATE CART
+  magento_cart_update($cart, TRUE);
+
+  //@TODO: recheck this if it's better to disable cart_lock validation on line #261 ( ...if ($form['#mclc'] != magento_cart_last_changed()) {...).
+  $form_build_id = $_POST['form_build_id'];
+  $form['#mclc'] = magento_cart_last_changed();
+  $form['mclc'] = array(
+    '#type' => 'value',
+    '#default_value' => magento_cart_last_changed()
+  );
+  form_set_cache($form_build_id, $form, $form_state);
+  // end @TODO
+
+  if (!empty($cart['errors']) && is_array($cart['errors'])) {
+    foreach ($cart['errors'] as $error) {
+      form_set_error('magento_cart_quote_view', $error);
+    }
+    return FALSE;
+  }
+
+  return TRUE;
+}
+/**
+ * Cart Validate Form Submit
+ */
+function magento_cart_quote_view_form_submit($form, &$form_state) {
+  global $user;
+
+  // Read which button was clicked.
+  $sbid = $form_state['clicked_button']['#sbid'];
+
+  // Loading cart.
+  $cart = magento_cart_get();
+
+  // Check which button was pressed.
+  switch ($sbid) {
+
+    // Go to the next step.
+    case 'continue':
+      $next_step = magento_cart_get_step_next();
+      magento_cart_update_state($next_step['step_id']);
+      magento_cart_goto_step($next_step);
+    break;
+
+    // Apply coupon.
+    case 'apply_coupon':
+      $orderData = $cart;
+      $orderData['coupon']['code'] = $form_state['values']['magento_cart_coupon']['code'];
+      $res = magento_api_validate_coupon($cart['store_id'], $orderData);
+
+      // If coupon valid - add it to the cart, and save it.
+      if (empty($res['errors'])) {
+        $cart['coupon']['code'] = $orderData['coupon']['code'];
+        magento_cart_update($cart, TRUE);
+      }
+
+      // If not - show errors.
+      else {
+        $err_msg = array_pop($res['errors']);
+        form_set_error('magento_cart_coupon][code', t($err_msg));
+      }
+
+    break;
+
+    // Remove coupon (Apply empty coupon).
+    case 'remove_coupon':
+      if (!empty($cart['coupon'])) {
+        unset($cart['coupon']['code']);
+        magento_cart_update($cart, TRUE);
+      }
+    break;
+  }
+
+  return;
+}
+
+/**
+ * Cart DELIVERY Form ********************************************
+ */
+function magento_cart_quote_delivery_form($form_state, $cart) {
+  global $user;
+  $form = array();
+
+  // PRELOAD defaults
+  if (empty($form_state['ajaxupdate'])) {
+    //magento_cart_quote_delivery_defaults_calc($form);
+    $cart = magento_cart_get();
+  }
+
+  /********************************************
+   * Addresses
+   * ******************************************/
+  $addresses = magento_customers_get_customer_addresses($user);
+
+  $address_options = array();
+  $default_billing = NULL;
+  $default_shipping = NULL;
+  foreach ($addresses as $key => $address) {
+    $address_options[$address['customer_address_id']] = theme('magento_cart_quote_address_item', $user, $address);
+    if ($address['is_default_shipping']) {
+      $default_shipping = $address['customer_address_id'];
+    }
+    if ($address['is_default_billing']) {
+      $default_billing = $address['customer_address_id'];
+    }
+  }
+
+  $first_address = key($address_options);
+  if (empty($default_billing)) {
+    $default_billing = $first_address;
+  }
+  if (empty($default_shipping)) {
+    $default_shipping = $first_address;
+  }
+
+  $selected_shipping = (isset($cart['shipping']['address']['customer_address_id'])) ? $cart['shipping']['address']['customer_address_id'] :  $default_shipping;
+  $selected_billing = (isset($cart['billing']['address']['customer_address_id'])) ? $cart['billing']['address']['customer_address_id'] :  $default_billing;
+
+  $form['new_shipping_address'] = array(
+    '#type' => 'markup',
+    '#value' => l(t('New address'), 'user/' . $user->uid . '/new-address', array('query' => array('destination' => 'cart/delivery'))),
+  );
+
+  // Add addresses into radio
+  if (0 < count($address_options)) {
+    $form["magento_cart_quote_billing"] = array(
+        '#type' => 'fieldset',
+        '#title' => t('Billing address'),
+        '#collapsible' => TRUE,
+    );
+
+    $form["magento_cart_quote_billing"]['billing_address'] = array(
+        '#type' => 'radios',
+        '#options' => $address_options,
+        '#default_value' => $selected_billing,
+        '#attributes' => array('class' => 'block-billing-choise-addr'));
+
+    $form["magento_cart_quote_shipping"] = array(
+        '#type' => 'fieldset',
+        '#title' => t('Shipping address'),
+        '#collapsible' => TRUE,
+    );
+
+    $form["magento_cart_quote_shipping"]['shipping_address'] = array(
+        '#type' => 'radios',
+        '#options' => $address_options,
+        '#default_value' => $selected_shipping,
+        '#attributes' => array('class' => 'block-shipping-choise-addr')
+    );
+  }
+  else { // Customer has no address.
+    $form["magento_cart_quote_shipping"] = array(
+        '#type' => 'fieldset',
+        '#title' => t('Shipping address'),
+        '#collapsible' => TRUE,
+    );
+    $form["magento_cart_quote_shipping"]['shipping_address'] = array(
+        '#type' => 'markup',
+        '#value' => t('Please register your customers address first to process the order.') . l(t('New address'), 'user/' . $user->uid . '/new-address', array('query' => array('destination' => 'cart/delivery')) ),
+        '#attributes' => array('class' => 'block-shipping-choise-addr'));
+
+    form_set_error('shipping_address', t('Please register your customers address first to process the order.'));
+  }
+
+  $form['magento_cart_quote_delivery'] = array('#type' => 'submit',
+    '#value' => t('Continue'),
+  );
+  $form['_backlink'] = array(
+    '#value' => magento_cart_get_back_link(),
+  );
+
+  $form['#mclc'] = magento_cart_last_changed();
+  $form['mclc'] = array(
+    '#type' => 'hidden',
+    '#default_value' => magento_cart_last_changed()
+  );
+  $form['#validate'][] = 'magento_cart_quote_delivery_form_validate';
+  $form['#submit'][]   = 'magento_cart_quote_delivery_form_submit';
+
+  return $form;
+}
+
+/**
+ * Cart Validate Form Submit
+ */
+function magento_cart_quote_delivery_form_validate($form, &$form_state) {
+  global $user;
+
+  // If we lost cart lock - drop error.
+  if ($form_state['values']['mclc'] != magento_cart_last_changed()) {
+    global $__magento_cart_lock_lost;
+    $__magento_cart_lock_lost = TRUE;
+    form_set_error('', t('Your Cart was modified outside of this checkout process, you can\'t continue.'));
+    return FALSE;
+  }
+
+  $cart = magento_cart_get();
+
+  $error_occured = FALSE;
+  /**
+   * Shipping address
+   */
+  if (!isset($form["magento_cart_quote_shipping"]['shipping_address']['#options'][$form_state['values']['shipping_address']])) {
+    form_set_error('shipping_address', t('Please, select one of available shipping address.'));
+    $error_occured = TRUE;
+  }
+  else {
+    $shipping_addresses = magento_customers_get_customer_addresses($user, $form_state['values']['shipping_address']);
+    if (empty($shipping_addresses[0])) {
+      form_set_error('shipping_address', t('Please, select one of available shipping address.'));
+      $error_occured = TRUE;
+    }
+    else {
+      // Billing address should be set
+      $cart['shipping']['address'] = _magento_cart_quote_pure_address_data($shipping_addresses[0]);
+    }
+  }
+  /**
+   * Billing address
+   */
+  // Billing address should be selected
+  if (!isset($form["magento_cart_quote_billing"]['billing_address']['#options'][$form_state['values']['billing_address']])) {
+    form_set_error('billing_address', t('Please, select one of available billing address.'));
+    $error_occured = TRUE;
+  }
+  else {
+    $billing_addresses = magento_customers_get_customer_addresses($user, $form_state['values']['billing_address']);
+    if (empty($billing_addresses[0])) {
+      form_set_error('billing_address', t('Please, select one of available billing address.'));
+      $error_occured = TRUE;
+    }
+    else {
+      // Billing address should be set
+      $cart['billing']['address'] = _magento_cart_quote_pure_address_data($billing_addresses[0]);
+    }
+  }
+
+  if ($error_occured) {
+    return;
+  }
+
+  magento_cart_update($cart, TRUE);
+}
+
+/**
+ * Cart Validate Form Submit
+ */
+function magento_cart_quote_delivery_form_submit($form, &$form_state) {
+  global $user;
+
+  // Update cart
+  //magento_cart_update_state('payment');
+  //drupal_goto('cart/payment');
+
+  // Go to next step;
+  $next_step = magento_cart_get_step_next();
+  magento_cart_goto_step($next_step);
+}
+
+/**
+ * Form builder for review step.
+ */
+function magento_cart_quote_step_review_form() {
+  $form['process'] = array(
+    '#type' => 'submit',
+    '#value' => t('Place Order'),
+  );
+  $form['_backlink'] = array(
+    '#value' => magento_cart_get_back_link(),
+  );
+  $form['#mclc'] = magento_cart_last_changed();
+  $form['mclc'] = array(
+    '#type' => 'value',
+    '#default_value' => magento_cart_last_changed()
+  );
+  $form['#theme'] = 'magento_cart_quote_review_form';
+  return $form;
+}
+
+/**
+ * Form Validator for Review step.
+ */
+function magento_cart_quote_step_review_form_validate($form, $form_state) {
+
+  // If we lost cart lock - drop error.
+  if ($form_state['values']['mclc'] != magento_cart_last_changed()) {
+    global $__magento_cart_lock_lost;
+    $__magento_cart_lock_lost = TRUE;
+    form_set_error('', t('Your Cart was modified outside of this checkout process, you can\'t continue.'));
+    return FALSE;
+  }
+
+  // Load Cart.
+  $cart = magento_cart_get();
+
+  // Check if we have all we need.
+  if ( empty($cart['custom_data']['payment_module'])
+    || empty($cart['payment_forms']['payment_form'])
+    || empty($cart['payment_forms']['payment_form_state']) ) {
+
+    // If not - fire error.
+    form_set_error('', t('Invalid Payment Data, please go to the Payment step again.'));
+  }
+}
+
+/**
+ * Form submit for review step.
+ * Process order, this was previously in payment submit.
+ */
+function magento_cart_quote_step_review_form_submit($form, &$form_state) {
+
+  // Load Cart.
+  $cart = magento_cart_get();
+
+  // Get reauired info.
+  $payment_module = $cart['custom_data']['payment_module'];
+  $payment_form = $cart['payment_forms']['payment_form'];
+  $payment_form_state = $cart['payment_forms']['payment_form_state'];
+
+  // Invoke payment procedure.
+  // If payment sucseed than magento_cart_quote_payment_succeded() will be called
+  // and move to the next step, if not magento_cart_quote_payment_failed() and redirect to prev step.
+  $res = magento_cart_quote_payment_process($payment_module, MAGENTO_CART_ORDER_STATE_NEW, $payment_form, $payment_form_state);
+}
+
+/**
+ * Cart Shipping form
+ */
+function magento_cart_quote_shipping_method_form($form_state, $cart) {
+  global $user;
+  $form = array();
+
+  $cart = magento_cart_get();
+
+  /**
+   * Shipping methods
+   */
+  $shiping_methods = magento_cart_quote_shipping_methods();
+  $form['#shiping_methods'] = $shiping_methods;
+
+  $shiping_method = empty($cart['shipping']['method'])
+    ? key($shiping_methods)
+    : $cart['shipping']['method'];
+
+  $shiping_method = in_array($shiping_method, array_keys($shiping_methods))
+    ? $shiping_method
+    : '';
+
+  $form['#shiping_method'] = !empty($shiping_methods[$shiping_method])
+    ? $shiping_methods[$shiping_method]
+    : array('price' => t('N/A'), 'grand_total' => t('N/A'));
+
+  $options = array();
+  foreach ($shiping_methods as $id => $method) {
+    $options[$id] = $method['select_string'];
+  }
+
+  $form["magento_cart_quote_shipping_methods"] = array(
+    '#type' => 'fieldset',
+    '#title' => t('Shipping methods'),
+    '#collapsible' => TRUE,
+  );
+
+  if (!empty($shiping_methods)) {
+    $form["magento_cart_quote_shipping_methods"]["shipping_method"] = array(
+      '#type' => 'radios',
+      '#options' => $options,
+      '#default_value' => $shiping_method,
+      '#attributes' => array('class' => 'block-shipping-choise-method'),
+    );
+    $form['magento_cart_quote_delivery'] = array('#type' => 'submit',
+      '#value' => t('Continue'),
+    );
+  }
+  else {
+    drupal_set_message(t('No shipping methods available, try to reload this page. If problem persist please contact site Administrator.'), 'error');
+    $form['magento_cart_quote_shipping_methods']['shipping_method'] = array(
+      '#value' => t('N/A'),
+    );
+  }
+
+   /********************************************
+   * Cart + delivery options
+   * ******************************************/
+
+  // TODO: is this nessesary?
+  $per_item_options = magento_cart_quote_shipping_method_options();
+  if (is_array($cart['products'])) foreach ($cart['products'] as $key => $product) {
+
+    $deliveries = array();
+    $prices = array();
+
+    $node = _magento_product_load_product($key);
+
+    $price=0;
+    foreach ($per_item_options as $option => $value) {
+      $deliveries[$option] = t('Shipping (%price &euro;)', array('%price' => $price));
+      $prices[$option] = $price;
+    }
+
+    if (is_array($deliveries)) {
+      $form['products'][$key] = array(
+        '#type'     => 'radios',
+        '#options'  => $deliveries,
+        '#prices'   => $prices,
+        '#disabled' => TRUE,
+      );
+      if (isset($product['data']['shipping_method_option'])) {
+        $form['products'][$key]['#default_value'] = $product['data']['shipping_method_option'];
+      }
+      else {
+        //default delivery address
+        $form['products'][$key]['#default_value'] = 'standard';
+      }
+    }
+
+  }
+  $form['_backlink'] = array(
+    '#value' => magento_cart_get_back_link(),
+  );
+  $form['#mclc'] = magento_cart_last_changed();
+  $form['mclc'] = array(
+    '#type' => 'value',
+    '#default_value' => magento_cart_last_changed()
+  );
+  $form['#validate'][] = 'magento_cart_quote_shipping_method_form_validate';
+  $form['#submit'][]   = 'magento_cart_quote_shipping_method_form_submit';
+
+  return $form;
+}
+
+/**
+ * Form Validate.
+ */
+function magento_cart_quote_shipping_method_form_validate($form, &$form_state) {
+  global $user;
+
+  // If we lost cart lock - drop error.
+  if ($form_state['values']['mclc'] != magento_cart_last_changed()) {
+    global $__magento_cart_lock_lost;
+    $__magento_cart_lock_lost = TRUE;
+    form_set_error('', t('Your Cart was modified outside of this checkout process, you can\'t continue.'));
+    return FALSE;
+  }
+
+  $cart = magento_cart_get();
+
+  $error_occured = FALSE;
+  /**
+   * Shipping method
+   */
+  if (empty($form_state['values']['shipping_method'])) {
+    form_set_error('shipping_method', t('Please, select one of available delivery methods.'));
+    $error_occured = TRUE;
+  }
+  else {
+    $cart['shipping']['method'] = $form_state['values']['shipping_method'];
+  }
+
+  if ($error_occured) {
+    return;
+  }
+
+  $shipping_method_option = magento_cart_quote_shipping_method_options();
+  foreach ($form['products'] as $product => $data) if (drupal_substr($product, 0, 1) != '#') {
+    if (isset($form_state['values'][$product]) && isset($shipping_method_option[$form_state['values'][$product]])) {
+      // is valid
+      $cart['products'][$product]['data']['shipping_method_option'] = $form_state['values'][$product];
+
+      // Save some values for payment page
+      $cart['products'][$product]['data']['magento_cart_quote_delivery'] = $data['#options'][$data['#value']];
+    }
+    elseif (!empty($shipping_method_option)) {
+      // hack?
+      form_set_error('products', t('Please, select one of available delivery methods for each product.'));
+    }
+  }
+  magento_cart_update($cart, TRUE);
+}
+
+/**
+ * Form Submit for shipping method step.
+ */
+function magento_cart_quote_shipping_method_form_submit($form, &$form_state) {
+  global $user;
+
+  // Go to next step;
+  $next_step = magento_cart_get_step_next();
+  magento_cart_goto_step($next_step);
+}
+
+/////////////////// DEPRECATED /////////////////////////////////////////
+/**
+ * TODO: Deprecated.
+ * Shipping method update Quote to see all totals
+ * #ahah callback
+ */
+/*
+function magento_cart_quote_shipping_method_update() {
+  global $user;
+  $address_error = FALSE;
+  $cart = magento_cart_quote_shipping_method_update_helper();
+
+  $form_id = 'magento_cart_quote_shipping_method_form';
+  $form_state = array('storage' => NULL, 'submitted' => FALSE, 'process_input' => 1, 'ajaxupdate' => TRUE);
+  $form_build_id = $_POST['form_build_id'];
+
+  $form = form_get_cache($form_build_id, $form_state);
+  $form_state['post'] = $form['#post'] = $_POST;
+  $form = drupal_rebuild_form($form_id, $form_state, array($form_state, $cart), $form_build_id);
+  $form['#action'] = url('cart/shipping_method');
+
+  // Final rendering callback.
+  print drupal_json(array('status' => FALSE, 'data' => theme_status_messages() . drupal_render_form($form_id, $form))); //theme_status_messages()
+  //exit();
+}
+ */
+
+/**
+ * TODO: Deprecated.
+ */
+/*
+function magento_cart_quote_shipping_method_update_helper() {
+  global $user;
+
+  $cart = magento_cart_get();
+
+  $form = magento_cart_quote_shipping_method_form(array('ajaxupdate' => TRUE), $cart);
+
+  // VALIDATE arguments
+  $address_error = FALSE;
+
+  if (empty($_REQUEST['shipping_method'])) {
+    $address_error = TRUE;
+  }
+  else {
+    $cart['shipping']['method'] = $_REQUEST['shipping_method'];
+  }
+
+
+  //If Shipping is the same as Billing then set `sameAsBillingAddress` attribute
+  if (!empty($cart['shipping']['address']['customer_address_id']) && !empty($cart['billing']['address']['customer_address_id'])) {
+    $cart['custom_data']['shipping_same_as_billing'] =  ($cart['shipping']['address']['customer_address_id'] == $cart['billing']['address']['customer_address_id']) ? 1: 0;
+  }
+
+  //final validation
+  if ($address_error) {
+    return magento_cart_get();
+  }
+
+  //Update Cart
+  $cart = magento_cart_update($cart, TRUE);
+  return $cart;
+}
+ */
+
+/**
+ * TODO: Deprecated.
+ * Calculate delivery default options
+ */
+/*
+function magento_cart_quote_delivery_defaults_calc(&$form) {
+  global $user;
+
+  $cart = magento_cart_get();
+  $changed = FALSE;
+
+  if (empty($cart['shipping']['method'])) {
+    $shiping_methods = magento_cart_quote_shipping_methods();
+    $cart['shipping']['method'] = key($shiping_methods);
+    $changed = TRUE;
+  }
+
+  //Update Cart.
+  if ($changed) {
+    magento_cart_save($cart);
+    $cart = magento_cart_update($cart, TRUE);
+  }
+}
+ */

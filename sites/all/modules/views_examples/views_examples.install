@@ -1,0 +1,28 @@
+<?php
+
+/**
+ * @file
+ * Provides install, upgrade and un-install functions for views_examples.
+ */
+
+/**
+ * Implements hook_uninstall().
+ */
+function views_examples_uninstall() {
+  // fixme: anything to do?
+  cache_clear_all();
+}
+
+/**
+ * Implements hook_enable().
+ */
+function views_examples_enable() {
+  drupal_set_message(t('To use Views Examples, go to <a href="@url">Views Examples admin page</a>.', array('@url' => url('admin/settings/views_examples'))));
+}
+
+/**
+ * Implements hook_install().
+ */
+function views_examples_install() {
+  // nothing to do
+}

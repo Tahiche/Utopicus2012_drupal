@@ -1,0 +1,15 @@
+core = "6.x"
+name = "Magento Cart Quote"
+description = "Magento Cart Quote"
+package = "Magento"
+version = "6.x-1.0"
+
+dependencies[] = "magento_cart"
+dependencies[] = "magento_product"
+dependencies[] = "magento_customers"
+; Information added by drupal.org packaging script on 2011-11-11
+version = "6.x-2.x-dev"
+core = "6.x"
+project = "magento"
+datestamp = "1321014079"
+

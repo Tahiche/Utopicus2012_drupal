@@ -1,0 +1,285 @@
+<?php
+// $Id$
+
+/**
+ * @file
+ * Custom Options for Magento product.
+ */
+
+/**
+ * Implementation of hook_form_alter().
+ */
+function magento_custom_options_form_alter(&$form, &$form_state, $form_id) {
+  if (strpos($form_id, 'magento_cart_add_product') !== FALSE) {
+    magento_custom_options_form_magento_cart_add_product_form_alter($form, $form_state);
+  }
+}
+
+/**
+ * Helper to add CUSTOM_OPTIONS on magento_cart_add_product_form. (This is not a hook)
+ *
+ * see magento_custom_options_form_alter()
+ */
+function magento_custom_options_form_magento_cart_add_product_form_alter(&$form, &$form_state) {
+  if (empty($form['magento_cart_add_product_nid']['#value'])) {
+    return;
+  }
+
+  $product_node = node_load($form['magento_cart_add_product_nid']['#value']);
+
+  if (empty($product_node->field_custom_options_data[0]['value'])) {
+    return;
+  }
+
+  $custom_options = unserialize($product_node->field_custom_options_data[0]['value']);
+
+  if (!is_array($custom_options) || empty($custom_options)) {
+    return;
+  }
+
+  $form['custom_options'] =  array(
+    '#type'        => 'fieldset',
+    '#title'       => t('Custom Options'),
+    '#collapsible' => FALSE,
+    '#weight'      => 0,
+  );
+
+  foreach ($custom_options as $option) {
+    $build_func = 'magento_custom_options_build_option_' . $option['type'];
+    if (!function_exists($build_func)) {
+      continue;
+    }
+    $form['custom_options']['option_' . $option['option_id']] = $build_func($option, $form);
+    $form['custom_options']['option_' . $option['option_id']]['#option_id'] = $option['option_id'];
+  }
+
+  array_unshift($form['#validate'], 'magento_custom_options_add_product_form_validate');
+  array_unshift($form['#submit'], 'magento_custom_options_add_product_form_submit');
+  //$form['#validate'][] = 'magento_custom_options_add_product_form_validate';
+  //$form['#submit'][] = 'magento_custom_options_add_product_form_submit';
+}
+
+/**
+ * Submit handler to add CUSTOM OPTIONS for magento_cart_add_product_form
+ */
+function magento_custom_options_add_product_form_submit($form, &$form_state) {
+  global $magento_cart_custom_options;
+
+  $nid = $form_state['values']['magento_cart_add_product_nid'];
+
+  $product_node = node_load($nid);
+
+  $elements = $form['custom_options'];
+
+  $options = array();
+  // Recurse through all children.
+  foreach (element_children($elements) as $key) {
+    if (isset($elements[$key]) && $elements[$key] && isset($form_state['values'][$key])) {
+      $options[$elements[$key]['#option_id']] = $form_state['values'][$key];
+    }
+  }
+
+  $magento_cart_custom_options[$nid] = $options;
+}
+
+
+/**
+ * Helper function to build form element for option of type `file`
+ */
+function magento_custom_options_build_option_file($option, &$form) {
+  $form['#attributes'] = array('enctype' => "multipart/form-data");
+  $form['#validate'][] = 'magento_custom_options_build_option_file_validate';
+
+  $validators = array('is_required' => $option['is_require']);
+  if (!empty($option['file_extension'])) {
+    $validators['file_validate_extensions'] = array($option['file_extension']);
+  }
+  if (!empty($option['image_size_x']) && !empty($option['image_size_y'])) {
+    $validators['file_validate_image_resolution'] = array($option['image_size_x'] . 'x' . $option['image_size_y']);
+  }
+  // $validators['file_validate_size'] = array($option['file_size'], $option['user_size']);
+
+  return array(
+    '#type' => 'file',
+    '#title' => $option['title'],
+    '#size' => 40,
+    '#validators' => $validators
+  );
+}
+
+/**
+ * Helper function to build form element for option of type `radio` (textfield)
+ */
+function magento_custom_options_build_option_radio($option, &$form) {
+  if (empty($option['values'])) {
+    return;
+  }
+
+  $radio_options = array();
+  foreach ($option['values'] as $value) {
+    $radio_options[$value['option_type_id']] = $value['title'];
+  }
+
+  return array(
+    '#type' => 'radios',
+    '#title' => $option['title'],
+    '#default_value' => key($radio_options),
+    '#options' => $radio_options,
+    '#required' => $option['is_require'],
+  );
+}
+
+/**
+ * Helper function to build form element for option of type `field` (textfield)
+ */
+function magento_custom_options_build_option_field($option, &$form) {
+  return array(
+   '#type' => 'textfield',
+      '#title' => $option['title'],
+      '#size' => 60,
+      '#maxlength' => empty($option['max_characters']) ? NULL : $option['max_characters'],
+      '#required' => $option['is_require'],
+  );
+}
+
+/**
+ * Validate Custom Options of type `file` for magento_add_product_form
+ */
+function magento_custom_options_build_option_file_validate($form, &$form_state) {
+  $elements = $form['custom_options'];
+
+  // Create uploads directory for magento_custom_options
+  $upload_path = file_directory_path() . "/uploaded_cart_custom_options";
+  if (!is_dir($upload_path)) {
+    mkdir($upload_path);
+  }
+
+  // Recurse through all children.
+  foreach (element_children($elements) as $key) {
+    if (isset($elements[$key]['#type']) && $elements[$key]['#type'] == 'file') {
+      //_form_validate($elements[$key], $form_state);
+      $is_required = $elements[$key]['#validators']['is_required'];
+      unset($elements[$key]['#validators']['is_required']);
+      // Save new file uploads.
+      if ($file = file_save_upload($key, $elements[$key]['#validators'], $upload_path)) {
+        // Do something with $file here.
+        //Make file permanent
+        file_set_status($file, FILE_STATUS_PERMANENT);
+
+        //$form_state['values'][$key] = file_create_url($file->filepath);
+        $file_url = file_create_url($file->filepath);
+        $image_info = image_get_info($file->filepath);
+        $form_state['values'][$key] = array(
+          //customized params
+            'is_from_drupal_connector' => TRUE,
+            'drupals_path' => $file->filepath,
+            'file_url' => $file_url,
+          //end customized parms
+
+            'type' => $file->filemime,
+            'title' => $file->filename,
+            'quote_path' => $file_url,
+            //'fullpath' => '/virtual/magento.cl1/media/custom_options/quote/t/h/bcf471825d0f1a0b231e4aa2cca21ee6.png'
+            'order_path' => $file_url,
+            'size' => $file->filesize,
+            //'secret_key' => substr(md5(file_get_contents($file->filepath)), 0, 20)
+          );
+
+        if (!empty($image_info['width'])) {
+          $form_state['values'][$key]['width'] = $image_info['width'];
+          $form_state['values'][$key]['height'] = $image_info['height'];
+        }
+      }
+      elseif ($is_required) {
+        form_set_error($key, t('Custom option %el_name is required.', array('%el_name' => $elements[$key]['#title'])));
+      }
+    }
+  }
+}
+
+
+/**
+ * Implementation of hook_magento_stores().
+ */
+function magento_custom_options_magento_cart($event, $break = FALSE, &$arg1 = NULL, &$arg2 = NULL, &$arg3 = NULL, &$arg4 = NULL, &$arg5 = NULL, &$arg6 = NULL, &$arg7 = NULL) {
+  if ('before add' == $event) {
+    $product = &$arg1[0];
+    global $magento_cart_custom_options;
+    if (isset($magento_cart_custom_options[$product['nid']])) {
+      $product['options'] = $magento_cart_custom_options[$product['nid']];
+    }
+  }
+}
+
+/**
+ * Implementation of hook_theme().
+ */
+function magento_custom_options_theme() {
+  return array(
+    'magento_product_options' => array(
+      'arguments' => array('product' => NULL, 'node' => NULL)
+    ),
+  );
+}
+
+/**
+ * Theme implemantetion for `magento_product_options`
+ * @param $product array
+ *   Product data in cart with `options` (custom_options).
+ *   - `options`: user selected custom_options for the Product
+ *
+ * @param $product_node
+ *   Product node.
+ */
+function theme_magento_product_options($product, $product_node) {
+  if (empty($product['options']) || empty($product_node->field_custom_options_data[0]['value'])) {
+    return '';
+  }
+
+  $custom_options = unserialize($product_node->field_custom_options_data[0]['value']);
+
+  if (!is_array($custom_options) || empty($custom_options)) {
+    return '';
+  }
+
+  $items = array();
+  foreach ($custom_options as $option) {
+    if (empty($product['options'][$option['option_id']])) {
+      continue;
+    }
+
+    $render_func = 'magento_custom_options_render_option_' . $option['type'] . '_value';
+    if (function_exists($render_func)) {
+      //continue;
+      $items[] = '<b>' . $option['title'] . '</b>:' . $render_func($product['options'][$option['option_id']], $option);
+    }
+    else {
+      $items[] = '<b>' . $option['title'] . '</b>:' . $product['options'][$option['option_id']];
+    }
+  }
+
+  return theme_item_list($items, $title = t('Custom Options'), $type = 'ul', $attributes = array('class' => 'product-item-custom-options'));
+}
+
+/**
+ * Helper function to render value of option of type `file`
+ * @param $option_value array
+ *   Value of the option
+ */
+function magento_custom_options_render_option_file_value($option_value, $option) {
+  return l($option_value['title'], $option_value['file_url']);
+}
+
+/**
+ * Helper function to render value of option of type `file`
+ * @param $option_value array
+ *   Value of the option
+ */
+function magento_custom_options_render_option_radio_value($option_value, $option) {
+  foreach ($option['values'] as $value) {
+    if ($value['option_type_id'] == $option_value) {
+      return $value['title'];
+    }
+  }
+  return $option_value;
+}

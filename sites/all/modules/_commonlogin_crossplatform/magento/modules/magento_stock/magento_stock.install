@@ -1,0 +1,176 @@
+<?php
+// $Id$
+
+/**
+ * @file
+ * Implements install hooks
+ */
+
+/**
+ * Implementation of hook_schema().
+ */
+function magento_stock_schema() {
+  $schema = array();
+  $schema['magento_stock'] = array(
+    'description' => t('Local cache of Magento Stock information'),
+    'fields' => array(
+      'item_id' => array(
+        'description' => t('Stock item ID'),
+        'type' => 'serial',
+        'unsigned' => TRUE,
+        'not null' => TRUE,
+      ),
+      'product_id' => array(
+        'description' => t('Magento product_id'),
+        'type' => 'int',
+        'unsigned' => TRUE,
+        'not null' => TRUE,
+      ),
+      'stock_id' => array(
+        'description' => t('Magento stock_id'),
+        'type' => 'int',
+        'unsigned' => TRUE,
+        'size' => 'small',
+        'not null' => TRUE,
+      ),
+      'qty' => array(
+        'description' => t('Quantity'),
+        'type' => 'numeric',
+        'not null' => TRUE,
+        'precision' => '10',
+        'scale' => '4',
+      ),
+      'min_qty' => array(
+        'description' => t('Minimum Quantity'),
+        'type' => 'numeric',
+        'not null' => TRUE,
+        'precision' => '10',
+        'scale' => '4',
+      ),
+      'use_config_min_qty' => array(
+        'description' => t('Flag if to use min_qty'),
+        'type' => 'int',
+        'unsigned' => TRUE,
+        'size' => 'tiny',
+        'not null' => TRUE,
+      ),
+      'is_qty_decimal' => array(
+        'description' => t('Flag if Quantity is decimal'),
+        'type' => 'int',
+        'unsigned' => TRUE,
+        'not null' => TRUE,
+      ),
+      'backorders' => array(
+        'description' => t('Flag if backorders'),
+        'type' => 'int',
+        'unsigned' => TRUE,
+        'size' => 'tiny',
+        'not null' => TRUE,
+      ),
+      'use_config_backorders' => array(
+        'description' => t('Flag if to use backrders'),
+        'type' => 'int',
+        'unsigned' => TRUE,
+        'size' => 'tiny',
+        'not null' => TRUE,
+      ),
+      'min_sale_qty' => array(
+        'description' => t('Minimum Quantity for sale'),
+        'type' => 'numeric',
+        'not null' => TRUE,
+        'precision' => '10',
+        'scale' => '4',
+      ),
+      'use_config_min_sale_qty' => array(
+        'description' => t('Flag if to use Minimum Quantity for sale'),
+        'type' => 'int',
+        'unsigned' => TRUE,
+        'size' => 'tiny',
+        'not null' => TRUE,
+      ),
+      'max_sale_qty' => array(
+        'description' => t('Maximum quantity for sale'),
+        'type' => 'numeric',
+        'not null' => TRUE,
+        'precision' => '10',
+        'scale' => '0',
+      ),
+      'use_config_max_sale_qty' => array(
+        'description' => t('Flag if to use Maximum Quantity for sale'),
+        'type' => 'int',
+        'unsigned' => TRUE,
+        'size' => 'tiny',
+        'not null' => TRUE,
+      ),
+      'is_in_stock' => array(
+        'description' => t('Flag InStock or OutOfStock'),
+        'type' => 'int',
+        'unsigned' => TRUE,
+        'size' => 'tiny',
+        'not null' => TRUE,
+      ),
+      'low_stock_date' => array(
+        'description' => t('Low stock Date'),
+        'type' => 'int',
+        'not null' => FALSE,
+      ),
+      'notify_stock_qty' => array(
+        'description' => t('Quantity in Stock when to send notification'),
+        'type' => 'int',
+        'unsigned' => TRUE,
+        'size' => 'tiny',
+        'not null' => FALSE,
+      ),
+      'use_config_notify_stock_qty' => array(
+        'description' => t('Flag if to use notify_stock_qty'),
+        'type' => 'int',
+        'unsigned' => TRUE,
+        'size' => 'tiny',
+        'not null' => TRUE,
+      ),
+      'manage_stock' => array(
+        'description' => t('Flag if Manage stock'),
+        'type' => 'int',
+        'unsigned' => TRUE,
+        'size' => 'tiny',
+        'not null' => TRUE,
+      ),
+      'use_config_manage_stock' => array(
+        'description' => t('Flag if to use manage_stock'),
+        'type' => 'int',
+        'unsigned' => TRUE,
+        'size' => 'tiny',
+        'not null' => TRUE,
+      ),
+      'stock_status_changed_automatically' => array(
+        'description' => t('Flag if Stock Status changed automatically'),
+        'type' => 'int',
+        'unsigned' => TRUE,
+        'size' => 'tiny',
+        'not null' => TRUE,
+      ),
+    ),
+    'primary key' => array('item_id'),
+    'indexes' => array(
+      'STOCK_PRODUCT' => array('product_id', 'stock_id'),
+    ),
+  );
+
+  return $schema;
+}
+
+/**
+ * Implementation of hook_install().
+ */
+function magento_stock_install() {
+  // Create table
+  drupal_install_schema('magento_stock');
+}
+
+/*
+ * Implementation of hook_uninstall().
+ */
+function magento_stock_uninstall() {
+  // Drop table
+  drupal_uninstall_schema('magento_stock');
+}

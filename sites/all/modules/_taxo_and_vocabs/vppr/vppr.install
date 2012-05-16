@@ -1,0 +1,15 @@
+<?php
+// $Id: vppr.install,v 1.1 2011/01/27 15:02:41 boobaa Exp $
+
+/**
+ * @file
+ * Vocabulary Permissions Per Role - uninstallation routines.
+ */
+
+/**
+ * Implementation of hook_uninstall().
+ */
+function vppr_uninstall() {
+  variable_del('vppr_perms');
+}
+

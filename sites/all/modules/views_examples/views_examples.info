@@ -1,0 +1,15 @@
+
+name = "Views Examples"
+description = "A library of views examples. These can be edited or cloned and 
+changed as desired. Custom examples can be uploaded to the library."
+core = 6.x
+package = Views
+dependencies[] = views
+dependencies[] = php
+
+; Information added by drupal.org packaging script on 2011-02-25
+version = "6.x-1.x-dev"
+core = "6.x"
+project = "views_examples"
+datestamp = "1298620649"
+

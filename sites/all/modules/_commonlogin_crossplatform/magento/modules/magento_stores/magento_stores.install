@@ -1,0 +1,158 @@
+<?php
+// $Id$
+/**
+ * @file
+ * Module installation/uninstallation hooks.
+ */
+
+// Create required content types
+module_load_include('inc',     'magento',        'magento.strings');
+module_load_include('inc',     'magento',        'magento.node_helper');
+module_load_include('strings', 'magento_api',    'magento_api');
+module_load_include('strings', 'magento_stores', 'magento_stores');
+
+
+/**
+ * Implementation of hook_requirements($phase).
+ * Used to enable all dependecies before running hook_install
+ *
+ */
+function magento_stores_requirements($phase) {
+  if ($phase == 'install') {
+    module_enable(array('content'));
+    module_enable(array('nodereference'));
+    module_enable(array('number'));
+    module_enable(array('text'));
+    module_enable(array('magento'));
+  }
+}
+/**
+ * Implementation of hook_schema().
+ */
+function magento_stores_schema() {
+  $schema[MAGENTO_STORES_TABLE_ATTRIBUTES] = array(
+    'fields' => array(
+      'attribute_id'                => array('type' => 'int',  'unsigned' => TRUE, 'not NULL' => TRUE),
+      MAGENTO_ATTRIBUTE_CODE        => array('type' => 'varchar', 'length' => 255, 'not NULL' => TRUE, 'default' => ''),
+      'backend_type'                => array('type' => 'varchar', 'length' => 32,  'not NULL' => TRUE, 'default' => ''),
+      'frontend_input'              => array('type' => 'varchar', 'length' => 32,  'not NULL' => TRUE, 'default' => ''),
+      MAGENTO_API_ATTRIBUTE_SCOPE   => array('type' => 'varchar', 'length' => 32,  'not NULL' => TRUE, 'default' => ''),
+      'is_required'                 => array('type' => 'int',                      'not NULL' => TRUE, 'default' => 0),
+    ),
+    'primary key' => array('attribute_id'),
+    'unique keys' => array(
+      MAGENTO_ATTRIBUTE_CODE => array(MAGENTO_ATTRIBUTE_CODE)
+    ),
+  );
+
+  $schema[MAGENTO_STORES_TABLE_LABELS] = array(
+    'fields' => array(
+      'object_id'   => array('type' => 'varchar', 'length' => 256,    'not NULL' => TRUE),
+      'store'       => array('type' => 'int',                         'not NULL' => TRUE, 'default' => 0),
+      'type'        => array('type' => 'varchar', 'length' => 32,     'not NULL' => TRUE, 'default' => ''),
+      'parent_id'   => array('type' => 'varchar', 'length' => 256,    'not NULL' => TRUE, 'default' => ''),
+      // actually it could be great if we might use ENUM - but.....
+      'label'       => array('type' => 'varchar', 'length' => 256,   'not NULL' => TRUE, 'default' => ''),
+    ),
+    'primary key' => array(array('object_id', 20), 'store', 'type', array('parent_id', 20)),
+  );
+
+  $schema[MAGENTO_STORES_TABLE_ATTRIBUTE_SETS] = array(
+    'fields' => array(
+      MAGENTO_STORES_TYPE    => array('type' => 'varchar', 'length' => 255, 'not NULL' => TRUE),
+      MAGENTO_ATTRIBUTE_CODE => array('type' => 'varchar', 'length' => 255, 'not NULL' => TRUE, 'default' => ''),
+    ),
+    'primary key' => array(array(MAGENTO_STORES_TYPE, 128), array(MAGENTO_ATTRIBUTE_CODE, 128)),
+  );
+
+  return $schema;
+}
+
+/**
+ * Implementation of hook_install().
+ */
+function magento_stores_install() {
+  // WEBSITE
+  magento_add_content_type(MAGENTO_STORES_CONTENT_TYPE_WEBSITE, 'Website', 'Magento website object (required for synchronization)');
+    /* Comment: we use unique name for magento ID fiend - in order to store it in the same table */
+    magento_add_cck_field(MAGENTO_STORES_CONTENT_TYPE_WEBSITE, 'field_magento_id',         'Website ID',       'number_integer', 'number');
+
+    /* Required stuff */
+    magento_add_cck_field(MAGENTO_STORES_CONTENT_TYPE_WEBSITE, 'field_default_group_id',   'Default Group ID', 'number_integer', 'number');
+
+    /* Do we really need these? */
+    //magento_add_cck_field(MAGENTO_STORES_CONTENT_TYPE_WEBSITE, 'field_is_default',         'Is Default',       'number_integer', 'optionwidgets_onoff');
+    magento_add_cck_field_onoff(MAGENTO_STORES_CONTENT_TYPE_WEBSITE, 'field_is_default', 'Is Default', 'number_integer', 'optionwidgets_onoff', FALSE, FALSE, array('default_value' => FALSE));
+    magento_add_cck_field(MAGENTO_STORES_CONTENT_TYPE_WEBSITE, 'field_sort_order',         'Sort Order',       'number_integer', 'number');
+    magento_add_cck_field(MAGENTO_STORES_CONTENT_TYPE_WEBSITE, 'field_code',               'Code',             'text',           'text_textfield', TRUE);
+
+  // STORE
+  magento_add_content_type(MAGENTO_STORES_CONTENT_TYPE_GROUP, 'Store Group', 'Magento Store Group object (required for synchronization)');
+    /* Comment: we use unique name for magento ID fiend - in order to store it in the same table */
+    magento_add_cck_field(MAGENTO_STORES_CONTENT_TYPE_GROUP, 'field_magento_id',           'Store Group ID',   'number_integer', 'number');
+
+    /* Required stuff */
+    magento_add_cck_field(MAGENTO_STORES_CONTENT_TYPE_GROUP, 'field_default_store_id',     'Default Store ID', 'number_integer', 'number');
+    magento_add_cck_field(MAGENTO_STORES_CONTENT_TYPE_GROUP, 'field__website__',                'Website',          'nodereference',  'nodereference_autocomplete');
+    magento_field_instance_update('field__website__', array('referenceable_types' => array(MAGENTO_STORES_CONTENT_TYPE_WEBSITE => MAGENTO_STORES_CONTENT_TYPE_WEBSITE)));
+
+    /* Do we really need these? */
+    magento_add_cck_field(MAGENTO_STORES_CONTENT_TYPE_GROUP, 'magento_store_root_category_id', 'Root Category ID', 'number_integer', 'number', TRUE);
+
+  // STORE VIEW
+  magento_add_content_type(MAGENTO_STORES_CONTENT_TYPE_STORE, 'Store', 'Magento Store object (required for synchronization)');
+    /* Comment: we use unique name for magento ID fiend - in order to store it in the same table */
+    magento_add_cck_field(MAGENTO_STORES_CONTENT_TYPE_STORE, 'field_magento_id',       'Store ID',   'number_integer', 'number');
+
+    /* Required stuff */
+    magento_add_cck_field(MAGENTO_STORES_CONTENT_TYPE_STORE, 'field__store_group__',   'Store Group', 'nodereference',  'nodereference_autocomplete');
+    magento_field_instance_update('field__store_group__', array('referenceable_types' => array(MAGENTO_STORES_CONTENT_TYPE_GROUP => MAGENTO_STORES_CONTENT_TYPE_GROUP)));
+
+    /* Do we really need these? */
+    magento_add_cck_field(MAGENTO_STORES_CONTENT_TYPE_STORE, 'field_store_sort_order', 'Sort Order', 'number_integer', 'number');
+    //magento_add_cck_field(MAGENTO_STORES_CONTENT_TYPE_STORE, 'field_store_is_active',  'Is Active',  'number_integer', 'optionwidgets_onoff');
+    magento_add_cck_field_onoff(MAGENTO_STORES_CONTENT_TYPE_STORE, 'field_store_is_active', 'Is Active', 'number_integer', 'optionwidgets_onoff', FALSE, FALSE, array('default_value' => TRUE));
+    magento_add_cck_field(MAGENTO_STORES_CONTENT_TYPE_STORE, 'field_store_code',       'Code',       'text',           'text_textfield', TRUE);
+
+  drupal_install_schema('magento_stores');
+
+  /* WARNING! update existing tables because 32 characters is not enough for our attributes */
+  update_sql('ALTER TABLE {content_node_field} MODIFY field_name VARCHAR(255)');
+  update_sql('ALTER TABLE {content_node_field_instance} MODIFY field_name VARCHAR(255)');
+}
+
+/**
+ * Implementation of hook_uninstall().
+ */
+function magento_stores_uninstall() {
+  //
+
+  magento_remove_content_type(MAGENTO_STORES_CONTENT_TYPE_STORE);
+  magento_remove_content_type(MAGENTO_STORES_CONTENT_TYPE_GROUP);
+  magento_remove_content_type(MAGENTO_STORES_CONTENT_TYPE_WEBSITE);
+
+  drupal_uninstall_schema('magento_stores');
+}
+
+/**
+ * Helper function to update cck fields
+ */
+function _update_magento_cck_field_onoff($content_type, $field_name, $label, $type, $widget_type, $rebuild = FALSE, $multiple = FALSE, $options = array()) {
+  //$message = magento_add_cck_field($content_type, $field_name, $label, $type, $widget_type, $rebuild, $multiple);
+
+  $data = array('allowed_values' => '0|'. t('No') ."\n1|". t('Yes'), 'widget' => array('description' => $label, 'allowed_values' => '0|'. t('No') ."\n1|". t('Yes') ), 'description' => $label);
+  if (isset($options['default_value'])) {
+    magento_merge_arrays($data, array('widget' => array('default_value' => array(array('value' => $options['default_value'])))));
+  }
+  magento_field_instance_update($field_name, $data);
+
+  //return $message;
+}
+
+/**
+ * Implementation of hook_update_N().
+ */
+function magento_update_6001() {
+  _update_magento_cck_field_onoff(MAGENTO_STORES_CONTENT_TYPE_WEBSITE, 'field_is_default', 'Is Default', 'number_integer', 'optionwidgets_onoff', FALSE, FALSE, array('default_value' => FALSE));
+  _update_magento_cck_field_onoff(MAGENTO_STORES_CONTENT_TYPE_STORE, 'field_store_is_active', 'Is Active', 'number_integer', 'optionwidgets_onoff', FALSE, FALSE, array('default_value' => TRUE));
+}

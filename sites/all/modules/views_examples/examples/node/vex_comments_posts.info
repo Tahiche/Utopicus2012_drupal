@@ -1,0 +1,10 @@
+name = My Comments, Your Comments, and More
+description = Many comments blocks: my own comments, comments others made on my posts, replies to my comments, my posts with comments.
+package = Node - Comments
+
+; Information added by drupal.org packaging script on 2011-02-25
+version = "6.x-1.x-dev"
+core = "6.x"
+project = "views_examples"
+datestamp = "1298620649"
+

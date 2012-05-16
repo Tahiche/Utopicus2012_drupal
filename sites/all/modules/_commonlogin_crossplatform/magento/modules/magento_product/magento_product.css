@@ -1,0 +1,37 @@
+.model {
+  font-weight: bold;
+  margin-right: 2em;
+}
+
+.product-image {
+  clear: right;
+  float: right;
+  margin-left: 4px;
+  padding-left: 4px;
+  padding-top: 4px;
+  text-align: center;
+}
+
+.main-product-thumbnail img {
+  width: 140px;
+}
+
+.magento-product-price-display {
+  clear: right;
+  float: right;
+  font-size: 1.3em;
+  font-weight: bold;
+  padding-bottom: 4px;
+  padding-left: 4px;
+  text-align: center;
+  width: 140px;
+}
+
+.magento-product-image-zoom {
+  clear: right;
+  float: right;
+  padding-bottom: 4px;
+  padding-left: 4px;
+  text-align: center;
+  width: 140px;
+}

@@ -1,0 +1,15 @@
+;$Id:$
+
+core = "6.x"
+name = "Magento Shipping"
+description = "Allows to use enabled (in Magento) shipping methods"
+package = "Magento Core"
+version = "6.x-2.0-dev"
+
+dependencies[] = "magento_cart"
+; Information added by drupal.org packaging script on 2011-11-11
+version = "6.x-2.x-dev"
+core = "6.x"
+project = "magento"
+datestamp = "1321014079"
+

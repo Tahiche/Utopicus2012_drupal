@@ -1,0 +1,373 @@
+<?php
+// $Id$
+
+define('ONE_STEP_PRODUCTS_AMOUNT_CRON', 100);
+define('LOCK_TIMEOUT_CRON', get_cfg_var('max_execution_time') * 2);
+
+/////////////////// DRUPAL HOOKS ///////////////////////////////////////
+/**
+ * Implementation of hook_menu().
+ * Insert new menu items into Magento section.
+ */
+function magento_synchronize_menu() {
+  // content management
+  $items['admin/content/magento'] = array(
+    'title'            => 'Magento Synchronization Console',
+    'description'      => 'View and manage Margento\'s data.',
+    'page callback'    => 'magento_synchronize_page',
+    'access arguments' => array('access administration pages'),
+    'file'             => 'magento_synchronize.content.inc',
+    'type' => MENU_NORMAL_ITEM,
+  );
+
+  $items['admin/content/magento/synchronization'] = array(
+    'title'            => 'Synchronization',
+    'type' => MENU_DEFAULT_LOCAL_TASK,
+  );
+  // synchronization settings
+  $items['admin/settings/magento/synchronization'] = array(
+    'title'            => 'Synchronization',
+    'description'      => 'Synchronization settings',
+    'page callback'    => 'drupal_get_form',
+    'page arguments'   => array('magento_synchronize_settings'),
+    'access arguments' => array('access administration pages'),
+    'file'             => 'magento_synchronize.settings.inc',
+    'type' => MENU_LOCAL_TASK,
+  );
+
+  return $items;
+}
+
+/**
+ * Implementation of hook_cronapi() for Elysia Cron.
+ */
+function magento_synchronize_cronapi($op, $job = NULL) {
+  switch ($op) {
+    case 'list' :
+      return array(
+        'magento_synchronize_categories'              => t('Compare and update categories from Magento'),
+        'magento_synchronize_products'                => t('Get recently updated products from Magento'),
+        'magento_synchronize_remove_surplus_products' => t('Remove products which do not exist in Magento any more'),
+      );
+      break;
+    case 'rule' :
+      switch ($job) {
+        case 'magento_synchronize_categories'              : return '0 0 * * *';
+        case 'magento_synchronize_products'                : return '0 0 * * *';
+        case 'magento_synchronize_remove_surplus_products' : return '0 0 * * *';
+      }
+      break;
+  }
+}
+
+/**
+ * Implementation of hook_magento_stores().
+ */
+function magento_synchronize_magento_stores($event, $break = FALSE, &$arg1 = NULL, &$arg2 = NULL, &$arg3 = NULL, &$arg4 = NULL, &$arg5 = NULL, &$arg6 = NULL, &$arg7 = NULL) {
+  static $product   = NULL;
+  static $store     = NULL;
+
+  static $store_id  = NULL;
+
+    switch ($event) {
+      case 'before store_update':
+          $store_id = $arg1['store_id'];
+          break;
+    case 'after store_update':
+          if ($store_id) {
+            $store_node = magento_get_node(MAGENTO_STORES_CONTENT_TYPE_STORE, $store_id);
+        if ($store_node) {
+          $store_node->field__autosynch__[0]['value'] = 1;
+          magento_node_save($store_node);
+        }
+          }
+          $store_id = NULL;
+          break;
+
+        case 'before product_update':
+          $product = $arg1;
+          $store   = $arg2;
+          break;
+
+        case 'after product_update':
+          if ($product && $store) {
+        // update last synchronization time
+        $store_node = magento_get_node(MAGENTO_STORES_CONTENT_TYPE_STORE, $store);
+        if ($store_node && (empty($store_node->field__last_autosynch_time__[0]['value']) ||  $store_node->field__last_autosynch_time__[0]['value'] <= $product['updated_at'])) {//&& $store_node->field__autosynch__[0]['value'] == 1
+          $store_node->field__last_autosynch_magento_id__[0]['value'] = ($arg1) ? $product['product_id'] : NULL;
+          $store_node->field__last_autosynch_time__[0]['value']       = $product['updated_at'];
+          magento_node_save($store_node);
+        }
+        $product = NULL;
+        $store   = NULL;
+          }
+            break;
+        default:
+            break;
+    }
+}
+
+/**
+ * Get remote store ids which should be updated
+ */
+function magento_synchronize_get_stores_for_synchronization($all = FALSE) {
+  $query = "SELECT n.title, v.field_magento_id_value FROM {node} n LEFT JOIN {content_type_magento_store} s ON s.nid = n.nid LEFT JOIN {content_field_magento_id} v ON v.nid = n.nid WHERE n.type = '". MAGENTO_STORES_CONTENT_TYPE_STORE ."'";
+
+  if (!$all) {
+    $query .= ' AND (field__autosynch___value IS NULL OR field__autosynch___value = 1)';
+  }
+  $nodes = db_query($query);
+
+  $stores = array();
+  while ($store = db_fetch_array($nodes)) {
+    $stores[] = $store;
+  }
+  return $stores;
+}
+
+/**
+ * magento_synchronize_products_batch_get
+ */
+function magento_synchronize_products_batch_get(&$params) {
+    static $items_left               = -1;
+    static $one_step_products_amount = -1;
+  /* Read Drupal variables to initialize number of products for Sync on each step */
+    if (0 > $items_left) {
+      $items_left = variable_get('magento_products_for_autosynch', ONE_STEP_PRODUCTS_AMOUNT_CRON);
+    }
+
+    if (0 > $one_step_products_amount) {
+      $one_step_products_amount = variable_get('magento_products_for_batchsynch', ONE_STEP_PRODUCTS_AMOUNT);
+    }
+
+  if (0 == $params['finished']) {
+    $field_last_autosynch_time       = NULL;
+    $field_last_autosynch_magento_id = NULL;
+
+    $store = magento_get_node(MAGENTO_STORES_CONTENT_TYPE_STORE, $params['store_id']);
+    $field_last_autosynch_time = 0;
+    if ($store) {
+      $field_last_autosynch_time       = $store->field__last_autosynch_time__[0]['value'];
+      $field_last_autosynch_magento_id = $store->field__last_autosynch_magento_id__[0]['value'];
+    }
+
+    // try to get the number of products we will have
+    $params['products_update'] = _magento_syncronize_get_products_ids_to_update_by_cron($params['store_id'], $field_last_autosynch_time, $items_left);
+    if (empty($params['products_update'])) {
+      $params['products_update'] = array();
+    }
+    $params['steps']    = count($params['products_update']);
+    $params['current'] = 0;
+    // may be we don't have to update some products - let's find the starting position
+    // it happens when last sync time = current and last sync id = current
+    foreach ($params['products_update'] as $key => $value) {
+      if ($value['updated_at'] != $field_last_autosynch_time) {
+        break;
+      }
+      elseif ($value['id'] == $field_last_autosynch_magento_id) {
+        $params['current'] = $key + 1;
+        break;
+      }
+    }
+
+    if ($params['steps'] <= $params['current']) {
+      $params['products'] = array();
+      $params['steps']    = 0;
+    }
+  }
+
+  $params['products'] = array();
+  $items_to_sync = 0;
+
+  while (0 < $items_left && $items_to_sync < $one_step_products_amount) {
+  //while (0 < $items_left) {
+    if (isset($params['products_update'][$params['current'] + $items_to_sync]['id'])) {
+      // get new portion of products
+      $params['products'][] = $params['products_update'][$params['current'] + $items_to_sync]['id'];
+    }
+    else {
+      break;
+    }
+    $items_to_sync += 1;
+    $items_left -= 1;
+  }
+}
+
+/**
+ * Gets ids of product that will be synchronized by cron task `magento_syncronize_products`.
+ * Actually wrapper over magento_api_get_products_ids_to_update().
+ *
+ * @see magento_api_get_products_ids_to_update()
+ */
+function _magento_syncronize_get_products_ids_to_update_by_cron($store_id, $field_last_autosynch_time=0, $limit) {
+  static $product_ids;
+  $hash = $store_id . ' at ' . $field_last_autosynch_time . " ($limit)";
+
+  if (isset($product_ids[$hash])) {
+    return $product_ids[$hash];
+  }
+
+  $product_ids[$hash] = magento_api_get_products_ids_to_update($store_id, $field_last_autosynch_time, $limit);
+  return $product_ids[$hash];
+}
+
+/**
+ * Rerurn products count that should be syncronized by cron
+ */
+function magento_synchronize_get_products_for_autosynch_count() {
+  $count = 0;
+  $stores = magento_synchronize_get_stores_for_synchronization();
+  foreach ($stores as $store) {
+    $store_node = magento_get_node(MAGENTO_STORES_CONTENT_TYPE_STORE, $store['field_magento_id_value']);
+    if ($store_node) {
+      $field_last_autosynch_time       = $store_node->field__last_autosynch_time__[0]['value'];
+      $field_last_autosynch_magento_id = $store_node->field__last_autosynch_magento_id__[0]['value'];
+
+      $count_for_update = magento_api_get_count_products_to_update($store['field_magento_id_value'], $store_node->field__last_autosynch_time__[0]['value']);
+      if (isset($count_for_update['count'])) {
+        //return $count_for_update['count'];
+        //$count+=$count_for_update['count'];
+        //continue;
+      };
+
+//      $products_for_update = magento_api_get_products_ids_to_update($store['field_magento_id_value'], $store_node->field__last_autosynch_time__[0]['value']);
+      $products_for_update = $count_for_update['products_updated_in_the_time'];
+      if (!$products_for_update) {
+        $products_for_update = array();
+      }
+
+      if (!is_array($products_for_update)) {
+        $products_for_update = array();
+      }
+      //$steps   = count($products_for_update);
+      $steps   = $count_for_update['count'];
+      $current = 0;
+      // may be we don't have to update some products - let's find the starting position
+      // it happens when last sync time = current and last sync id = current
+      foreach ($products_for_update as $key => $value) {
+        if ($value['updated_at'] != $field_last_autosynch_time) {
+          break;
+        }
+        elseif ($value['id'] == $field_last_autosynch_magento_id) {
+          $current = $key + 1;
+          break;
+        }
+      }
+
+      if ($steps > $current) {
+        $count += $steps - $current;
+      }
+    }
+  }
+  return $count;
+}
+
+/**
+ * Flush the time each store were syncronized
+ */
+function magento_synchronize_reset_last_synch_time() {
+  $stores = magento_synchronize_get_stores_for_synchronization(TRUE);
+  foreach ($stores as $store) {
+    $save = FALSE;
+    $store_node = magento_get_node(MAGENTO_STORES_CONTENT_TYPE_STORE, $store['field_magento_id_value']);
+
+    if ($store_node && !empty($store_node->field__last_autosynch_magento_id__[0]['value'])) {
+      $store_node->field__last_autosynch_magento_id__[0]['value'] = NULL;
+      $save = TRUE;
+    }
+
+    if ($store_node && !empty($store_node->field__last_autosynch_time__[0]['value'])) {
+      $store_node->field__last_autosynch_time__[0]['value'] = NULL;
+      $save = TRUE;
+    }
+
+    if ($save) {
+      magento_node_save($store_node);
+    }
+  }
+}
+
+/////////////////// SYNC OPERATIONS ////////////////////////////////////
+/**
+ * Synchronize recently updated products from MAGENTO to DRUPAL
+ */
+function magento_synchronize_products($gui = FALSE) {
+  // Locking cron task
+  if (!lock_acquire('magento_synchronize_products', variable_get('magento_cron_task_timeout', LOCK_TIMEOUT_CRON)))
+    return;
+
+  $include          = drupal_get_path('module', 'magento_stores') .'/includes/magento_stores.'. MAGENTO_STORES_PRODUCTS .'.inc';
+  $function_process = 'magento_stores_' . MAGENTO_STORES_PRODUCTS . '_' . MAGENTO_STORES_OPERATION_FETCH . '_batch_create';
+  $function_before  = "magento_synchronize_products_batch_get"; // use custom function to fetch products
+
+  // Get modified products' ids till the last synchronization
+  $batch = array();
+  $stores = magento_synchronize_get_stores_for_synchronization();
+  foreach ($stores as $store) {
+    // One batch operation for each store
+    $batch[] = array($include, $function_process, $function_before, array(
+      'store'    => $store['title'],
+      'store_id' => $store['field_magento_id_value'])
+    );
+  }
+  // Batch info
+  $info = array(
+    'title'        => t('ReSynchronization of products'),
+    'init_message' => t('Start processing')
+  );
+
+  // Submit batch - we use non-GUI mode when running under Elysia Cron
+  magento_batch_process($info, $batch, $gui);
+
+  lock_release('magento_synchronize_products');
+}
+
+/**
+ * Syncronize Categories cron task.
+ */
+function magento_synchronize_categories() {
+  // Locking cron task
+  if (!lock_acquire('magento_synchronize_categories', variable_get('magento_cron_task_timeout', LOCK_TIMEOUT_CRON)))
+    return;
+
+  $batch = magento_stores_create_batch(MAGENTO_STORES_CATEGORIES, MAGENTO_STORES_OPERATION_FETCH);
+
+  // Batch info
+  $info = array(
+    'title'        => t("Categories' ReSynchronization"),
+    'init_message' => t('Start processing')
+  );
+
+  // Submit batch - we use non-GUI mode
+  magento_batch_process($info, $batch, FALSE);
+
+  lock_release('magento_synchronize_categories');
+}
+
+/**
+ * Remove surplus products
+ */
+function magento_synchronize_remove_surplus_products($gui = FALSE) {
+  $include          = drupal_get_path('module', 'magento_stores') . '/includes/magento_stores.' . MAGENTO_STORES_PRODUCTS . '.inc';
+  $function_process = 'magento_stores_' . MAGENTO_STORES_PRODUCTS . '_' . MAGENTO_STORES_OPERATION_REMOVE_SURPLUS . '_batch_create';
+
+  // Get all the stores
+  $batch = array();
+  $stores = magento_synchronize_get_stores_for_synchronization(TRUE);
+  foreach ($stores as $store) {
+    // One batch operation for each store
+    $batch[] = array($include, $function_process, NULL, array(
+      'store'    => $store['title'],
+      'store_id' => $store['field_magento_id_value'])
+    );
+  }
+
+  // Batch info
+  $info = array(
+    'title'        => t('Removing surplus products'),
+    'init_message' => t('Start processing')
+  );
+
+  // Submit batch - we use non-GUI mode when running under Elysia Cron
+  magento_batch_process($info, $batch, $gui);
+}

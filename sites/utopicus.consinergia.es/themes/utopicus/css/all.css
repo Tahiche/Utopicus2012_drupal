@@ -1681,7 +1681,7 @@ button:hover{cursor:pointer;}
 #content{
 	float:left;
 	width:683px;
-	font-size:1.2em;
+	/*font-size:1.2em;*/
 	line-height:1.583em;
 	padding:3px 0 0;
 }
@@ -1868,7 +1868,7 @@ h2.content{
 .category-list{
 	padding:7px 0 0;
 	margin:0 0 17px;
-	font-size:1.2em;
+	/*font-size:1.2em;*/
 	line-height:1.167em;
 	border-bottom:1px solid #cfcfcf;
 }
@@ -1879,7 +1879,7 @@ h2.content{
 }
 /* news-list */
 .news-list{
-	font-size:1.3em;
+	/*font-size:1.3em;*/
 	line-height:1.462em;
 	font-style:italic;
 	border-bottom:1px solid #cfcfcf;

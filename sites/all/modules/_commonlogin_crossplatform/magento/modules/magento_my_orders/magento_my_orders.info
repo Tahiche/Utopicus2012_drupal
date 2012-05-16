@@ -1,0 +1,16 @@
+;$Id:$
+
+core = "6.x"
+name = "Magento My Orders"
+description = "Provide information about Customers's orders in Magento."
+package = "Magento Core"
+version = "6.x-2.0-dev"
+
+dependencies[] = "magento_api"
+dependencies[] = "magento_customers"
+; Information added by drupal.org packaging script on 2011-11-11
+version = "6.x-2.x-dev"
+core = "6.x"
+project = "magento"
+datestamp = "1321014079"
+

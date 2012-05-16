@@ -1,0 +1,1026 @@
+<?php
+// $Id$
+
+/**
+ * @file
+ * Magento API functions
+ */
+
+require_once 'magento_api.strings';
+
+module_load_include('inc', 'xmlrpc', 'includes/xml');
+
+/**
+ * Implementation of hook_menu().
+ */
+function magento_api_menu() {
+
+  $items['admin/settings/magento'] = array(
+    'title'            => 'Magento',
+    'description'      => 'Settings for Margento integration modules.',
+    'page callback'    => 'drupal_get_form',
+    'page arguments'   => array('magento_api_settings_form'),
+    'access arguments' => array('administer site configuration'),
+    'file'             => 'magento_api.settings.inc',
+    'type' => MENU_NORMAL_ITEM,
+  );
+
+  $items['admin/settings/magento/api'] = array(
+    'title' => 'API',
+    'description' => 'Configuration of login/password for Magento API client.',
+    'type' => MENU_DEFAULT_LOCAL_TASK,
+  );
+
+  return $items;
+}
+
+/**
+ * Perform test connection with Magento backend
+ *
+ * @param $params
+ *   Array with keys 'url', 'login', 'password'
+ */
+function magento_api_test_credentials($params) {
+  $result = array('status' => 'error');
+  $session = _magento_api_connect(
+    $params['url'],
+    $params['login'],
+    $params['password']
+  );
+  if (!empty($session)) {
+    $list = xmlrpc($params['url'], 'call', $session, 'country.list');
+
+    if ($list) {
+      // OK
+      $result = array('status' => 'ok');
+      //$result['message'] = (defined('MAGENTO_API_VERSION'))? array(MAGENTO_API_VERSION) : array('version: unknown');
+    }
+  }
+  else {
+    // FAIL
+  }
+
+  if ($res = _magento_api_xmlrpc_error())
+    $result['message'] = $res->message;
+
+  return $result;
+}
+
+/**
+ * Set Magento API login credentials
+ *
+ * @param $params
+ *   Array with necessary keys: 'url', 'login', 'password'
+ */
+function magento_api_set_credentials($params) {
+  $result = array('status' => 'ok');
+
+  // temporary disable connection to Magenta
+  _magento_api_allow_connection(FALSE);
+
+  // store all data
+  foreach ($params as $param => $value) {
+    if ($param != 'session') { /* WARNING: reserved word */
+      variable_set("magento_api_$param", $value);
+    }
+  }
+
+  // enable connection
+  _magento_api_allow_connection(TRUE);
+
+  return $result;
+}
+
+/************************************
+ * Private functions
+ * *********************************/
+
+/**
+ * Read Magento URL from the settings
+ *
+ * @return string URL
+ */
+function _magento_api_get_url() {
+  return variable_get('magento_api_url', '');
+}
+
+/**
+ * Reset stored session id
+ */
+function _magento_api_reset_session() {
+  $session = variable_get('magento_api_session', MAGENTO_API_ENABLED);
+  if (MAGENTO_API_ENABLED != $session && MAGENTO_API_DISABLED != $session) {
+    variable_set('magento_api_session', MAGENTO_API_ENABLED);
+  }
+}
+
+/**
+ * Get session id or create a new one (reconnect)
+ *
+ * @return string session id
+ */
+function _magento_api_get_session() {
+  // check for stored session id
+  $session = variable_get('magento_api_session', MAGENTO_API_ENABLED);
+  switch ($session) {
+    // try to reconnect
+    case MAGENTO_API_ENABLED:
+      $session = _magento_api_connect(
+        _magento_api_get_url(),
+        variable_get('magento_api_login',    ''),
+        variable_get('magento_api_password', '')
+      );
+      if (!empty($session)) {
+        variable_set('magento_api_session', $session);
+      }
+      break;
+
+    // connection is temporary disabled
+    case MAGENTO_API_DISABLED:
+
+    // we already have some stored session
+    default:
+  }
+  return $session;
+}
+
+/**
+ * Handles xmlrpc_error
+ *
+ * @return object xmlrpc_error
+ */
+function _magento_api_xmlrpc_error() {
+  if ($error = xmlrpc_error()) {
+    if ($error->code == -32700) { //occured xmlrpc_error(-32700, t('Parse error. Not well formed'));
+      //$error->message = t('Outgoing HTTP request failed because the socket could not be opened.');
+      $error->message = t('Magento API call failed.');
+    }
+    elseif ($error->code != MAGENTO_API_XMLRPC_SESSION_EXPIRED) {
+      if (variable_get('magento_api_log', 0))
+        watchdog('magento_api', $error->code , array($error->message), WATCHDOG_NOTICE, $link = NULL);
+    }
+  }
+  return $error;
+}
+
+/**
+ * Call XML-RPC API method of Magento
+ *
+ * @return
+ *   Result of request
+ */
+function _magento_api_call() {
+  $args = func_get_args();
+  $called_method = empty($args[0]) ? '' : $args[0];
+  // hook before
+  $invoke_args = @array_merge(array('magento_api', 'before api_call'), $args);
+  //call_user_func_array('magento_invoke', $invoke_args);
+  magento_invoke($invoke_args[0], $invoke_args[2], $invoke_args[3], $invoke_args[4], $invoke_args[5]);
+
+  //TODO: pay attention here
+  $result               = NULL;
+  $number_of_reconnects = 5;
+  do { // Autoreconnect on session expiration only once
+    //dd($called_method, '_magento_api_call');
+    $response = call_user_func_array('xmlrpc', array_merge(array(_magento_api_get_url(), 'call', _magento_api_get_session()), $args));
+
+    // Check for session expiration
+    $error = _magento_api_xmlrpc_error();
+    if ($error && MAGENTO_API_XMLRPC_SESSION_EXPIRED == $error->code) {
+      if (0 < $number_of_reconnects) {
+        _magento_api_reset_session();
+        continue;
+      }
+      else {
+        // no more reconnects
+        _magento_api_set_last_error(t('Error during connection'), 'error');
+      }
+    }
+
+    elseif ($error) {
+      _magento_api_set_last_error(t($error->message), 'error');
+      drupal_set_message(t('XMLRPC: call to Magento.`%method` produced "ERROR: (%error_msg)". See Recent Logs for details.', array('%method' => $called_method, '%error_msg' => $error->message)));
+      //LOG_ERROR
+      watchdog('magento_api', 'XMLRPC: call to Magento.`%method` with "PARAMS: (%params)" produced "ERROR: (%error_msg)"', array('%method' => $called_method, '%params' => print_r($args, TRUE), '%error_msg' => $error->message), WATCHDOG_ERROR);
+    }
+    break;
+  } while (TRUE);
+
+  $result = $response;
+
+  if ($log_level = variable_get('magento_api_log', 0)) {
+    $params = ($log_level == 9) ? print_r($args, TRUE) : '';
+    watchdog('magento_api', 'XMLRPC: call to Magento.`%method` "(%params)"', array('%method' => $called_method, '%params' => $params), WATCHDOG_NOTICE);
+  }
+
+  // hook after
+  magento_invoke('magento_api', 'after api_call', $result);
+  return $result;
+}
+
+/**
+ * Set last error
+ *
+ * @param string $error
+ * @param string $type
+ */
+function _magento_api_set_last_error($error, $type) {
+  $static_error = &_magento_api_get_last_error();
+  $static_error = $error;
+}
+
+/**
+ * Get last error
+ *
+ * @return string error text
+ */
+function &_magento_api_get_last_error() {
+  static $error;
+
+  return $error;
+}
+
+function _magento_api_allow_connection($allow = TRUE) {
+  switch ($allow) {
+    case FALSE:
+      // reset stored session ID and disable connections
+      variable_set('magento_api_session', MAGENTO_API_DISABLED);
+      break;
+    default:
+      variable_set('magento_api_session', MAGENTO_API_ENABLED);
+  }
+}
+
+/**
+ * Login to Magento
+ *
+ * @param $url
+ *   URL of Magento xml-rpc server
+ * @param $login
+ *   Login of Magento xml-rpc user
+ * @param $password
+ *   Password of Magento xml-rpc user
+ *
+ * @return
+ *   Magento session id
+ */
+function _magento_api_connect($url, $login, $password) {
+  // hook before
+  magento_invoke('magento_api', 'before connect', $url, $login, $password);
+
+  $session = xmlrpc($url, 'login', $login, $password);
+
+  // hook after
+  magento_invoke('magento_api', 'after connect', $session);
+  return $session;
+}
+
+/**
+ * Return predefined order states
+ * @return array
+ */
+function magento_api_get_order_states() {
+  static $states = array(
+    'new',
+      'pending_payment',
+      'processing',
+      'complete',
+      'closed',
+      'canceled',
+    'holded',
+  );
+
+  return $states;
+}
+
+/************************************
+ * General API, products, stores, attributes, etc
+ * *********************************/
+
+/**
+ * Returns simple statistics about Magento state
+ */
+function magento_api_get_statistics($keys) {
+  // hook before
+  magento_invoke('magento_api', 'before get_statistics', $keys);
+
+  if ($keys && !is_array($keys)) {
+    $keys = array($keys);
+  }
+  $statistics = _magento_api_call('integration.getStatistics', array($keys));
+  // hook after
+  magento_invoke('magento_api', 'after get_statistics', $statistics);
+  return $statistics;
+}
+
+/**
+ * Get attribute sets + corresponding attributes
+ */
+function magento_api_get_attribute_sets($ids = NULL, $fill = TRUE) {
+  // hook before
+  magento_invoke('magento_api', 'before get_attribute_sets', $ids, $fill);
+
+  // Use general functions
+  // 1. Get attribute sets
+  //$attribute_set_list = _magento_api_call('integration.getAttributeSets');
+
+  $attribute_set_list = _magento_api_call('product_attribute_set.list');
+
+  if (is_array($attribute_set_list)) {
+    foreach ($attribute_set_list as &$attribute_set) {
+      // apply responce patch to match required stucture
+      $attribute_set[MAGENTO_API_ATTRIBUTESET_ID] = $attribute_set['set_id'];
+      $attribute_set[MAGENTO_API_ATTRIBUTESET_NAME] = $attribute_set['name'];
+      // @deprecated, following `fill in attributes` isn't used any longer
+      //$attribute_set['attributes'] = magento_api_get_attribute_set_attributes($attribute_set[MAGENTO_API_ATTRIBUTESET_ID]);
+    }
+  }
+
+  // hook after
+  magento_invoke('magento_api', 'after get_attribute_sets', $attribute_set_list);
+  return $attribute_set_list;
+}
+
+/**
+ * Get list of attributes for a particular attribute set
+ *
+ * @param $attribute_set_id
+ *   Magento attribute set ID
+ *
+ * @return
+ *   Array of attributes
+ */
+function magento_api_get_attribute_set_attributes($attribute_set_id) {
+  // hook before
+  magento_invoke('magento_api', 'before get_attribute_set_attributes', $attribute_set_id);
+
+  $attributes = _magento_api_call('attributes_api.getAttributeSetAttributes', array($attribute_set_id));
+
+  // hook after
+  magento_invoke('magento_api', 'after get_attribute_set_attributes', $attributes);
+  return $attributes;
+}
+
+/**
+ * Get full list of Magento attributes
+ *
+ * @return
+ *   Array of Magento attributes
+ */
+function magento_api_get_attributes() {
+  // hook before
+  // magento_invoke('magento_api', 'before get_attributes', array());
+
+  $result = _magento_api_call('integration.getAttributes');
+
+  // hook after
+  magento_invoke('magento_api', 'after get_attributes', $result);
+  return $result;
+}
+
+/**
+ * Get a tree of Magento websites and stores
+ */
+function magento_api_get_store_tree() {
+  // hook before
+  // magento_invoke('magento_api', 'before get_store_tree');
+
+  $result = _magento_api_call('integration.getStoreTree');
+
+  // hook after
+  magento_invoke('magento_api', 'after get_store_tree', $result);
+  return $result;
+}
+
+/**
+ * Get attribute sets
+ *
+ * @return
+ *   Array of attribute sets
+ */
+function magento_api_get_product_types() {
+  // hook before
+  magento_invoke('magento_api', 'before get_product_types');
+
+  // Use general functions
+  $product_types = _magento_api_call('product_type.list');
+
+  // hook after
+  magento_invoke('magento_api', 'after get_product_types', $product_types);
+  return $product_types;
+}
+
+/**
+ * Get categories tree for single store
+ *
+ * @param $store_id
+ *   Magento store ID
+ *
+ * @return
+ *   Array of categories
+ */
+function magento_api_get_categories($store_id = NULL) {
+  // hook before
+  magento_invoke('magento_api', 'before get_categories', $store_id);
+
+  // Use integration functions
+  $categories = _magento_api_call('catalog_api.getCatalogTree', array($store_id));
+
+  // hook after
+  magento_invoke('magento_api', 'after get_categories', $categories);
+  return $categories;
+}
+
+/**
+ * Returns the list of product ids updated after the specified date and for the selected Store
+ *
+ * @param $store_id
+ *   Magento store ID
+ * @param $date
+ *   Date of last update
+ * @param $limit
+ *   The maximum number of products to return. Default == NULL - no limitations
+ * @param $offset
+ *   The first row to return
+ *
+ * @return
+ *   Array of product ids
+ */
+function magento_api_get_products_ids_to_update($store_id, $date, $limit = NULL, $offset = 0) {
+  // hook before
+  magento_invoke('magento_api', 'before get_products_ids_to_update', $store_id, $date);
+
+  $ids = _magento_api_call('integration.getProductsIdsToUpdate', array($store_id, $date, $limit, $offset));
+
+  // hook after
+  magento_invoke('magento_api', 'after get_products_ids_to_update', $ids);
+  return $ids;
+}
+/**
+ * Get count of products ids updated after the specified date and for the selected Store
+ *
+ * @param $store_id
+ *   Magento store ID
+ * @param $date
+ *   Date of last update
+ *
+ * @return
+ *   Array of product ids
+ */
+function magento_api_get_count_products_to_update($store_id, $date) {
+  // hook before
+  magento_invoke('magento_api', 'before get_products_ids_to_update', $store_id, $date);
+
+  $ids = _magento_api_call('integration.getCountProductsToUpdate', array($store_id, $date));
+
+  // hook after
+  magento_invoke('magento_api', 'after get_products_ids_to_update', $ids);
+  return $ids;
+}
+
+/**
+ * Get full product information for all product or products with specific ids.
+ *
+ * @param $store_id
+ *   Magento store ID
+ * @param $ids
+ *   Specific product ids
+ *
+ * @return
+ *   Array of products
+ */
+function magento_api_get_products($store_id = NULL, $ids = NULL) {
+  // hook before
+  magento_invoke('magento_api', 'before get_products', $store_id);
+
+  // Use general functions
+  $products = _magento_api_call('products_api.getProducts', array($store_id, $ids));
+
+  // hook after
+  magento_invoke('magento_api', 'after get_products', $products);
+  return $products;
+}
+
+/**
+ * Get information about single product
+ *
+ * @param $id
+ *   Product ID
+ *
+ * @return
+ *   Array with product information
+ */
+function magento_api_get_product_info($id) {
+  // hook before
+  magento_invoke('magento_api', 'before get_product_info', $id);
+
+  // Use general functions
+  $product = _magento_api_call('product.info', array($id));
+
+  // hook after
+  magento_invoke('magento_api', 'after get_product_info', $product);
+  return $product;
+}
+
+/************************************
+ * Orders and quote API
+ * *********************************/
+
+/**
+ * Updates existing qoute or Creates a new one
+ *
+ * @param string $store_id
+ *   Magento store ID
+ * @param array $quote_data
+ *   Magento quote
+ *
+ * @return
+ *   Array with updated quote
+ */
+function magento_api_update_quote($store_id, $quote_data) {
+  magento_invoke('magento_api', 'before update_quote', $store_id, $quote_data);
+
+  $params = array($store_id, $quote_data);
+  if (!empty($quote_data['id'])) {
+    $params[] = $quote_data['id'];
+  }
+
+  $result = _magento_api_call('quote_api.updateQuote', $params);
+
+  magento_invoke('magento_api', 'after update_quote', $result);
+  return $result;
+}
+
+/**
+ * Delete existing qoute
+ *
+ * @param string $store_id
+ *   Magento store id
+ * @param string $quote_id
+ *   Magento quote id
+ *
+ * @return Array
+ */
+function magento_api_delete_quote($store_id, $quote_id) {
+  magento_invoke('magento_api', 'before delete_quote', $store_id, $quote_id);
+
+  $result = _magento_api_call('quote_api.deleteQuote', array($store_id, $quote_id));
+
+  magento_invoke('magento_api', 'after delete_quote', $result);
+  return $result;
+}
+
+/**
+ * List Orders
+ *
+ * @param string $store_id
+ *   Magento store id
+ * @param array $filters
+ *   Filters used to reduce search results
+ *
+ * @return
+ *   Array of orders
+ */
+function magento_api_get_orders($store_id, $filters = NULL) {
+  magento_invoke('magento_api', 'before get_orders', $store_id, $filters);
+
+  $result = _magento_api_call('order_api.getOrders', array($store_id, $filters));
+
+  magento_invoke('magento_api', 'after get_orders', $result);
+  return $result;
+}
+
+/**
+ * Create Order
+ *
+ * @param string $store_id
+ *   Magento store id
+ * @param array $order_data
+ *   Magento order data
+ * @param string $quote_id
+ *   Existing quote ID
+ *
+ * @return Array
+ */
+function magento_api_create_order($store_id, $order_data, $quote_id = NULL) {
+  // hook before
+  magento_invoke('magento_api', 'before create_qoute', $store_id, $order_data, $quote_id);
+
+  $result = _magento_api_call('order_api.createOrder', array($store_id, $order_data, $quote_id));
+
+  // hook after
+  magento_invoke('magento_api', 'after create_order', $result);
+  return $result;
+}
+
+/**
+ * Update existing order's state
+ *
+ * @param string $store_id
+ *   Magento store id
+ * @param string $order_increment_id
+ *   Magento increment order id
+ * @param string $state
+ *   const STATE_NEW                  = 'new';
+ *   const STATE_PENDING_PAYMENT      = 'pending_payment';
+ *   const STATE_PROCESSING           = 'processing';
+ *   const STATE_COMPLETE             = 'complete';
+ *   const STATE_CLOSED               = 'closed';
+ *   const STATE_CANCELED             = 'canceled';
+ *   const STATE_HOLDED               = 'holded';
+ *
+ * @return array
+ */
+function magento_api_order_update_state($store_id, $order_increment_id, $state) {
+  magento_invoke('magento_api', 'before order_update_state', $store_id, $order_increment_id, $state);
+
+  $result = _magento_api_call('order_api.setOrderState', array($store_id, $order_increment_id, $state));
+
+  magento_invoke('magento_api', 'after order_update_state', $result);
+  return $result;
+}
+
+/**
+ * Update existing order's data
+ *
+ * @param string $store_id
+ *   Magento store id
+ * @param string $order_increment_id
+ *   Magento increment order id
+ * @param string $order_data
+ *   - allows to set orderData params like `status`, `pbx_return`
+ *
+ * @return array
+ */
+function magento_api_order_update($store_id, $order_increment_id, $order_data) {
+  magento_invoke('magento_api', 'before order_update', $store_id, $order_increment_id, $order_data);
+
+  $result = _magento_api_call('order_api.updateOrder', array($store_id, $order_increment_id, $order_data));
+
+  magento_invoke('magento_api', 'after order_update', $result);
+  return $result;
+}
+
+/**
+ * Validate coupon code(discount code) magento API call
+ *
+ * @param string $store_id
+ *   Magento store id
+ * @param array $quote_data
+ *   Quote data
+ *
+ * @return array
+ */
+function magento_api_validate_coupon($store_id, $quote_data) {
+  magento_invoke('magento_api', 'before validate_coupon', $store_id, $quote_data);
+
+  $result = _magento_api_call('quote_api.checkCouponCode', array($store_id, $quote_data));
+
+  magento_invoke('magento_api', 'after validate_coupon', $result);
+  return $result;
+}
+
+/************************************
+ * Customers API
+ * *********************************/
+
+/**
+ * Retrieve customer data by email
+ *
+ * @param string $mail
+ * @param string $website
+ *   Magento website
+ *
+ * @return
+ *   Array with customer data
+ */
+function magento_api_customer_get_customer_id_by_email($mail, $website) {
+  magento_invoke('magento_api', 'before get_customer_id_by_email', $mail, $website);
+
+  $result = _magento_api_call('customer.list', array(array('email' => $mail, 'website_id' => $website), 'email'));
+
+  magento_invoke('magento_api', 'after get_customer_id_by_email', $result);
+  return $result;
+}
+
+/**
+ * Retrieve customer address list
+ *
+ * @param string $customer_id
+ *   Magento customer id
+ *
+ * @return
+ *   Array of addresses
+ */
+function magento_api_customer_get_customer_address_list($customer_id) {
+  magento_invoke('magento_api', 'before get_customer_id_by_email', $customer_id);
+
+  $result = _magento_api_call('customer_address.list', array($customer_id));
+
+  magento_invoke('magento_api', 'after get_customer_id_by_email', $result);
+  return $result;
+}
+
+/**
+ * Retrieve customer groups list
+ *
+ * @return Array
+ */
+function magento_api_customer_group_list() {
+  magento_invoke('magento_api', 'before customer_group_list');
+
+  $result = _magento_api_call('customer_group.list');
+
+  magento_invoke('magento_api', 'after customer_group_list', $result);
+  return $result;
+}
+
+/**
+ * Create new customer
+ *
+ * @param array $customer_data
+ *   Magento customer data
+ *
+ * @return int
+ *   Result status
+ */
+function magento_api_customer_create($customer_data) {
+  magento_invoke('magento_api', 'before customer_create');
+
+  $result = _magento_api_call('customer.create', array($customer_data));
+
+  magento_invoke('magento_api', 'after customer_create', $result);
+  return $result;
+}
+
+/**
+ * Update customer data
+ *
+ * @param int $customer_id
+ *   Magento customer id
+ * @param array $customer_data
+ *   Customer data
+ *
+ * @return boolean
+ *   Update status
+ */
+function magento_api_customer_update($customer_id, $customer_data) {
+  magento_invoke('magento_api', 'before customer_update');
+
+  $result = _magento_api_call('customer.update', array($customer_id, $customer_data));
+
+  magento_invoke('magento_api', 'after customer_update', $result);
+  return $result;
+}
+
+/**
+ * Delete customer
+ *
+ * @param int $customer_id
+ *   Magento customer id
+ *
+ * @return boolean
+ *   Delete status
+ */
+function magento_api_customer_delete($customer_id) {
+  magento_invoke('magento_api', 'before customer_delete');
+
+  $result = _magento_api_call('customer.delete', array($customer_id));
+
+  magento_invoke('magento_api', 'after customer_delete', $result);
+  return $result;
+}
+
+/**
+ * Retrieve customers paged list
+ *
+ * @param array $filters
+ *   Filters to reduce list of customers
+ * @param int $page
+ *   Page number to start from
+ * @param int $page_size
+ *   Size of elements per page
+ *
+ * @return
+ *   Array of customers
+ *
+ * TODO: describe format of filters
+ */
+function magento_api_customer_get_customer_list($filters, $page = 0, $page_size = 0) {
+  magento_invoke('magento_api', 'before get_customer_list', $filters, $page, $page_size);
+
+  $result = _magento_api_call('customers_api.getCustomers', array($filters, $page, $page_size));
+
+  magento_invoke('magento_api', 'after get_customer_list', $result);
+  return $result;
+}
+
+/**
+ * Retrieve customers count
+ *
+ * @param array $filters
+ *   Filters to reduce number of customers
+ *
+ * @return int
+ *   Number of customers
+ */
+function magento_api_customer_get_customer_count($filters) {
+  magento_invoke('magento_api', 'before get_customer_count', $filters);
+
+  $result = _magento_api_call('customers_api.getCustomersCount', array($filters));
+
+  magento_invoke('magento_api', 'after get_customer_count', $result);
+  return $result;
+}
+
+/**
+ * Send customers to Magento for synchronization
+ *
+ * @param array $customers
+ *   Customers to synchronize
+ *
+ * @return
+ *   TRUE in case of success or otherwise array of errors
+ */
+function magento_api_customer_send_customer($customers) {
+  magento_invoke('magento_api', 'before magento_api_customer_send_customer', $customers);
+
+  $msg = "[%date] - Send customer to Magento request:\n%request\n";
+  //watchdog('magento_api', $msg, array('%date' => date(DATE_ATOM), '%request' => var_export($customers, TRUE)), WATCHDOG_NOTICE);
+
+  $result = _magento_api_call('integration.syncCustomers', array($customers));
+
+  $msg = "[%date] - Send customer to Magento response:\n%response\n";
+  //watchdog('magento_api', $msg, array('%date' => date(DATE_ATOM), '%response' => var_export($result, TRUE)), WATCHDOG_NOTICE);
+
+  magento_invoke('magento_api', 'after magento_api_customer_send_customer', $result);
+  return $result;
+}
+
+/************************************
+ * Other stuff
+ * *********************************/
+
+/**
+ * Retrieve Magento configuration information
+ *
+ * @param string $path
+ *   Magento config path
+ * @param string $store
+ * @param int $ttl
+ *   positive = cache ttl, 0 use static cache only, -1 (any negative) ignore all cache.
+ *
+ * @return string
+ */
+function magento_api_get_config_info($path, $store = NULL, $ttl = 0) {
+    static $config = array(), $metaconf;
+
+    // Hook before.
+    magento_invoke('magento_api', 'before get_config_info', $path, $store);
+
+    // Caching routine.
+    $ckey = implode(':', array('magento_api', 'config', $path, serialize($store)));
+    $result = NULL;
+
+    // If we are allowed to use cache.
+    if ($ttl >= 0) {
+
+      // Check if we can use static cache.
+      $result = isset($config[$ckey]) ? $config[$ckey] : NULL;
+
+      // If static fail and we allowed to use expencive cache.
+      if ( ($result === NULL) && ($ttl > 0) ) {
+        // Attempting to get cache.
+        if (($cache = cache_get($ckey)) && !empty($cache->data) && (time() < $cache->expire)) {
+          $result = $cache->data;
+        }
+      }
+    }
+
+    // If we get here with no result - call retrieval code.
+    if ($result === NULL) {
+      $metaconf = isset($metaconf)
+        ? $metaconf
+        : module_invoke_all('magento_api_get_config_meta');
+      if (!empty($metaconf[$path]) && function_exists($metaconf[$path])) {
+        $function = $metaconf[$path];
+        $result = $function($store);
+      }
+      else {
+        $result = _magento_api_call('config.getConfigInfo', array($path, $store));
+      }
+    }
+
+    // Update cache.
+    if ($result !== NULL) {
+      $config[$ckey] = $result;
+      if ($ttl > 0) {
+        cache_set($ckey, $result, 'cache', time() + $ttl);
+      }
+    }
+
+    // Hook after.
+    magento_invoke('magento_api', 'after get_config_info', $result);
+    return $result;
+}
+
+/**
+ * Get full Country List with all Regions
+ */
+function magento_api_get_country_list() {
+  // hook before
+  magento_invoke('magento_api', 'before getCountriesAndRegions');
+
+  // Use general functions
+  $result = _magento_api_call('config.getCountriesAndRegions', array());
+
+  // hook after
+  magento_invoke('magento_api', 'after getCountriesAndRegions', $result);
+  return $result;
+}
+
+/**
+ * Get Customer Address info by AddressID
+ * Retrieve customer address data
+ * @param $address_id
+ *   Customer address ID
+ *
+ * @return: array
+ *   Address info
+ */
+function magento_api_customer_get_address_info($address_id) {
+  // hook before
+  magento_invoke('magento_api', 'before getAddressInfo');
+
+  // Use general functions
+  $result = _magento_api_call('customer_address.info', array($address_id));
+
+  // hook after
+  magento_invoke('magento_api', 'after getAddressInfo', $result);
+  return $result;
+}
+
+/**
+ * Retrieve Shipment Information
+ * @param $shipping_id
+ *   Magento shipping increment_id number
+ *
+ * @return: array
+ *   Shippment info
+ */
+function magento_api_order_get_shipment_info($shipping_id) {
+  // hook before
+  magento_invoke('magento_api', 'before getShipmentInfo');
+
+  // Use general functions
+  $result = _magento_api_call('sales_order_shipment.info', array($shipping_id));
+
+  // hook after
+  magento_invoke('magento_api', 'after getShipmentInfo', $result);
+  return $result;
+}
+
+/**
+ * Retrieve Shipment List by order_id
+ * @param $order_id
+ *   Magento order_id number ( order_id but not order increment_id)
+ *
+ * @return: array
+ *   Shippment List
+ */
+function magento_api_order_get_shipment_list($order_id) {
+  // hook before
+  magento_invoke('magento_api', 'before getShipmentList');
+
+  // Use general functions
+  $result = _magento_api_call('sales_order_shipment.list', array(array('order_id' => $order_id)));
+
+  // hook after
+  magento_invoke('magento_api', 'after getShipmentList', $result);
+  return $result;
+}
+
+
+/**
+ * Add comment to the order specified by $order_id
+ * Wrapper over Magento Core `sales_order.addComment`
+ *
+ * @param $order_id - string Magento Order Increment id
+ * @param $status - string Order status // Important Note! Changing Order STATUS via this function is blocked.
+ * @param comment - string order comment (optional)
+ * @param $notify - boolean notification flag (optional)
+ *
+ * @return: boolean
+ */
+function _magento_api_order_add_comment($order_id, $status, $comment = NULL, $notify = FALSE) {
+  // hook before
+  magento_invoke('magento_api', 'before sales_order.addComment');
+
+  // Use general functions
+  $status = FALSE; // PreSAVE old status when adding a comment.
+  $result = _magento_api_call('sales_order.addComment', array($order_id, $status, $comment, $notify));
+
+  // hook after
+  magento_invoke('magento_api', 'after sales_order.addComment', $result);
+  return $result;
+}

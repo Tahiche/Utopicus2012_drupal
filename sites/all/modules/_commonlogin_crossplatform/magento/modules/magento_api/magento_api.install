@@ -1,0 +1,25 @@
+<?php
+// $Id$
+
+/**
+ * @file
+ * Install and related hooks for Magento API module
+ */
+
+/**
+ * Implementation of hook_install().
+ */
+function magento_api_install() {
+  // Check for Magento module presense and if it exists - export connection settings
+  if (module_exists('magento')) {
+    require_once('magento_api.module');
+
+    $credentials = array(
+      'url'      => variable_get('magento_host_url', ''),
+      'login'    => variable_get('magento_user',     ''),
+      'password' => variable_get('magento_key',      '')
+    );
+
+    magento_api_set_credentials($credentials);
+  }
+}

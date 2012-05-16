@@ -1,0 +1,23 @@
+<?php
+define('MAGENTO_API_DISABLED',               -1);
+define('MAGENTO_API_ENABLED',                '');
+define('MAGENTO_API_XMLRPC_SESSION_EXPIRED',  5);
+define('MAGENTO_API_VERSION',  '2.0-dev');
+
+define('MAGENTO_API_ATTRIBUTE_SETS', 'attribute_sets');
+define('MAGENTO_API_ATTRIBUTES',     'attributes');
+define('MAGENTO_API_GROUPS',         'groups');
+define('MAGENTO_API_PRODUCT_TYPES',  'product_types');
+define('MAGENTO_API_STORES',         'stores');
+define('MAGENTO_API_WEBSITES',       'websites');
+
+// constants to describe OBJECTS
+define('MAGENTO_API_ATTRIBUTE_SCOPE',      'scope');
+define('MAGENTO_API_ATTRIBUTESET_ID',      'attribute_set_id');
+define('MAGENTO_API_ATTRIBUTESET_NAME',    'attribute_set_name');
+define('MAGENTO_API_IMAGES',               'images');
+define('MAGENTO_API_MEDIA_GALLERY',        'media_gallery');
+
+define('MAGENTO_API_MEDIA_GALLERY_IMAGES', MAGENTO_API_MEDIA_GALLERY .'_'. MAGENTO_API_IMAGES);
+
+define('MAGENTO_T_TEST_CONNECTION',   t('Test connection'));

@@ -1,0 +1,263 @@
+<?php
+// $Id$
+
+/**
+ * @file
+ * Integration with Magento Inventory
+ */
+
+/**
+ * Implementation of hook_magento_stores().
+ */
+function magento_stock_magento_stores($event, $break = FALSE, &$arg1 = NULL, &$arg2 = NULL, &$arg3 = NULL, &$arg4 = NULL, &$arg5 = NULL, &$arg6 = NULL, &$arg7 = NULL) {
+  if ('before product_update' == $event) {
+    _magento_stock_product_update($arg1);
+  }
+}
+
+/**
+ * Implementation hook_magento_cart().
+ * Manage cart states.
+ */
+function magento_stock_magento_cart($event, $break = FALSE, &$arg1 = NULL, &$arg2 = NULL, &$arg3 = NULL, &$arg4 = NULL, &$arg5 = NULL, &$arg6 = NULL, &$arg7 = NULL) {
+  switch ($event) {
+    case 'before update_state': //before validate_state ? before update_state
+      /* Cart state machine */
+      $cart = magento_cart_get();
+      switch ($arg1) {
+
+        case 'view':
+          _magento_stock_update_stock_for_in_cart_products($cart);
+          return;
+
+        case 'payment-succeeded':
+          /* payment_succeeded/%quote_id */
+          $quote_id = intval(arg(2));
+          if ($quote_id>0) {
+            $payed_cart = _magento_cart_payment_quote($quote_id);
+            _magento_stock_update_stock_for_in_cart_products($payed_cart);
+          }
+          return;
+      }
+      break;
+  }
+}
+
+/**
+ * Helper function for hook magento_stores
+ *
+ * @param $product
+ *   An assosiative array containg Product data that was received from Magento API `integration.getProducts`
+ *   - product_id: Integer, represents Magento's product_id
+ *   - stock: An assosiative array with stock info
+ *
+ * @see hook_magento_stores()
+ *
+ */
+function _magento_stock_product_update($product) {
+  if (empty($product['stock']) || empty($product['product_id'])) {
+    return;
+  }
+
+  magento_stock_set_stock_by_product_id($product['product_id'], $product['stock']);
+}
+
+/**
+ * Get current product stock by magento product_id
+ * (stock_getter)
+ *
+ * @param $product_id
+ *   Integer Magento's product_id.
+ *
+ * @return
+ *   An assosiative array with Stock info
+ *   if there is Stock info stored locally in Drupal or empty Array otherwise.
+ *   - item_id
+ *   - product_id
+ *   - stock_id
+ *   - qty
+ *   - min_qty
+ *   - use_config_min_qty
+ *   - is_qty_decimal
+ *   - backorders
+ *   - use_config_backorders
+ *   - min_sale_qty
+ *   - use_config_min_sale_qt
+ *   - max_sale_qty
+ *   - use_config_max_sale_qty
+ *   - is_in_stock
+ *   - low_stock_date
+ *   - notify_stock_qty
+ *   - use_config_notify_stock_qty
+ *   - manage_stock
+ *   - use_config_manage_stock
+ *   - stock_status_changed_automatically
+ */
+function magento_stock_get_stock_by_product_id($product_id) {
+  if (empty($product_id)) {
+    return array();
+  }
+
+  $stock = db_fetch_array(db_query("SELECT * FROM {magento_stock} WHERE product_id = %d", array($product_id)));
+
+  return $stock;
+}
+
+/**
+ * Set current product stock by magento product_id.
+ * (stock_setter)
+ *
+ * @param $product_id
+ *   Integer Magento's product_id.
+ * @param $stock
+ *   An assosiative array with Stock info to save locally in Drupal
+ *   available keys for stock info (if some keys aren't set then they won't be changed or will be filled with default values):
+ *   - item_id
+ *   - product_id
+ *   - stock_id
+ *   - qty
+ *   - min_qty
+ *   - use_config_min_qty
+ *   - is_qty_decimal
+ *   - backorders
+ *   - use_config_backorders
+ *   - min_sale_qty
+ *   - use_config_min_sale_qty
+ *   - max_sale_qty
+ *   - use_config_max_sale_qty
+ *   - is_in_stock
+ *   - low_stock_date
+ *   - notify_stock_qty
+ *   - use_config_notify_stock_qty
+ *   - manage_stock
+ *   - use_config_manage_stock
+ *   - stock_status_changed_automatically
+ */
+function magento_stock_set_stock_by_product_id($product_id, $stock) {
+  $old_stock = magento_stock_get_stock_by_product_id($product_id);
+
+  if (isset($old_stock['item_id'])) {
+    //updating stock if stock data changed
+    foreach ($stock as $key => $value) {
+      if (isset($old_stock[$key]) && $old_stock[$key] != $value) {
+        $update = array('item_id');
+        $stock['item_id'] = $old_stock['item_id'];
+
+        drupal_write_record('magento_stock', $stock, $update);
+        return;
+      }
+    }
+  }
+  else {
+    //insert stock
+    // prepare data - remove magento's index field(item_id)
+    unset($stock['item_id']);
+
+    drupal_write_record('magento_stock', $stock);
+  }
+}
+
+/**
+ * Adds stock information to magento_product node.
+ * - Helper to check local (saved in Drupal) stock information
+ *
+ * @param &$product_node
+ *   Drupal node object. The node will be changed and stock information will be set in its `stock` property.
+ *   Example usage, to call this function in hook_nodeapi() to add stock information to nodes on `load` event.
+ */
+function magento_stock_add_stock_to_product(&$product_node) {
+  $product_id = isset($product_node->field_magento_id[0]['value']) ? $product_node->field_magento_id[0]['value'] : NULL;
+  $product_node->stock = magento_stock_get_stock_by_product_id($product_id);
+}
+
+/**
+ * API to get remote Magento stock information for the product(s)
+ * - use `cataloginventory_stock_item.list`(alias `product_stock.list` ) Magento API method
+ *
+ * @param $products_ids
+ *   Array of magento product_ids or single integer with product_id.
+ *
+ * @return
+ *   Array of arrays with stock info for each input $product_ids
+ *   - array with stock info contains:
+ *     - product_id: Magento product id (product_id)
+ *     - sku: Magento product SKU
+ *     - qty: Quantity in Magento Stock
+ *     - is_in_stock: Flag whether product is InStock or is OutOfStock
+ */
+function magento_stock_api_get_remote_stock($product_ids) {
+  if (empty($product_ids)) {
+    return;
+  }
+
+  if (!is_array($product_ids)) {
+    $product_ids = array($product_ids);
+  }
+
+  // hook before
+  magento_invoke('magento_api', 'before get_stock', $product_ids);
+
+  //dd($product_ids, 'magento_stock_api_get_remote_stock product_ids');
+  // Get Product stock info
+  $stock_info = _magento_api_call('product_stock.list', array($product_ids));
+  //dd($stock_info, 'magento_stock_api_get_remote_stock RESULT');
+
+  // hook after
+  magento_invoke('magento_api', 'after get_products', $stock_info);
+
+  return $stock_info;
+}
+
+/**
+ * Update local (saved in Drupal) stock information for specified products
+ * from remote Magento stock. Literally means two actions:
+ * first, get remote Magento stock information for the products
+ * then, save the stock information in Drupal's DB
+ *
+ * @param $products_ids
+ *   Array of magento product_ids
+ */
+function magento_stock_update_stock($product_ids) {
+  //_magento_cart_validate_item($node_id);
+  //$product_item = _magento_cart_validate_item($node_id);
+  //$product_id = $product_item['field_magento_id_value'];
+
+  $stock_info = magento_stock_api_get_remote_stock($product_ids);
+
+  if (empty($stock_info)) {
+    return;
+  }
+
+  foreach ($stock_info as $stock) {
+    if (empty($stock['product_id'])) {
+      continue;
+    }
+    magento_stock_set_stock_by_product_id($stock['product_id'], $stock);
+  }
+}
+
+/**
+ * Updates local stock information for all products in cart
+ *
+ * @param $cart
+ *   Assosiative array of Magento cart data.
+ *   Only following data keys are used:
+ *   - quote: Quote data array returned from Magento
+ *     - products: Array of products in cart.
+ *
+ * @see magento_stock_magento_cart()
+ * @see magento_get_cart()
+ */
+function _magento_stock_update_stock_for_in_cart_products($cart) {
+  if (empty($cart['quote']['products'])) {
+    return;
+  }
+  // get all product_ids in cart
+  $product_ids = array();
+  foreach ($cart['quote']['products'] as $product_id => $product) {
+    $product_ids[] = $product_id;
+  }
+
+  //upate stock information
+  magento_stock_update_stock($product_ids);
+}
