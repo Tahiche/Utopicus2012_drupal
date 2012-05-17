@@ -2,17 +2,16 @@
 /* CSS Document */
 
 ul.load-more-pager li.pager-next{
-/*text-indent: -100em;*/
-background: none repeat scroll 0 0 #444444;
+    background: none repeat scroll 0 0 #444444;
     border-radius: 16px 16px 16px 16px;
-    /*bottom: 0;*/
+    display: block;
     height: 33px;
     left: 50%;
     margin: 0 0 0 -20px;
     overflow: hidden;
-    position: absolute;
+    padding: 0;
+    position: relative;
     width: 33px;
-	 padding: 0;
 	-webkit-transition:all 500ms ease-in-out;
 	-moz-transition:all 500ms ease-in-out;
 	-o-transition:all 500ms ease-in-out;
@@ -60,4 +59,65 @@ ul.load-more-pager li.pager-next a.views-throbbing{
 	float: left;
     padding: 0 13px 0 0;
 	text-transform:capitalize;	
+	}
+p a{
+	text-decoration:underline;
+	}
+.terms-inline ul li a{
+	text-decoration:none;
+	}
+	
+#content  h2.subtitulo, h2.subtitulo {
+    font: 700 1.333em/1.438em 'Asap',Arial,Helvetica,sans-serif;
+    margin: 0 0 8px;
+    text-transform: none;
+	font-style:italic;
+	
+}
+#tocplayer{
+	margin: 20px 0}
+	
+	div.meta{
+		border-bottom:1px solid #999;
+		border-top:1px solid #999;
+		display: inline-block;
+		margin: 20px 0}
+		}
+		
+		
+
+	
+ 		
+.imagegrid {
+    display: block;
+    margin: 0 0 12px;
+    position: relative;
+	width:223px;
+	height:223px;
+	} 
+ 
+.grayoverImage .grey-image{
+	position:absolute;
+	top:0;
+	left:0;
+	-webkit-transition:all 500ms ease-in-out;
+	-moz-transition:all 500ms ease-in-out;
+	-o-transition:all 500ms ease-in-out;
+	transition:all 500ms ease-in-out;
+}
+.gray_link:hover{ 
+	box-shadow: 0 0 5px #bcbcbc;
+	-webkit-box-shadow: 0 0 5px #bcbcbc;
+	-moz-box-shadow: 0 0 5px #bcbcbc;
+}
+.gray_link:hover .grayoverImage .grey-image{opacity:0;}
+
+.grid-list li {
+    display: inline-block !important;
+    width: 223px;
+}
+
+.gray_link .title{
+	background:none;
+	padding:0;
 	}

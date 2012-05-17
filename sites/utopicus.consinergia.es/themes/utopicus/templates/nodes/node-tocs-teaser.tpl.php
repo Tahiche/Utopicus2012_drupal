@@ -70,25 +70,33 @@
  * @see zen_preprocess_node()
  * @see zen_process()
  */
-
+// miKrumo($node);
+//if($node->nid==247) miKrumo($node);
 ?>
     
     
 <a href="<?php  print url( 'node/' . $node->nid);?>" class="gray_link">
-<span class="image">
-
+<span class="image imagegrid">
 <?php 
+$imgpath=$node->field_video_embed[0]['data']['emthumb']['filepath'];
 //krumo(imagecache_presets());
-$imgpath=$node->field_top_image[0]['filepath'];
+$elemento=array(
+'fid'=>$node->field_video_embed[0]['data']['emthumb']['uid'],
+'nid'=>$node->nid,
+'filepath'=>$node->field_video_embed[0]['data']['emthumb']['filepath'],
+'data'=>array('alt'=>$node->title,'title'=>$node->title)
+);
+
 $opciones=array("nolink"=>TRUE);
-print theme('imageformatters_grayover',$node->field_top_image[0],"Imagen-223x223-grid" , $opciones );
+print theme('imageformatters_grayover',$elemento,"Imagen-223x223-grid" , $opciones );
 ?>
 
 </span>
+
 <strong class="title"><?php print $node->title;  ?></strong>
-<span class="text-box"><?php print trim_text($node->teaser,200);  ?></span>
+<span class="text-box"><?php print $node->field_subtitulo[0]['value'];  ?></span>
 
 
 </a>
 
-<?php //krumo($node); ?>
+

@@ -1,0 +1,11 @@
+; $Id: publishcontent.info,v 1.2.4.3 2010/07/01 19:52:14 ambiguator Exp $
+name = Promoted in Views
+description = "Adds a 'Promoted' or 'Unpromoted' link on the node edit/view pages,<br />and a field 'Promoted Link' if the Views module is enabled. Viene de Publishcontent Module"
+core = 6.x
+; Information added by drupal.org packaging script on 2010-07-02
+version = "6.x-1.4"
+core = "6.x"
+project = "promotecontent"
+datestamp = "1278081907"
+package=" Fixes"
+

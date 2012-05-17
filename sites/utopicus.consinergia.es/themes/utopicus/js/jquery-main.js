@@ -1,10 +1,27 @@
+
+	Drupal.behaviors.my_ajaxrefresh = function (context) { 
+   //alert("my_ajaxrefresh");
+   jcf.customForms.replaceAll();
+   };
+   
 // page init
 jQuery(function(){
+	
+
+   
 	initTabs();
 	initLightbox();
 	initLayoutFix();
 	initInputs();
 	initSameHeight();
+	
+	
+	/**
+   * Attaches the AJAX behavior to Views Load More waypoint support.
+   */
+
+	
+	
 });
 
 // clear inputs on focus
@@ -767,6 +784,7 @@ jcf = {
 			}
 		},
 		replaceAll: function() {
+			// alert("replaceAll");
 			for(var k in jcf.modules) {
 				var els = jcf.lib.queryBySelector(jcf.modules[k].prototype.selector);
 				for(var i = 0; i<els.length; i++) {
@@ -1621,7 +1639,7 @@ jcf.addModule({
 // custom select module
 jcf.addModule({
 	name:'select',
-	selector:'select.niceselector',
+	selector:'select.niceselector, select#edit-tid',
 	defaultOptions: {
 		handleDropPosition: false,
 		wrapperClass:'select-area',
@@ -1979,4 +1997,4 @@ jcf.addModule({
 // replace custom forms
 jcf.lib.domReady(function(){
 	jcf.customForms.replaceAll();
-});
+}); 

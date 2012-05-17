@@ -32,7 +32,7 @@ function imageformatters_field_formatter_info() {
 	   foreach (imagecache_presets() as $preset) {
 		 $formatters[$preset['presetname'] .'_grayover'] = array(
 		   'label' => t('@preset image with grayscale over', array('@preset' => $preset['presetname'])),
-		   'field types' => array('image', 'filefield'),
+		   'field types' => array('image', 'filefield','emfield','emvideo'),
 		 );
 	   }
  }
@@ -56,7 +56,10 @@ if (module_exists('imagecache')) {
    }  }
    
     
-
+ $theme['imageformatters_grayover'] = array(
+       'arguments' => array('element' => NULL,'preset'=>NULL,'options'=>NULL),
+       'function' => 'theme_imageformatters_grayoverpic',
+     );
   // $theme['imageformatters_formatter_popup'] = array('arguments' => array('element' => NULL));
 
   return $theme;
@@ -121,6 +124,70 @@ $imageGray = theme('imagecache', "grayscale", $colorpath , $item['data']['alt'],
 	
 								
     return l("<div class='image'>".$imageColor.$imageGray."</div>", $path, array('attributes' => array('class' => $class), 'html' => TRUE));	
+}
+
+
+
+
+
+
+function theme_imageformatters_grayoverpic($element=NULL,$preset=NULL,$options=NULL) {
+
+//krumo($element);
+
+
+// Inside a view $element may contain NULL data. In that case, just return.
+    if (empty($element['fid'])) {
+      return '';
+    }
+
+  // Extract the preset name from the formatter name.
+   $presetname = $preset;
+    $style = 'linked';
+
+    $item = $element;
+	
+    $item['data']['alt'] = isset($item['data']['alt']) ? $item['data']['alt'] : '';
+    $item['data']['title'] = isset($item['data']['title']) ? $item['data']['title'] : NULL;
+
+	
+   $img_c = array(
+    'src' => imagecache_create_url($presetname, $item['filepath']), 
+    'alt' => $item['data']['alt'], 
+    'title' => $item['data']['title'],
+  );
+  $colorpath=imagecache_create_path($presetname, $item['filepath']);
+  if ($imageInfo = image_get_info($colorpath)) {
+  $img_c += array(
+      'width' => $imageInfo['width'],
+      'height' => $imageInfo['height'],
+    );
+  };
+  // krumo($img_c);
+ 
+  $attributes_c = array(
+    'class' => "image_color", 
+    );
+  
+   $imageColor='<img' . drupal_attributes($img_c + $attributes_c) . '/>';
+  
+   //$imagetag = theme('imagecache', $presetname, $item['filepath'], $item['data']['alt'], $item['data']['title']);
+	//krumo($item);
+	/*krumo($colorpath);
+	krumo($item);*/
+	// devuelvo la grayscale
+	
+$imageGray = theme('imagecache', "grayscale", $colorpath , $item['data']['alt'], $item['data']['title'],$attributes=array('class'=>"grey-image") );
+
+
+    $path = empty($item['nid']) ? '' : "node/".$item['nid'];
+    
+	 $class = "imagecache imagecache-$presetname imagecache-$style imagecache-{$element['#formatter']}";
+	
+	
+	if($options['nolink']) return "<div class='image grayoverImage'>".$imageColor.$imageGray."</div>";
+					
+    return l("<div class='image grayoverImage'>".$imageColor.$imageGray."</div>", $path, array('attributes' => array('class' => $class), 'html' => TRUE));	
 }
 
 

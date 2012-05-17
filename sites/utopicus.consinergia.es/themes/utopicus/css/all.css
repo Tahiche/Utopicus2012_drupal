@@ -2311,3 +2311,108 @@ html.js input.form-autocomplete {
 html.js input.throbbing {
   background-position: 100% -12px; /* LTR */
 }
+
+/******************************************************* GRID *****************************************/
+
+/* grid-list */
+.grid-list{
+	overflow:hidden;
+	width:940px;
+	padding:0 0 11px 2px;
+}
+.grid-list li{
+	display:inline-block;
+	vertical-align:top;
+	margin:0 8px 16px 0;
+	 width: 233px;
+}
+*+html .grid-list li{
+	display:inline;
+	margin-right:11px;
+}
+.grid-list a{
+	float:left;
+	width:223px;
+	overflow:hidden;
+}
+.grid-list a:hover{text-decoration:none;}
+.grid-list img{vertical-align:top;}
+.grid-list .image{
+	display:block;
+	width:100%;
+	height:223px;
+	margin:0 0 12px;
+	position:relative;
+	background-color:#EFEFEF;
+}
+.grid-list .info{
+	position:absolute;
+	top:0;
+	left:0;
+	width:100%;
+	height:100%;
+	background:#dcf8ff url(../images/shadow-cowokers.png) repeat-x 0 100%;
+	display:none;
+}
+.grid-list a:hover .info{display:block;}
+.grid-list .note{
+	position:absolute;
+	top:11px;
+	left:5px;
+	width:214px;
+	font-size:11px;
+	line-height:14px;
+	text-transform:uppercase;
+	overflow:hidden;
+	white-space:nowrap;
+	text-overflow:ellipsis;
+}
+.grid-list .text{
+	position:absolute;
+	left:6px;
+	bottom:11px;
+	width:206px;
+	font-size:12px;
+	line-height:22px;
+	overflow:hidden;
+	max-height:154px;
+}
+.grid-list .title{
+	display:block;
+	width:100%;
+	padding:0 0 13px;
+	text-transform:uppercase;
+	font:700 1.1em/1.273em 'Asap', Arial, Helvetica, sans-serif;
+	background:url(../images/divider-grey.gif) repeat-x 0 100%;
+}
+.grid-list .text-box{
+	padding:6px 0 4px;
+	display:block;
+	/*font-size:1.2em;
+	line-height:1.583em;*/
+}
+.grid-list .style-1 .info{background-color:#dbf7ff;}
+.grid-list .style-2 .info{background-color:#ffe1da;}
+.grid-list .style-3 .info{background-color:#e0fbed;}
+.grid-list .style-4 .info{background-color:#d5dbff;}
+.grid-list .style-5 .info{background-color:#fffedc;}
+.grid-list .style-6 .info{background-color:#ffcbd3;}
+.grid-list .style-7 .info{background-color:#bbf5e8;}
+.grid-list .style-8 .info{background-color:#afebff;}
+.grid-list .style-9 .info{background-color:#ffe2db;}
+.grid-list .style-10 .info{background-color:#d5dbff;}
+.grid-list .style-11 .info{background-color:#dcf8ff;}
+.grid-list .style-12 .info{background-color:#fffedc;}
+.grid-list .style-13 .info{background-color:#afebff;}
+.grid-list .style-14 .info{background-color:#ffe1da;}
+.grid-list .style-15 .info{background-color:#ffcbd4;}
+.grid-list .style-16 .info{background-color:#bbf6e8;}
+.grid-list .style-17 .info{background-color:#d5dbff;}
+.grid-list .style-18 .info{background-color:#e0fbed;}
+.grid-list .style-19 .info{background-color:#afebff;}
+.grid-list .style-20 .info{background-color:#dcf8ff;}
+
+
+div.view-filters, .view-filters {    
+	margin-bottom:20px;
+	}	
