@@ -70,25 +70,39 @@
  * @see zen_preprocess_node()
  * @see zen_process()
  */
- // miKrumo($node);
-?>
-    
-    
-<a href="<?php  print url( 'node/' . $node->nid);?>">
-<span class="image">
-
-<?php 
-//krumo(imagecache_presets());
-$imgpath=$node->field_top_image[0]['filepath'];
-$opciones=array("tit"=>"Túitulo alternativoooo");
-print theme('imageformatters_grayover',$node->field_top_image[0],"Imagen-223x223-grid" , $opciones );
+ miKrumo($node);
 ?>
 
-</span>
-<strong class="title"><?php print $node->title;  ?></strong>
-<span class="text-box"><?php print trim_text($node->teaser,200);  ?></span>
+<div id="teaser"><?php print strip_tags($node->teaser,'<p><a>');  ?></div>
 
 
-</a>
+
+<div id="content">
+<div id="node-<?php print $node->nid; ?>" class="content-area padding <?php print $classes; ?> clearfix">
+  <?php print $user_picture; ?>
 
 
+ 
+
+  <div class="contenidonodo">
+    <?php print $content; ?>
+  </div>
+  
+  
+   <?php if ($display_submitted || $terms): ?>
+    <div class="meta">
+      <?php if ($display_submitted): ?>
+        <span class="submitted">
+          <?php print $submitted; ?>
+        </span>
+      <?php endif; ?>
+
+      <?php if ($terms): ?>
+        <div class="terms terms-inline"><?php print $terms; ?></div>
+      <?php endif; ?>
+    </div>
+  <?php endif; ?>
+
+  <?php print $links; ?>
+  </div>
+</div><!-- /.node -->

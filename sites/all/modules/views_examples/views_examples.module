@@ -1,0 +1,42 @@
+<?php
+
+/**
+ * @file
+ * Views Examples module.
+ */
+
+/**
+ * Implementation of hook_menu().
+ */
+function views_examples_menu() {
+  $items['admin/settings/views_examples'] = array(
+    'title' => 'Views Examples',
+    'description' => 'Views Examples administration settings',
+    'access arguments' => array('administer site configuration'),
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('views_examples_settings_form'),
+    'file' => 'views_examples.admin.inc',
+  );
+  return $items;
+}
+
+/**
+ * Implementation hook_help().
+ */
+function views_examples_help($path, $arg) {
+  switch ($path) {
+    case 'admin/help#featured_content':
+      module_load_include('inc', 'featured_content', 'views_examples.pages');
+      return views_examples_help_text($path, $arg);
+  }
+}
+
+/**
+ *  Implementation of hook_views_api().
+ */
+function views_examples_views_api() {
+  return array(
+    'api' => 2,
+    'path' => drupal_get_path('module', 'views_examples'),
+  );
+}

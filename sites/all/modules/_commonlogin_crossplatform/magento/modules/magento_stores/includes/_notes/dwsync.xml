@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <dwsync>
-<file name="magento_stores.attribute_sets.inc" server="utopicus.teachnova.net/2011_09_18-openatrium-comunidad-1.0/" local="129810534000000000" remote="129810534000000000" />
-<file name="magento_stores.attributes.inc" server="utopicus.teachnova.net/2011_09_18-openatrium-comunidad-1.0/" local="129810534000000000" remote="129810534000000000" />
-<file name="magento_stores.broken_nodes.inc" server="utopicus.teachnova.net/2011_09_18-openatrium-comunidad-1.0/" local="129810534000000000" remote="129810534000000000" />
-<file name="magento_stores.categories.inc" server="utopicus.teachnova.net/2011_09_18-openatrium-comunidad-1.0/" local="129810534000000000" remote="129810534000000000" />
-<file name="magento_stores.product_types.inc" server="utopicus.teachnova.net/2011_09_18-openatrium-comunidad-1.0/" local="129810534000000000" remote="129810534000000000" />
-<file name="magento_stores.products.inc" server="utopicus.teachnova.net/2011_09_18-openatrium-comunidad-1.0/" local="129810534000000000" remote="129810534000000000" />
-<file name="magento_stores.stores.inc" server="utopicus.teachnova.net/2011_09_18-openatrium-comunidad-1.0/" local="129810534000000000" remote="129810534000000000" />
+<file name="magento_stores.attributes.inc" server="utopicus.teachnova.net/2011_09_18-openatrium-comunidad-1.0/" local="129654663640000000" remote="129810534000000000" />
+<file name="magento_stores.attribute_sets.inc" server="utopicus.teachnova.net/2011_09_18-openatrium-comunidad-1.0/" local="129654663640000000" remote="129810534000000000" />
+<file name="magento_stores.broken_nodes.inc" server="utopicus.teachnova.net/2011_09_18-openatrium-comunidad-1.0/" local="129654663640000000" remote="129810534000000000" />
+<file name="magento_stores.categories.inc" server="utopicus.teachnova.net/2011_09_18-openatrium-comunidad-1.0/" local="129654663640000000" remote="129810534000000000" />
+<file name="magento_stores.products.inc" server="utopicus.teachnova.net/2011_09_18-openatrium-comunidad-1.0/" local="129654663640000000" remote="129810534000000000" />
+<file name="magento_stores.product_types.inc" server="utopicus.teachnova.net/2011_09_18-openatrium-comunidad-1.0/" local="129654663640000000" remote="129810534000000000" />
+<file name="magento_stores.stores.inc" server="utopicus.teachnova.net/2011_09_18-openatrium-comunidad-1.0/" local="129654663640000000" remote="129810534000000000" />
 </dwsync>

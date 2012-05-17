@@ -60,3 +60,26 @@ ul.load-more-pager li.pager-next a.views-throbbing{
     padding: 0 13px 0 0;
 	text-transform:capitalize;	
 	}
+a{
+	text-decoration:underline;
+	}
+.terms-inline ul li a{
+	text-decoration:none;
+	}
+	
+#content  h2.subtitulo, h2.subtitulo {
+    font: 700 1.333em/1.438em 'Asap',Arial,Helvetica,sans-serif;
+    margin: 0 0 8px;
+    text-transform: none;
+	font-style:italic;
+	
+}
+#tocplayer{
+	margin: 20px 0}
+	
+	div.meta{
+		border-bottom:1px solid #999;
+		border-top:1px solid #999;
+		display: inline-block;
+		margin: 20px 0}
+		}

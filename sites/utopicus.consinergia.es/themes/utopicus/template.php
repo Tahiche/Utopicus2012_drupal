@@ -167,6 +167,12 @@ function utopicus_preprocess_page(&$vars, $hook) {
 		 krumo($vars);
 		
 	}
+	// me cargo los comments del output por defecto y los asigno a variables
+	$vars['comments'] = $vars['comment_form'] = '';
+  if (module_exists('comment') && isset($vars['node'])) {
+    $vars['comments'] = comment_render($vars['node']);
+    $vars['comment_form'] = drupal_get_form('comment_form', array('nid' => $vars['node']->nid));
+  }
 	//$vars['template_files'][]="page-miguel-es-un-capullo";
 
 	//print_r($vars['node']->links['print']['title']);
@@ -181,7 +187,9 @@ function utopicus_preprocess_page(&$vars, $hook) {
 }
 
 function utopicus_preprocess_node(&$vars, $hook) {
-  
+  // me cargo los comments del output por defecto y los asigno a variables en page
+    $vars['node']->comment = 0;
+	
   // krumo($vars);
   //default template suggestions for all nodes
   $vars['template_files'] = array();
@@ -233,7 +241,8 @@ function utopicus_preprocess_node(&$vars, $hook) {
     }
   }
  
-  
+  // fivestar widget como variable
+   $vars['fivestar_widget']="<div id='fivestardiv'>".$vars['node']->content['fivestar_widget']['#value']."</div>";
 	  
   // To remove a class from $classes_array, use array_diff().
   //$vars['classes_array'] = array_diff($vars['classes_array'], array('class-to-remove'));

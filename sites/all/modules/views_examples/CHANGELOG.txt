@@ -1,0 +1,8 @@
+6.x-1.x-beta1
+
+Same as alpha1 - just changing to beta so drush will download painlessly
+
+6.x-1.x-dev
+
+Views examples to turn on for use in views module.
+

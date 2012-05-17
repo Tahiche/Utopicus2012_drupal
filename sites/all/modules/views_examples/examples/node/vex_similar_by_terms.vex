@@ -1,0 +1,798 @@
+<?php
+$view = new view;
+$view->name = 'vex_similar_by_terms';
+$view->description = 'Closest matches to the given node based on the number of matching taxonomy terms. It is recommended you clone this view and make changes on the cloned version, so this version can be used for reference.';
+$view->tag = 'views examples';
+$view->view_php = '';
+$view->base_table = 'node';
+$view->is_cacheable = FALSE;
+$view->api_version = 2;
+$view->disabled = FALSE; /* Edit this to true to make a default view disabled initially */
+$handler = $view->new_display('default', 'Defaults', 'default');
+$handler->override_option('fields', array(
+  'nid' => array(
+    'label' => 'Nid',
+    'alter' => array(
+      'alter_text' => 0,
+      'text' => '',
+      'make_link' => 0,
+      'path' => '',
+      'link_class' => '',
+      'alt' => '',
+      'prefix' => '',
+      'suffix' => '',
+      'target' => '',
+      'help' => '',
+      'trim' => 0,
+      'max_length' => '',
+      'word_boundary' => 1,
+      'ellipsis' => 1,
+      'strip_tags' => 0,
+      'html' => 0,
+    ),
+    'empty' => '',
+    'hide_empty' => 0,
+    'empty_zero' => 0,
+    'link_to_node' => 0,
+    'exclude' => 1,
+    'id' => 'nid',
+    'table' => 'node',
+    'field' => 'nid',
+    'relationship' => 'none',
+    'override' => array(
+      'button' => 'Override',
+    ),
+  ),
+  'title' => array(
+    'label' => 'Title',
+    'alter' => array(
+      'alter_text' => 0,
+      'text' => '',
+      'make_link' => 0,
+      'path' => '',
+      'link_class' => '',
+      'alt' => '',
+      'prefix' => '',
+      'suffix' => '',
+      'target' => '',
+      'help' => '',
+      'trim' => 0,
+      'max_length' => '',
+      'word_boundary' => 1,
+      'ellipsis' => 1,
+      'strip_tags' => 0,
+      'html' => 0,
+    ),
+    'empty' => '',
+    'hide_empty' => 0,
+    'empty_zero' => 0,
+    'link_to_node' => 1,
+    'exclude' => 0,
+    'id' => 'title',
+    'table' => 'node',
+    'field' => 'title',
+    'relationship' => 'none',
+  ),
+  'tid' => array(
+    'label' => '# Terms',
+    'alter' => array(
+      'alter_text' => 0,
+      'text' => '',
+      'make_link' => 0,
+      'path' => '',
+      'link_class' => '',
+      'alt' => '',
+      'prefix' => '',
+      'suffix' => '',
+      'target' => '',
+      'help' => '',
+      'trim' => 0,
+      'max_length' => '',
+      'word_boundary' => 1,
+      'ellipsis' => 1,
+      'strip_tags' => 0,
+      'html' => 0,
+    ),
+    'empty' => '',
+    'hide_empty' => 0,
+    'empty_zero' => 0,
+    'set_precision' => FALSE,
+    'precision' => 0,
+    'decimal' => '.',
+    'separator' => ',',
+    'prefix' => '',
+    'suffix' => '',
+    'exclude' => 0,
+    'id' => 'tid',
+    'table' => 'term_data',
+    'field' => 'tid',
+    'override' => array(
+      'button' => 'Override',
+    ),
+    'relationship' => 'none',
+  ),
+  'views_sql_groupedfields' => array(
+    'label' => 'Group By Fields',
+    'alter' => array(
+      'alter_text' => FALSE,
+      'text' => '',
+      'make_link' => FALSE,
+      'path' => '',
+      'alt' => '',
+      'link_class' => '',
+      'prefix' => '',
+      'suffix' => '',
+      'target' => '',
+      'trim' => FALSE,
+      'max_length' => '',
+      'word_boundary' => TRUE,
+      'ellipsis' => TRUE,
+      'strip_tags' => FALSE,
+      'html' => FALSE,
+    ),
+    'empty' => '',
+    'hide_empty' => 0,
+    'empty_zero' => 0,
+    'exclude' => '1',
+    'id' => 'views_sql_groupedfields',
+    'table' => 'views_groupby',
+    'field' => 'views_sql_groupedfields',
+    'relationship' => 'none',
+    'views_groupby_fields_to_group' => array(
+      'nid' => 'nid',
+    ),
+    'views_groupby_sql_function' => 'count',
+    'views_groupby_fields_to_aggregate' => array(
+      'tid' => 'tid',
+    ),
+    'views_groupby_field_sortby' => 'tid',
+    'views_groupby_sortby_direction' => 'desc',
+    'override' => array(
+      'button' => 'Override',
+    ),
+  ),
+));
+$handler->override_option('arguments', array(
+  'nid' => array(
+    'default_action' => 'default',
+    'style_plugin' => 'default_summary',
+    'style_options' => array(),
+    'wildcard' => 'all',
+    'wildcard_substitution' => 'All',
+    'title' => '',
+    'breadcrumb' => '',
+    'default_argument_type' => 'node',
+    'default_argument' => '',
+    'validate_type' => 'none',
+    'validate_fail' => 'not found',
+    'break_phrase' => 0,
+    'not' => 1,
+    'id' => 'nid',
+    'table' => 'node',
+    'field' => 'nid',
+    'validate_user_argument_type' => 'uid',
+    'validate_user_roles' => array(
+      '2' => 0,
+    ),
+    'relationship' => 'none',
+    'default_options_div_prefix' => '',
+    'default_argument_user' => 0,
+    'default_argument_fixed' => '',
+    'default_argument_php' => '',
+    'validate_argument_node_type' => array(
+      'page' => 0,
+      'story' => 0,
+    ),
+    'validate_argument_node_access' => 0,
+    'validate_argument_nid_type' => 'nid',
+    'validate_argument_vocabulary' => array(),
+    'validate_argument_type' => 'tid',
+    'validate_argument_transform' => 0,
+    'validate_user_restrict_roles' => 0,
+    'validate_argument_php' => '',
+  ),
+  'tid' => array(
+    'default_action' => 'default',
+    'style_plugin' => 'default_summary',
+    'style_options' => array(),
+    'wildcard' => 'all',
+    'wildcard_substitution' => 'All',
+    'title' => '',
+    'breadcrumb' => '',
+    'default_argument_type' => 'php',
+    'default_argument' => '',
+    'validate_type' => 'none',
+    'validate_fail' => 'not found',
+    'break_phrase' => 1,
+    'add_table' => 1,
+    'require_value' => 0,
+    'reduce_duplicates' => 0,
+    'set_breadcrumb' => 0,
+    'id' => 'tid',
+    'table' => 'term_node',
+    'field' => 'tid',
+    'validate_user_argument_type' => 'uid',
+    'validate_user_roles' => array(
+      '2' => 0,
+    ),
+    'override' => array(
+      'button' => 'Override',
+    ),
+    'relationship' => 'none',
+    'default_options_div_prefix' => '',
+    'default_argument_user' => 0,
+    'default_argument_fixed' => '',
+    'default_argument_php' => 'if (arg(0) == \'node\' && is_numeric(arg(1))) {
+  $node = node_load(arg(1));
+  if ($node->nid) {
+    $terms = $node->taxonomy;
+    if (! empty($terms)) {
+      $tids = array();
+      foreach ($terms as $term_data) {
+         $tids[] = $term_data->tid;
+      }
+      return implode(\'+\', $tids);
+    }
+  }
+}
+ ',
+    'validate_argument_node_type' => array(
+      'webform' => 0,
+      'forum' => 0,
+      'page' => 0,
+      'story' => 0,
+    ),
+    'validate_argument_node_access' => 0,
+    'validate_argument_nid_type' => 'nid',
+    'validate_argument_vocabulary' => array(
+      '1' => 0,
+      '3' => 0,
+      '2' => 0,
+    ),
+    'validate_argument_type' => 'tid',
+    'validate_argument_transform' => 0,
+    'validate_user_restrict_roles' => 0,
+    'validate_argument_php' => '',
+  ),
+));
+$handler->override_option('filters', array(
+  'status' => array(
+    'operator' => '=',
+    'value' => '1',
+    'group' => '0',
+    'exposed' => FALSE,
+    'expose' => array(
+      'operator' => FALSE,
+      'label' => '',
+    ),
+    'id' => 'status',
+    'table' => 'node',
+    'field' => 'status',
+    'override' => array(
+      'button' => 'Override',
+    ),
+    'relationship' => 'none',
+  ),
+));
+$handler->override_option('access', array(
+  'type' => 'role',
+  'role' => array(
+    '2' => 2,
+  ),
+));
+$handler->override_option('cache', array(
+  'type' => 'time',
+  'results_lifespan' => '-1',
+  'output_lifespan' => '3600',
+));
+$handler->override_option('title', 'Similar Content');
+$handler->override_option('footer', '<?php
+if (arg(0) == \'node\' && is_numeric(arg(1))) {
+$node = node_load(arg(1));
+if ($node->nid) {
+print l(\'more\', \'similar-by-terms/\'.$node->nid, array(\'attributes\' => array(\'class\'=>\'more-link\')));
+}
+}');
+$handler->override_option('footer_format', '3');
+$handler->override_option('footer_empty', 0);
+$handler->override_option('use_ajax', TRUE);
+$handler->override_option('distinct', 1);
+$handler->override_option('style_options', array(
+  'grouping' => '',
+));
+$handler = $view->new_display('block', 'Similar by Terms List Block', 'block_1');
+$handler->override_option('fields', array(
+  'nid' => array(
+    'label' => 'Nid',
+    'alter' => array(
+      'alter_text' => 0,
+      'text' => '',
+      'make_link' => 0,
+      'path' => '',
+      'link_class' => '',
+      'alt' => '',
+      'prefix' => '',
+      'suffix' => '',
+      'target' => '',
+      'help' => '',
+      'trim' => 0,
+      'max_length' => '',
+      'word_boundary' => 1,
+      'ellipsis' => 1,
+      'strip_tags' => 0,
+      'html' => 0,
+    ),
+    'empty' => '',
+    'hide_empty' => 0,
+    'empty_zero' => 0,
+    'link_to_node' => 0,
+    'exclude' => 1,
+    'id' => 'nid',
+    'table' => 'node',
+    'field' => 'nid',
+    'relationship' => 'none',
+    'override' => array(
+      'button' => 'Use default',
+    ),
+  ),
+  'title' => array(
+    'label' => '',
+    'alter' => array(
+      'alter_text' => 0,
+      'text' => '',
+      'make_link' => 0,
+      'path' => '',
+      'link_class' => '',
+      'alt' => '',
+      'prefix' => '',
+      'suffix' => '',
+      'target' => '',
+      'help' => '',
+      'trim' => 0,
+      'max_length' => '',
+      'word_boundary' => 1,
+      'ellipsis' => 1,
+      'strip_tags' => 0,
+      'html' => 0,
+    ),
+    'empty' => '',
+    'hide_empty' => 0,
+    'empty_zero' => 0,
+    'link_to_node' => 1,
+    'exclude' => 0,
+    'id' => 'title',
+    'table' => 'node',
+    'field' => 'title',
+    'relationship' => 'none',
+    'override' => array(
+      'button' => 'Use default',
+    ),
+  ),
+  'tid' => array(
+    'label' => 'Term ID Count',
+    'alter' => array(
+      'alter_text' => 0,
+      'text' => '',
+      'make_link' => 0,
+      'path' => '',
+      'link_class' => '',
+      'alt' => '',
+      'prefix' => '',
+      'suffix' => '',
+      'target' => '',
+      'help' => '',
+      'trim' => 0,
+      'max_length' => '',
+      'word_boundary' => 1,
+      'ellipsis' => 1,
+      'strip_tags' => 0,
+      'html' => 0,
+    ),
+    'empty' => '',
+    'hide_empty' => 0,
+    'empty_zero' => 0,
+    'set_precision' => FALSE,
+    'precision' => 0,
+    'decimal' => '.',
+    'separator' => ',',
+    'prefix' => '',
+    'suffix' => '',
+    'exclude' => 1,
+    'id' => 'tid',
+    'table' => 'term_data',
+    'field' => 'tid',
+    'override' => array(
+      'button' => 'Use default',
+    ),
+    'relationship' => 'none',
+  ),
+  'views_sql_groupedfields' => array(
+    'label' => 'Group By Fields',
+    'alter' => array(
+      'alter_text' => FALSE,
+      'text' => '',
+      'make_link' => FALSE,
+      'path' => '',
+      'alt' => '',
+      'link_class' => '',
+      'prefix' => '',
+      'suffix' => '',
+      'target' => '',
+      'trim' => FALSE,
+      'max_length' => '',
+      'word_boundary' => TRUE,
+      'ellipsis' => TRUE,
+      'strip_tags' => FALSE,
+      'html' => FALSE,
+    ),
+    'empty' => '',
+    'hide_empty' => 0,
+    'empty_zero' => 0,
+    'exclude' => '1',
+    'id' => 'views_sql_groupedfields',
+    'table' => 'views_groupby',
+    'field' => 'views_sql_groupedfields',
+    'relationship' => 'none',
+    'views_groupby_fields_to_group' => array(
+      'nid' => 'nid',
+    ),
+    'views_groupby_sql_function' => 'count',
+    'views_groupby_fields_to_aggregate' => array(
+      'tid' => 'tid',
+    ),
+    'views_groupby_field_sortby' => 'tid',
+    'views_groupby_sortby_direction' => 'desc',
+    'override' => array(
+      'button' => 'Override',
+    ),
+  ),
+));
+$handler->override_option('style_plugin', 'list');
+$handler->override_option('style_options', array(
+  'grouping' => '',
+  'type' => 'ul',
+));
+$handler->override_option('block_description', '');
+$handler->override_option('block_caching', -1);
+$handler = $view->new_display('block', 'Similar by Terms Table Block', 'block_2');
+$handler->override_option('style_plugin', 'table');
+$handler->override_option('style_options', array(
+  'grouping' => '',
+  'override' => 1,
+  'sticky' => 0,
+  'order' => 'asc',
+  'columns' => array(
+    'nid' => 'nid',
+    'title' => 'title',
+    'tid' => 'tid',
+    'views_sql_groupedfields' => 'views_sql_groupedfields',
+  ),
+  'info' => array(
+    'nid' => array(
+      'sortable' => 0,
+      'separator' => '',
+    ),
+    'title' => array(
+      'sortable' => 0,
+      'separator' => '',
+    ),
+    'tid' => array(
+      'sortable' => 0,
+      'separator' => '',
+    ),
+    'views_sql_groupedfields' => array(
+      'separator' => '',
+    ),
+  ),
+  'default' => '-1',
+));
+$handler->override_option('block_description', '');
+$handler->override_option('block_caching', -1);
+$handler = $view->new_display('page', 'Similar by Terms Page', 'page_1');
+$handler->override_option('fields', array(
+  'nid' => array(
+    'label' => 'Nid',
+    'alter' => array(
+      'alter_text' => 0,
+      'text' => '',
+      'make_link' => 0,
+      'path' => '',
+      'link_class' => '',
+      'alt' => '',
+      'prefix' => '',
+      'suffix' => '',
+      'target' => '',
+      'help' => '',
+      'trim' => 0,
+      'max_length' => '',
+      'word_boundary' => 1,
+      'ellipsis' => 1,
+      'strip_tags' => 0,
+      'html' => 0,
+    ),
+    'empty' => '',
+    'hide_empty' => 0,
+    'empty_zero' => 0,
+    'link_to_node' => 0,
+    'exclude' => 1,
+    'id' => 'nid',
+    'table' => 'node',
+    'field' => 'nid',
+    'relationship' => 'none',
+    'override' => array(
+      'button' => 'Use default',
+    ),
+  ),
+  'title' => array(
+    'label' => '',
+    'alter' => array(
+      'alter_text' => 0,
+      'text' => '',
+      'make_link' => 0,
+      'path' => '',
+      'link_class' => '',
+      'alt' => '',
+      'prefix' => '',
+      'suffix' => '',
+      'target' => '',
+      'help' => '',
+      'trim' => 0,
+      'max_length' => '',
+      'word_boundary' => 1,
+      'ellipsis' => 1,
+      'strip_tags' => 0,
+      'html' => 0,
+    ),
+    'empty' => '',
+    'hide_empty' => 0,
+    'empty_zero' => 0,
+    'link_to_node' => 1,
+    'exclude' => 0,
+    'id' => 'title',
+    'table' => 'node',
+    'field' => 'title',
+    'relationship' => 'none',
+    'override' => array(
+      'button' => 'Use default',
+    ),
+  ),
+  'tid' => array(
+    'label' => 'Term ID Count',
+    'alter' => array(
+      'alter_text' => 0,
+      'text' => '',
+      'make_link' => 0,
+      'path' => '',
+      'link_class' => '',
+      'alt' => '',
+      'prefix' => '',
+      'suffix' => '',
+      'target' => '',
+      'help' => '',
+      'trim' => 0,
+      'max_length' => '',
+      'word_boundary' => 1,
+      'ellipsis' => 1,
+      'strip_tags' => 0,
+      'html' => 0,
+    ),
+    'empty' => '',
+    'hide_empty' => 0,
+    'empty_zero' => 0,
+    'set_precision' => FALSE,
+    'precision' => 0,
+    'decimal' => '.',
+    'separator' => ',',
+    'prefix' => '',
+    'suffix' => '',
+    'exclude' => 1,
+    'id' => 'tid',
+    'table' => 'term_data',
+    'field' => 'tid',
+    'override' => array(
+      'button' => 'Use default',
+    ),
+    'relationship' => 'none',
+  ),
+  'teaser' => array(
+    'label' => '',
+    'alter' => array(
+      'alter_text' => 0,
+      'text' => '',
+      'make_link' => 0,
+      'path' => '',
+      'link_class' => '',
+      'alt' => '',
+      'prefix' => '',
+      'suffix' => '',
+      'target' => '',
+      'help' => '',
+      'trim' => 0,
+      'max_length' => '',
+      'word_boundary' => 1,
+      'ellipsis' => 1,
+      'strip_tags' => 0,
+      'html' => 0,
+    ),
+    'empty' => '',
+    'hide_empty' => 0,
+    'empty_zero' => 0,
+    'exclude' => 0,
+    'id' => 'teaser',
+    'table' => 'node_revisions',
+    'field' => 'teaser',
+    'override' => array(
+      'button' => 'Use default',
+    ),
+    'relationship' => 'none',
+  ),
+  'views_sql_groupedfields' => array(
+    'label' => 'Group By Fields',
+    'alter' => array(
+      'alter_text' => FALSE,
+      'text' => '',
+      'make_link' => FALSE,
+      'path' => '',
+      'alt' => '',
+      'link_class' => '',
+      'prefix' => '',
+      'suffix' => '',
+      'target' => '',
+      'trim' => FALSE,
+      'max_length' => '',
+      'word_boundary' => TRUE,
+      'ellipsis' => TRUE,
+      'strip_tags' => FALSE,
+      'html' => FALSE,
+    ),
+    'empty' => '',
+    'hide_empty' => 0,
+    'empty_zero' => 0,
+    'exclude' => '1',
+    'id' => 'views_sql_groupedfields',
+    'table' => 'views_groupby',
+    'field' => 'views_sql_groupedfields',
+    'relationship' => 'none',
+    'views_groupby_fields_to_group' => array(
+      'nid' => 'nid',
+    ),
+    'views_groupby_sql_function' => 'count',
+    'views_groupby_fields_to_aggregate' => array(
+      'tid' => 'tid',
+    ),
+    'views_groupby_field_sortby' => 'tid',
+    'views_groupby_sortby_direction' => 'desc',
+    'override' => array(
+      'button' => 'Override',
+    ),
+  ),
+));
+$handler->override_option('arguments', array(
+  'nid' => array(
+    'default_action' => 'default',
+    'style_plugin' => 'default_summary',
+    'style_options' => array(),
+    'wildcard' => 'all',
+    'wildcard_substitution' => 'All',
+    'title' => '',
+    'breadcrumb' => '',
+    'default_argument_type' => 'php',
+    'default_argument' => '',
+    'validate_type' => 'none',
+    'validate_fail' => 'not found',
+    'break_phrase' => 0,
+    'not' => 1,
+    'id' => 'nid',
+    'table' => 'node',
+    'field' => 'nid',
+    'validate_user_argument_type' => 'uid',
+    'validate_user_roles' => array(
+      '2' => 0,
+    ),
+    'override' => array(
+      'button' => 'Use default',
+    ),
+    'relationship' => 'none',
+    'default_options_div_prefix' => '',
+    'default_argument_user' => 0,
+    'default_argument_fixed' => '',
+    'default_argument_php' => 'if (arg(0) == \'similar-by-terms\') {
+  return arg(1);
+}',
+    'validate_argument_node_type' => array(
+      'page' => 0,
+      'story' => 0,
+    ),
+    'validate_argument_node_access' => 0,
+    'validate_argument_nid_type' => 'nid',
+    'validate_argument_vocabulary' => array(),
+    'validate_argument_type' => 'tid',
+    'validate_argument_transform' => 0,
+    'validate_user_restrict_roles' => 0,
+    'validate_argument_php' => '',
+  ),
+  'tid' => array(
+    'default_action' => 'default',
+    'style_plugin' => 'default_summary',
+    'style_options' => array(),
+    'wildcard' => 'all',
+    'wildcard_substitution' => 'All',
+    'title' => '',
+    'breadcrumb' => '',
+    'default_argument_type' => 'php',
+    'default_argument' => '',
+    'validate_type' => 'none',
+    'validate_fail' => 'not found',
+    'break_phrase' => 1,
+    'add_table' => 1,
+    'require_value' => 0,
+    'reduce_duplicates' => 0,
+    'set_breadcrumb' => 0,
+    'id' => 'tid',
+    'table' => 'term_node',
+    'field' => 'tid',
+    'validate_user_argument_type' => 'uid',
+    'validate_user_roles' => array(
+      '2' => 0,
+    ),
+    'override' => array(
+      'button' => 'Use default',
+    ),
+    'relationship' => 'none',
+    'default_options_div_prefix' => '',
+    'default_argument_user' => 0,
+    'default_argument_fixed' => '',
+    'default_argument_php' => 'if (arg(0) == \'similar-by-terms\' && is_numeric(arg(1))) {
+  $node = node_load(arg(1));
+  if ($node->nid) {
+    $terms = $node->taxonomy;
+    if (! empty($terms)) {
+      $tids = array();
+      foreach ($terms as $term_data) {
+         $tids[] = $term_data->tid;
+      }
+      return implode(\'+\', $tids);
+    }
+  }
+}
+ ',
+    'validate_argument_node_type' => array(
+      'page' => 0,
+      'story' => 0,
+    ),
+    'validate_argument_node_access' => 0,
+    'validate_argument_nid_type' => 'nid',
+    'validate_argument_vocabulary' => array(),
+    'validate_argument_type' => 'tid',
+    'validate_argument_transform' => 0,
+    'validate_user_restrict_roles' => 0,
+    'validate_argument_php' => '',
+  ),
+));
+$handler->override_option('title', '');
+$handler->override_option('header', '<?php
+if (arg(0) == \'similar-by-terms\' && is_numeric(arg(1))) {
+$node = node_load(arg(1));
+if ($node->nid) {
+print  \'<h1>\'.t(\'Similar Content for !url\', array(\'!url\' => l($node->title, \'node/\'.$node->nid))).\'</h1>\';
+}
+}
+');
+$handler->override_option('header_format', '3');
+$handler->override_option('header_empty', 0);
+$handler->override_option('use_pager', '1');
+$handler->override_option('path', 'similar-by-terms');
+$handler->override_option('menu', array(
+  'type' => 'none',
+  'title' => '',
+  'description' => '',
+  'weight' => 0,
+  'name' => 'navigation',
+));
+$handler->override_option('tab_options', array(
+  'type' => 'none',
+  'title' => '',
+  'description' => '',
+  'weight' => 0,
+));
+

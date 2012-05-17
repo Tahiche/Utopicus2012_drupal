@@ -35,7 +35,13 @@ global $theme_pathabsoluto;
 if (empty($theme_pathabsoluto)){
 	$theme_pathabsoluto= $base_root."/sites/utopicus.consinergia.es/themes/utopicus";
 }
+
+global $isloggedin;
+if (!isset($isloggedin)){
+	$isloggedin= FALSE;
+}
 ?>
+
 			<!-- header -->
 			<div id="header">
 				<!-- topbar -->
@@ -50,8 +56,10 @@ if (empty($theme_pathabsoluto)){
 						</ul>
 						<!-- loginmenu -->
 						<ul class="loginmenu">
+                        <?php if(!$isloggedin): ?>
 							<li><a href="/user">ÚNETE </a></li>
 							<li ><a id="toboggan-login-link" href="/user">ACCEDER</a></li>
+                         <?php endif; ?>
 						</ul>
 					</div>
 				</div>

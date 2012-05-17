@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <dwsync>
+<<<<<<< HEAD
 <file name="LICENSE.txt" server="utopicus.teachnova.net/2011_09_18-openatrium-comunidad-1.0/" local="129810532800000000" remote="129810532800000000" />
 <file name="README.txt" server="utopicus.teachnova.net/2011_09_18-openatrium-comunidad-1.0/" local="129810532800000000" remote="129810532800000000" />
 <file name="magento-cart.tpl.php" server="utopicus.teachnova.net/2011_09_18-openatrium-comunidad-1.0/" local="129810532800000000" remote="129810532800000000" />
@@ -9,4 +10,15 @@
 <file name="magento_cart_block_cart.tpl.php" server="utopicus.teachnova.net/2011_09_18-openatrium-comunidad-1.0/" local="129810532800000000" remote="129810532800000000" />
 <file name="magento_cart_empty.tpl.php" server="utopicus.teachnova.net/2011_09_18-openatrium-comunidad-1.0/" local="129810532800000000" remote="129810532800000000" />
 <file name="magento_cart_state.tpl.php" server="utopicus.teachnova.net/2011_09_18-openatrium-comunidad-1.0/" local="129810532800000000" remote="129810532800000000" />
+=======
+<file name="LICENSE.txt" server="utopicus.teachnova.net/2011_09_18-openatrium-comunidad-1.0/" local="129654663640000000" remote="129810532800000000" />
+<file name="magento-cart.tpl.php" server="utopicus.teachnova.net/2011_09_18-openatrium-comunidad-1.0/" local="129654663640000000" remote="129810532800000000" />
+<file name="magento_cart.info" server="utopicus.teachnova.net/2011_09_18-openatrium-comunidad-1.0/" local="129654804800000000" remote="129810532800000000" />
+<file name="magento_cart.module" server="utopicus.teachnova.net/2011_09_18-openatrium-comunidad-1.0/" local="129654663640000000" remote="129810532800000000" />
+<file name="magento_cart.settings.inc" server="utopicus.teachnova.net/2011_09_18-openatrium-comunidad-1.0/" local="129654663640000000" remote="129810532800000000" />
+<file name="magento_cart_block_cart.tpl.php" server="utopicus.teachnova.net/2011_09_18-openatrium-comunidad-1.0/" local="129654663640000000" remote="129810532800000000" />
+<file name="magento_cart_empty.tpl.php" server="utopicus.teachnova.net/2011_09_18-openatrium-comunidad-1.0/" local="129654663640000000" remote="129810532800000000" />
+<file name="magento_cart_state.tpl.php" server="utopicus.teachnova.net/2011_09_18-openatrium-comunidad-1.0/" local="129654663640000000" remote="129810532800000000" />
+<file name="README.txt" server="utopicus.teachnova.net/2011_09_18-openatrium-comunidad-1.0/" local="129654663640000000" remote="129810532800000000" />
+>>>>>>> 3219e29a4c880fd6602412a9569bb1a1dd647a22
 </dwsync>

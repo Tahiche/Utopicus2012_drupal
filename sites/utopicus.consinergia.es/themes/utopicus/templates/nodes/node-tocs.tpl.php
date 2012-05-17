@@ -70,8 +70,9 @@
  * @see zen_preprocess_node()
  * @see zen_process()
  */
+ krumo($vars);
 ?>
-<div id="content">NODE TOCSNODE TOCSNODE TOCSNODE TOCSNODE TOCSNODE TOCSNODE TOCSNODE TOCSNODE TOCSNODE TOCS
+<div id="content">
 <div id="node-<?php print $node->nid; ?>" class="content-area padding <?php print $classes; ?> clearfix">
 
 
