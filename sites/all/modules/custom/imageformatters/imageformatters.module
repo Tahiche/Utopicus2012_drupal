@@ -185,8 +185,9 @@ $imageGray = theme('imagecache', "grayscale", $colorpath , $item['data']['alt'],
 	 $class = "imagecache imagecache-$presetname imagecache-$style imagecache-{$element['#formatter']}";
 	
 	
-								
-    return l("<div class='image'>".$imageColor.$imageGray."</div>", $path, array('attributes' => array('class' => $class), 'html' => TRUE));	
+	if($options['nolink']) return "<div class='image grayoverImage'>".$imageColor.$imageGray."</div>";
+					
+    return l("<div class='image grayoverImage'>".$imageColor.$imageGray."</div>", $path, array('attributes' => array('class' => $class), 'html' => TRUE));	
 }
 
 

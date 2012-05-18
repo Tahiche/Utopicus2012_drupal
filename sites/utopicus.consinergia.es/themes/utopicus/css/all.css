@@ -2340,8 +2340,10 @@ html.js input.throbbing {
 .grid-list .image{
 	display:block;
 	width:100%;
+	height:223px;
 	margin:0 0 12px;
 	position:relative;
+	background-color:#EFEFEF;
 }
 .grid-list .info{
 	position:absolute;
@@ -2409,3 +2411,8 @@ html.js input.throbbing {
 .grid-list .style-18 .info{background-color:#e0fbed;}
 .grid-list .style-19 .info{background-color:#afebff;}
 .grid-list .style-20 .info{background-color:#dcf8ff;}
+
+
+div.view-filters, .view-filters {    
+	margin-bottom:20px;
+	}	

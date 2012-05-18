@@ -60,7 +60,7 @@ ul.load-more-pager li.pager-next a.views-throbbing{
     padding: 0 13px 0 0;
 	text-transform:capitalize;	
 	}
-a{
+p a{
 	text-decoration:underline;
 	}
 .terms-inline ul li a{
@@ -83,3 +83,41 @@ a{
 		display: inline-block;
 		margin: 20px 0}
 		}
+		
+		
+
+	
+ 		
+.imagegrid {
+    display: block;
+    margin: 0 0 12px;
+    position: relative;
+	width:223px;
+	height:223px;
+	} 
+ 
+.grayoverImage .grey-image{
+	position:absolute;
+	top:0;
+	left:0;
+	-webkit-transition:all 500ms ease-in-out;
+	-moz-transition:all 500ms ease-in-out;
+	-o-transition:all 500ms ease-in-out;
+	transition:all 500ms ease-in-out;
+}
+.gray_link:hover{ 
+	box-shadow: 0 0 5px #bcbcbc;
+	-webkit-box-shadow: 0 0 5px #bcbcbc;
+	-moz-box-shadow: 0 0 5px #bcbcbc;
+}
+.gray_link:hover .grayoverImage .grey-image{opacity:0;}
+
+.grid-list li {
+    display: inline-block !important;
+    width: 223px;
+}
+
+.gray_link .title{
+	background:none;
+	padding:0;
+	}

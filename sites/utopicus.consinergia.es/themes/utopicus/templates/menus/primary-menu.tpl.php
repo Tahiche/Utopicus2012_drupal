@@ -2,63 +2,57 @@
 						<li class="style-1 withdrop">
 							<a href="#"><span>COWORKING</span></a>
 							<ul class="drop" style="opacity: 0; top: 100%; display: none;">
-								<li><a href="#">Listado Coworkers</a></li>
-                                <li><a href="#">Tour</a></li>
-                                <li><a href="#">Comunidad</a></li>
-                                <li><a href="#">Espacios</a></li>
-                                <li><a href="#">Áreas</a></li>
-                                <li><a href="#">Tarifas y planes</a></li>
+                            <li><a href="/es/coworking/tour">Tour</a></li>
+								<li><a href="/es/coworking/coworkers">Coworkers</a></li>
+                                <li><a href="/es/coworking/comunidad">Comunidad</a></li>
+                                <li><a href="/es/coworking/espacios">Espacios</a></li>
+                                <li><a href="/es/coworking/tarifas_y_planes">Tarifas y planes</a></li>
 							</ul>
 						</li>
 						<li class="style-2 withdrop">
-							<a href="#"><span>formacion</span></a>
+							<a href="#"><span>FORMACIÓN</span></a>
 							<ul class="drop" style="opacity: 0; top: 100%; display: none;">
-                                <li><a href="#">Cursos</a></li>
-                                <li><a href="#">Dosis</a></li>
-                                <li><a href="#">Metodología</a></li>
-                                <li><a href="#">Solicitar información</a></li>
+                             <li><a href="/es/formacion/tocs">Vídeos TOCS</a></li>
+                                <li><a href="/es/formacion/cursos">Cursos</a></li>
+                               
+                                
 							</ul>
 						</li>
 						<li class="style-3 withdrop">
 							<a href="#"><span>actividades</span></a>
 							<ul class="drop" style="opacity: 0; top: 100%; display: none;">
-                                <li><a href="#">Agenda de Actividades</a></li>
-                                <li><a href="#">utopic_Sundays</a></li>
-                                <li><a href="#">utopic_TV</a></li>
+                                <li><a href="/es/actividades/agenda">Agenda</a></li>
+                                <li><a href="/es/actividades/utopic_gallery">Utopic_Gallery</a></li>
+                                <li><a href="/es/actividades/utopic_sundays">Utopic_Sundays</a></li>
+                                <li><a href="/es/actividades/mmm_us">MMM_US</a></li>
+                                <li><a href="/es/actividades/utopic_tv">Utopic_TV</a></li>
+                                <li><a href="/es/actividades/la_transformadora">La Transformadora</a></li>
 							</ul>
 						</li>
 						<li class="style-4 withdrop">
 							<a href="#"><span>mostrador</span></a>
                             <ul class="drop" style="opacity: 0; top: 100%; display: none;">
-                                    <li><a href="#">Audiovisual</a></li>
-                                    <li><a href="#">Arquitectura</a></li>
-                                    <li><a href="#">Consultoría</a></li>
-                                    <li><a href="#">Diseño y comunicación</a></li>
-                                    <li><a href="#">Web</a></li>
-                                    <li><a href="#">Música</a></li>
-                                    <li><a href="#">Moda</a></li>
+                                    
 							</ul>
 						</li>
 						<li class="style-5 withdrop">
 							<a href="#"><span>espacios</span></a>
 							<ul class="drop" style="opacity: 0; top: 100%; display: none;">
-                                    <li><a href="#">Madrid US_1</a></li>
-                                    <li><a href="#">Madrid US_2</a></li>
-                                    <li><a href="#">La Utópica Bar</a></li>
-                                    <li><a href="#">Utopic_Gallery</a></li>
-                                    <li><a href="#">La Transformadora</a></li>
-                                    <li><a href="#">Alquiler de Espacios</a></li>
+                                    <li><a href="/es/espacios/madrid_US_1">Madrid US_1</a></li>
+                                    <li><a href="/es/espacios/madrid_US_2">Madrid US_2</a></li>
+                                    <li><a href="/es/espacios/alquiler_de_espacios">Alquiler de Espacios</a></li>
+                                    <li><a href="/es/espacios/open_us">Open_US</a></li>
 							</ul>
 						</li>
 						<li class="style-6 withdrop">
 							<a href="#"><span>_US</span></a>
 							<ul class="drop" style="opacity: 0; top: 100%; display: none;">
-                                    <li><a href="/proyecto">El proyecto utopic_US</a></li>
-                                    <li><a href="/equipo">El equipo</a></li>
-                                    <li><a href="/noticias">Noticias</a></li>
-                                    <li><a href="/patrocinadores">Patrocinadores</a></li>
-                                    <li><a href="/sala_de_prensa">Sala de prensa</a></li>
-                                    <li><a href="/contacto">Contacto</a></li>
+                                    <li><a href="es/_US/el_proyecto">El proyecto</a></li>
+                                    <li><a href="es/_US/el_equipo">El equipo</a></li>
+                                    <li><a href="es/_US/noticias">Noticias</a></li>
+                                    <li><a href="es/_US/patrocinadores">Patrocinadores</a></li>
+                                    <li><a href="es/_US/sala_de_prensa">Sala de prensa</a></li>
+                                    <li><a href="es/_US/contacto">Contacto</a></li>
 							</ul>
 						</li>
 					</ul>

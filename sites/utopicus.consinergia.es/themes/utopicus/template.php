@@ -218,6 +218,9 @@ function utopicus_preprocess_node(&$vars, $hook) {
 		  case '113':
 		   $vars['template_files'][] = 'node-template-content-b-page-cb';
 		  break;
+		   case '501':
+		   $vars['template_files'][] = 'node-template-content-grande';
+		  break;
 		  default:
 		  break;
 		  }
@@ -235,9 +238,10 @@ function utopicus_preprocess_node(&$vars, $hook) {
     //template suggestions for nodes in teaser view
     //more granular control
     if($vars['teaser']) {
+		$vars['template_files'][] = 'node-teaser';
       $vars['template_files'][] = 'node-'.$vars['node']->type.'-teaser';
       $vars['template_files'][] = 'node-'.$vars['node']->nid.'-teaser';
-	  $vars['template_files'][] = 'node-teaser';
+	  
     }
   }
  

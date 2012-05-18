@@ -1,0 +1,13 @@
+name = Administration views
+description = Replaces all system object management pages in Drupal core with real views.
+package = Administration
+core = 6.x
+dependencies[] = views
+dependencies[] = views_bulk_operations
+
+; Information added by drupal.org packaging script on 2012-05-13
+version = "6.x-1.x-dev"
+core = "6.x"
+project = "admin_views"
+datestamp = "1336867389"
+
