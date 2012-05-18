@@ -1,0 +1,9 @@
+<?php
+
+/**
+ * @file
+ * Hierarchical Select Field Selector module.
+ * 
+ * Empty, to save memory. To use, include hs_field_selector.inc
+ */
+

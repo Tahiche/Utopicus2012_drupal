@@ -47,6 +47,7 @@ function Form_alters_form_alter(&$form, &$form_state, $form_id) {
 	 unset($form['timezone']);
 	 unset($form['status']);
 	 unset($form['roles']);
+	  unset($form['picture']);
 	// $form['buttons']['previous']['#validate' ]=array();
 	//'#validate' => array(),
 	//krumo(_multistep_get_current_step($type)); 
@@ -180,12 +181,11 @@ function Form_alters_content_extra_fields($type_name) {
     'description' => t('User account in profile'),
     'weight' => -10,
   );
-   $fields['picture'] = array(
+   /*$fields['picture'] = array(
     'label' => t('User picture in profile'),
     'description' => t('User picture in profile'),
     'weight' => -1, 
-  );
-  
+  );  */
    $fields['legal'] = array(
     'label' => t('Terms and conditions in profile'),
     'description' => t('Terms and conditions in profile'),

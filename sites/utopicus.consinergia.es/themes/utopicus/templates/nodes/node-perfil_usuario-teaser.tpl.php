@@ -70,25 +70,37 @@
  * @see zen_preprocess_node()
  * @see zen_process()
  */
+// miKrumo($node);
+/*if($node->nid==267) miKrumo($node);
 
+if($node->nid==273) miKrumo($node);*/
 ?>
     
     
 <a href="<?php  print url( 'node/' . $node->nid);?>" class="gray_link">
-<span class="image">
-
+<span class="image imagegrid">
 <?php 
+if($node->picture)$imgpath=$node->picture;
+else $imgpath=$node->field_userpic[0]['filepath'];
 //krumo(imagecache_presets());
-$imgpath=$node->field_top_image[0]['filepath'];
+$elemento=array(
+'fid'=>$node->nid,
+'nid'=>$node->nid,
+'filepath'=>$imgpath,
+'data'=>array('alt'=>$node->title,'title'=>$node->title)
+);
+//image223_gray 
 $opciones=array("nolink"=>TRUE);
-print theme('imageformatters_grayover',$node->field_top_image[0],"Imagen-223x223-grid" , $opciones );
+//print theme('imageformatters_grayover',$elemento,"Imagen-223x223-grid" , $opciones );
+print theme('imagecache',"image223_gray" ,$imgpath,$node->title,$node->title );
 ?>
 
 </span>
+
 <strong class="title"><?php print $node->title;  ?></strong>
-<span class="text-box"><?php print trim_text($node->teaser,200);  ?></span>
+<span class="text-box"><?php print $node->field_subtitulo[0]['value'];  ?></span>
 
 
 </a>
 
-<?php //krumo($node); ?>
+

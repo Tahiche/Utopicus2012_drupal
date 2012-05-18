@@ -1,0 +1,13 @@
+; $Id: imagefield_avatar.info,v 1.1.2.2 2010/02/15 17:50:03 crea Exp $
+name = ImageField Avatar
+description = Use imagefield/filefield for user pictures.
+package = CCK
+dependencies[] = imagefield
+dependencies[] = hs_field_selector
+core = 6.x
+; Information added by drupal.org packaging script on 2010-05-27
+version = "6.x-1.1"
+core = "6.x"
+project = "imagefield_avatar"
+datestamp = "1274970308"
+

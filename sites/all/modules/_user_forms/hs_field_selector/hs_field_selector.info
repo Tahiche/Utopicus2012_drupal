@@ -1,0 +1,12 @@
+name = Hierarchical Select Field Selector
+description = Form element to select content types and their fields.
+package = Form Elements
+dependencies[] = hierarchical_select
+dependencies[] = content
+core = 6.x
+; Information added by drupal.org packaging script on 2011-07-28
+version = "6.x-1.1"
+core = "6.x"
+project = "hs_field_selector"
+datestamp = "1311841321"
+

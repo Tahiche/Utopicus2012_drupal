@@ -1,0 +1,12 @@
+<?php
+// $Id: imagefield_avatar.install,v 1.1 2010/02/03 07:32:17 crea Exp $
+
+/**
+ * @file Imagefield Avatar.install
+ * Contains install and update functions for Imagefield Avatar.
+ */
+
+function imagefield_avatar_uninstall() {
+  variable_del('imagefield_avatar_content_type');
+  variable_del('imagefield_avatar_field');
+}

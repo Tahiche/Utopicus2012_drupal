@@ -1,0 +1,115 @@
+<?php
+// $Id: imagefield_avatar.module,v 1.1.2.3 2010/05/27 14:20:38 crea Exp $
+
+/**
+ * @file
+ * Imagefield Avatar module.
+ */
+
+/**
+ * Implementation of hook_nodeapi().
+ * 
+ * On node update, replace user's picture with imagefield value. When image is 
+ * not provided, use default image setting of imagefield.
+ * 
+ */
+function imagefield_avatar_nodeapi(&$node, $op, $teaser=NULL, $page=NULL) {
+  switch ($op) {
+    case 'insert':
+    case 'update':
+      $type = variable_get('imagefield_avatar_content_type', '');
+      $field = variable_get('imagefield_avatar_field', '');
+      if (_nodetype_field_valid($type, $field) && $node->type == $type) {
+        $filefield = $node->$field;
+        // Check first image.
+        if (!empty($filefield[0]['filepath'])) {
+          $file = $filefield[0]['filepath'];
+        }
+        else {
+          $file = '';
+        }
+        // Update the user's account picture.
+        db_query("UPDATE {users} SET picture = '%s' WHERE uid = %d", $file, $node->uid);
+      }
+      break;
+  }
+}
+
+/**
+ * Implementation of hook_form_alter().
+ */
+function imagefield_avatar_form_alter(&$form, &$form_state, $form_id) {
+  switch ($form_id) {
+    case 'content_field_edit_form':
+    case 'user_profile_form':
+    case 'user_admin_settings':
+      module_load_include('inc', 'imagefield_avatar', 'imagefield_avatar.admin');
+      _imagefield_avatar_form_alter($form, $form_state, $form_id);
+  }
+}
+
+/**
+ * Implementation of hook_requirements().
+ */
+function imagefield_avatar_requirements() {
+  $requirements = array();
+  $type = variable_get('imagefield_avatar_content_type', '');
+  $field = variable_get('imagefield_avatar_field', '');
+  if (!_nodetype_field_valid($type, $field)) {
+    $requirements['if_avatar_fields'] = array();
+    $requirements['if_avatar_fields']['title'] = t('Imagefield Avatar');
+    $requirements['if_avatar_fields']['description'] = t("Please check that you have atleast one imagefield configured, and change user picture settings accordingly.");
+    $requirements['if_avatar_fields']['severity'] = REQUIREMENT_ERROR;
+    $requirements['if_avatar_fields']['value'] = t('Configuration error.');
+  }
+  return $requirements;
+}
+
+/**
+ * Validate pair of node type and field.
+ */
+function _nodetype_field_valid($type, $field) {
+  // Empty string value means "none" i.e. ImageField Avatar is disabled. 
+  if (empty($type)) {
+    return TRUE;
+  }
+  if (empty($field))  {
+    return FALSE;
+  }
+  $types = content_types();
+  if (empty($types) ||
+      !is_array($types[$type]) || 
+      !is_array($types[$type]['fields'][$field]) ||
+      !_imagefield_avatar_field_filter($types[$type]['fields'][$field], $type)) {
+    return FALSE;
+  }
+  return TRUE;
+}
+
+/**
+ * Callback to select imagefield fields.
+ * 
+ * Imagefield is actually a filefield, and we don't have simple and reliable 
+ * way of selecting only filefields that are images (especially because user
+ * can use filefield widget with images), so instead we use all 
+ * filefields and let user choose between them.
+ */
+function _imagefield_avatar_field_filter(&$field, $parent) {
+  return ($field['type'] == 'filefield') ? TRUE : FALSE;
+}
+
+/**
+ * Callback to select node types.
+ */
+function _imagefield_avatar_nodetype_filter(&$type) {
+  if (!is_array($type['fields'])) {
+    return FALSE;
+  }
+  //Filter out node types without imagefields.
+  foreach ($type['fields'] as $id => $field) {
+    if (_imagefield_avatar_field_filter($field, '')) {
+      return TRUE;
+    }
+  }
+  return FALSE;
+}
