@@ -1,7 +1,33 @@
+Drupal.behaviors.hsAutoSubmit = function(context) {
+	//alert("hsAutoSubmit");
+ /* $('.views-widget .selects select').change(function() {
+	  alert("views-widget .selects select");
+    $(this.parentNode.parentNode.parentNode).bind('change-hierarchical-select',function() {
+      $('.view-filters form',context).submit();
+    });
+  });*/
+
+$('form#views-exposed-form-coworkers-grid-page').bind('add-to-dropbox remove-from-dropbox ', function(evento) {
+	//alert("add-to-dropbox"+evento);
+$('form#views-exposed-form-coworkers-grid-page').submit();
+});
+
+$('form#views-exposed-form-coworkers-grid-page-1').bind('add-to-dropbox remove-from-dropbox ', function(evento) {
+	//alert("add-to-dropbox"+evento);
+$('form#views-exposed-form-coworkers-grid-page-1').submit();
+});
+
+ /* $('#edit-tid-hierarchical-select-dropbox-add').click(function() {
+	  // $('.view-filters form').submit();
+	  $('form.views-processed').submit();
+	  /*alert("hola")
+	  })*/
+}
+
 
 	Drupal.behaviors.my_ajaxrefresh = function (context) { 
    //alert("my_ajaxrefresh");
-   jcf.customForms.replaceAll();
+    jcf.customForms.replaceAll();
    };
    
 // page init
@@ -1200,6 +1226,7 @@ jcf.lib = {
 	},
 	getElementsBySelector: function(selector, scope) {
 		if(typeof document.querySelectorAll === 'function') {
+			//console.log("               selector    "+selector)
 			return (scope || document).querySelectorAll(selector);
 		}
 		var selectors = selector.split(',');
@@ -1642,7 +1669,7 @@ jcf.addModule({
 // custom select module
 jcf.addModule({
 	name:'select',
-	selector:'select.niceselector, select#edit-tid_==',
+	selector:'select.niceselector, select#edit-tid, select.form-select',
 	defaultOptions: {
 		handleDropPosition: false,
 		wrapperClass:'select-area',

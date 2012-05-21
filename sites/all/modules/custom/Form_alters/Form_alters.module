@@ -220,4 +220,23 @@ function Form_alters_disable_validation(&$element) {
   //krumo($element);
  // if($element['#type']=="hierarchical_select") krumo($element);
 }
+
+
+
+    /**
+     * Implementation of hook_form_FORM_ID_alter() for 'views exposed form'
+     * Change the first option label '<All>' to 'Filter by Identifier Name' for exposed filters
+     * The filter identifier needs set up with underscores for multiple word filter names
+     * e.g. 'document_type' becomes 'Document Type'
+     */
+    /* 
+    function Form_alters_form_views_exposed_form_alter (&$form, $form_state) {
+	//krumo($form);
+    foreach($form as $key => &$value) {
+    if(isset($value['#options']['All'])) {
+    $label = ucwords(strtolower(str_replace('_', ' ', $key)));
+    $value['#options']['All'] = t('Filter by !label', array('!label' => $label));
+    }
+    }
+    }*/
 ?>

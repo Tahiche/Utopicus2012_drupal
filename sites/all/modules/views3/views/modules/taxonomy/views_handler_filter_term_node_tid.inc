@@ -311,7 +311,9 @@ class views_handler_filter_term_node_tid extends views_handler_filter_many_to_on
     $this->value_options = array();
 
     if ($this->value) {
-      $result = db_query("SELECT * FROM {term_data} td WHERE td.tid IN ("  . implode(', ', $this->value) . ")");
+     // $result = db_query("SELECT * FROM {term_data} td WHERE td.tid IN ("  . implode(', ', $this->value) . ")");
+	 /****************************************************************************************** patch !!!!!!!!!!!!!****/
+	 $result = db_query("SELECT * FROM {term_data} td WHERE td.tid IN ('"  . implode("', '", $this->value) . "')");
 
       while ($term = db_fetch_object($result)) {
         $this->value_options[$term->tid] = $term->name;

@@ -26,6 +26,8 @@ Drupal.viewsLoadMore = function(target, response) {
   var view_row_class = settings.row_class || '.views-row';
   // Check the 'display' for data.
   if (response.status && response.display) {
+	  
+	 // console.log(" response.status  "+response.status);
     // Grab the new contents.
     var $newView = $(response.display);
     // Find the new pager element, if it exists within the new contents.
@@ -41,13 +43,28 @@ Drupal.viewsLoadMore = function(target, response) {
     // Append the new content to the old view.
     // If we are using a grid or table-driven style plugin,
     // we'll have to check if a tbody container exists.
+	
+	
     var newRows = $newView.find(view_row_class);
+	
+	
     // Default tables in views 6.x do not include .views-row on the row class.
     // Therefore, jQuery has trouble identifying rows.
     // If the first query didn't find any results, check if the style plugin uses a table.
     if (newRows.length < 1 && (style_plugin == 'table' || style_plugin == 'grid')) {
       newRows = $('tbody tr', $newView);
     }
+	// list,default
+	/***********************************************************************************************************************************************/
+	if (newRows.length < 1 && (style_plugin == 'list,default' || style_plugin == 'list' || style_plugin == 'default')) {
+      console.log("  style_plugin style_pluginstyle_pluginstyle_plugin style_plugin@@");
+	  newRows = $('.grid-div .grid-list', $newView);
+    }
+	// list,default
+	/***********************************************************************************************************************************************/
+	
+
+	/*****************************************************************************************/
     if (newRows.length > 0) {
       // Drupal 6 ships with jQuery 1.2.6, making this a little harder
       // than it could be. There is no .parentsUntil() function.
@@ -65,9 +82,10 @@ Drupal.viewsLoadMore = function(target, response) {
       // Index 1 will be everything from the view's contents down.
       path_to_parent = path_to_parent.split(view_content_class);
       path_to_parent = view_content_class + ' ' + path_to_parent[1];
+	  console.log(" path_to_parent  "+path_to_parent);
       $(path_to_parent, $view).append(newRows);
-	  newRows.css("display", "none").slideDown("slow");
-
+	  /****************************************************************** efecto IN ************************/
+	  newRows.css("display", "none").slideDown(1500);
     }
     Drupal.attachBehaviors($view);
   }

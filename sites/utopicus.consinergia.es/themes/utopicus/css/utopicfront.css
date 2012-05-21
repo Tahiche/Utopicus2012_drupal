@@ -213,3 +213,10 @@ ul.links li{
 li.comment_forbidden{
 	display:none !important;
 	} 
+	/*********************************************************   filter forms ****************/
+/*#edit-submit-coworkers-grid{
+	display:none;
+	}*/
+.select-area.select-form-select {
+	background: none repeat scroll 0 0 #DDDDDD;
+	}

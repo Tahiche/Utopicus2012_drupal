@@ -6,4 +6,8 @@
 <file name="views-view.tpl.php" server="utopicus.teachnova.net/2011_09_18-openatrium-comunidad-1.0/" local="129798432227220000" remote="129798432000000000" />
 <file name="views-view--agenda-front.tpl.php" server="utopicus.teachnova.net/2011_09_18-openatrium-comunidad-1.0/" local="129809759003787566" remote="129809758800000000" />
 <file name="views-view-row-node.tpl.php" server="utopicus.teachnova.net/2011_09_18-openatrium-comunidad-1.0/" local="129810578141470000" remote="129810577800000000" />
+<file name="views-exposed-form-coworkers_grid.tpl.php" server="utopicus.teachnova.net/2011_09_18-openatrium-comunidad-1.0/" local="129821093002450624" remote="129821092800000000" />
+<file name="views-exposed-form.tpl.php" server="utopicus.teachnova.net/2011_09_18-openatrium-comunidad-1.0/" local="129821093428344984" remote="129821093400000000" />
+<file name="views_exposed_form__coworkers_grid__page_1.tpl.php" server="utopicus.teachnova.net/2011_09_18-openatrium-comunidad-1.0/" local="129821097435004152" remote="129821097000000000" />
+<file name="views-exposed-form--coworkers_grid.tpl.php" server="utopicus.teachnova.net/2011_09_18-openatrium-comunidad-1.0/" local="129821100242774747" remote="129821100000000000" />
 </dwsync>

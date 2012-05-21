@@ -286,6 +286,26 @@ foreach ($node_taxonomy AS $term) {
     }
 
 
+/**
+* Change submit button to search in exposed filters.
+*/
+
+function utopicus_preprocess_views_exposed_form(&$vars, $hook) {
+	// krumo($vars['form']['#id']);
+  // only alter the search view exposed filter form
+  if ($vars['form']['#id'] == 'views-exposed-form-coworkers-grid-page-1') {
+
+      
+    // Change the text on the submit button to Search
+    $vars['form']['submit']['#value'] = t('Filtrar');
+    unset($vars['form']['submit']['#printed']);
+    $vars['button'] = drupal_render($vars['form']['submit']);
+  }
+
+}
+
+
+
 /*function utopicus_pager_next($text, $limit, $element = 0, $interval = 1, $parameters = array()) {
   global $pager_page_array, $pager_total;
   $output = '';
