@@ -1230,7 +1230,7 @@ button:hover{cursor:pointer;}
 }
 .photo-info dd{
 	overflow:hidden;
-	height:1%;
+	/*height:1%;*/
 	padding:5px 9px 9px;
 }
 .photo-info img{
@@ -1260,8 +1260,8 @@ button:hover{cursor:pointer;}
 }
 /* holder */
 .profile-section .holder{
-	overflow:hidden;
-	height:1%;
+	/*overflow:hidden;
+	height:1%;*/
 	font-size:1.2em;
 	line-height:1.917em;
 	padding:0 6px 0 0;
@@ -1305,7 +1305,7 @@ button:hover{cursor:pointer;}
 }
 .areas dd{
 	overflow:hidden;
-	height:1%;
+	/*height:1%;*/
 	font-size:11px;
 	line-height:14px;
 	font-style:italic;
@@ -1316,7 +1316,7 @@ button:hover{cursor:pointer;}
 }
 /* links */
 .links{
-	height:1%;
+	/*height:1%;*/
 	padding:0 0 23px;
 	overflow:hidden;
 }
@@ -1346,7 +1346,7 @@ button:hover{cursor:pointer;}
 .links dd{
 	overflow:hidden;
 	padding:12px 10px 0;
-	height:1%;
+	/*height:1%;*/
 	font-size:11px;
 	line-height:14px;
 }
@@ -1904,7 +1904,7 @@ h2.content{
 #footer img{vertical-align:top;}
 /* footer-area */
 .footer-area{
-	height:1%;
+	/*height:1%;*/
 	overflow:hidden;
 	padding:0 8px 10px 0;
 	background:url(../images/divider-large.gif) no-repeat 0 100%;
@@ -2416,3 +2416,6 @@ html.js input.throbbing {
 div.view-filters, .view-filters {    
 	margin-bottom:20px;
 	}	
+	
+	
+	

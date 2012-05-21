@@ -70,47 +70,90 @@
  * @see zen_preprocess_node()
  * @see zen_process()
  */
-// miKrumo($node);
-/*if($node->nid==267) miKrumo($variables);
-
-if($node->nid==273) miKrumo($node);*/
-
-
+ // krumo($variables);
 ?>
-    
-    
-<a href="<?php  print url( 'node/' . $node->nid);?>" class="gray_link coworkercell">
-<span class="image imagegrid">
-<?php 
-if($node->picture)$imgpath=$node->picture;
-else $imgpath=$node->field_userpic[0]['filepath'];
-//krumo(imagecache_presets());
-$elemento=array(
-'fid'=>$node->nid,
-'nid'=>$node->nid,
-'filepath'=>$imgpath,
-'data'=>array('alt'=>$node->title,'title'=>$node->title)
-);
-//image223_gray 
-$opciones=array("nolink"=>TRUE);
-//print theme('imageformatters_grayover',$elemento,"Imagen-223x223-grid" , $opciones );
-// imagen gris
-print theme('imagecache',"image223_gray" ,$imgpath,$node->title,$node->title );
-?>
+<?php //krumo($variables); ?> 
 
-<!-- info -->
-<span class="info">
-										<span class="note">click para ver más.</span>
-										<span class="text"> <?php print trim_text($node->field_presentate[0]['value'],280); ?> </span> 
-</span>
-<!-- // info -->      
+
+
+<div class="profile-section">
+					<!-- aside -->
+					<div class="aside">
+						
+                        <?php 
+								if($node->picture)$imgpath=$node->picture;
+								else $imgpath=$node->field_userpic[0]['filepath'];
+								//krumo(imagecache_presets());
+								$elemento=array(
+								'fid'=>$node->nid,
+								'nid'=>$node->nid,
+								'filepath'=>$imgpath,
+								'data'=>array('alt'=>$node->title,'title'=>$node->title)
+								);
+								//image223_gray 
+								$opciones=array("nolink"=>TRUE);
+								print theme('imagecache',"Imagen_template_327x327" ,$imgpath,$node->title,$node->title );
+						?>
+
+						<!-- photo-info -->
+						<dl class="photo-info">
+						<!-- <dt>
+								<img width="26" height="25" alt="image discription" src="<?php print "/".path_to_theme() ?>/images_dummy/img44.gif">
+								<span>karma</span>
+							</dt> -->
+							<dd>
+								<strong class="number">25</strong>
+								<a class="like" href="#">ME GUSTA</a>
+							</dd>
+						</dl>
+					</div>
+					<!-- holder -->
+					<div class="holder">
+						<!-- heading -->
+						<div class="heading">
+							<h2><?php print $node->title;  ?></h2>
+						</div>
+						<!-- areas -->
+						<dl class="areas">
+							<dt>Áreas profesionales:</dt>
+							<dd>
+                            <?php print $terms_by_vocab[3]; ?>
                              
-</span><!-- // image -->    
-
-<strong class="title"><?php print $node->title;  ?></strong>
-<span class="text-box"><?php print $node->field_subtitulo[0]['value'];  ?></span>
-
-
-</a>
-
-
+                            </dd>
+						</dl>
+						<!-- links -->
+						<dl class="links">
+							<dt>
+								<!-- social-networks -->
+								<span class="social-networks">
+									<a class="facebook" href="#">facebook<span class="mask" style="opacity: 1;">&nbsp;</span></a>
+									<a class="twitter" href="#">twitter<span class="mask" style="opacity: 1;">&nbsp;</span></a>
+									<a class="igoogle" href="#">iGoogle<span class="mask" style="opacity: 1;">&nbsp;</span></a>
+									<a class="mail" href="#">mail<span class="mask" style="opacity: 1;">&nbsp;</span></a>
+								</span>
+							</dt>
+							<dd>
+                            <?php print $field_weblink1[0]['view']; ?>
+                            <?php print $field_weblink12[0]['view']; ?>
+							</dd>
+						</dl>
+						<?php print  $node->field_presentate[0]['value'] ?>
+						<!-- title -->
+						<strong class="title etiquetascoworker">Etiquetas</strong>
+						<!-- tags-list -->
+                        <div id="coworkertags">
+						 <?php print $terms_by_vocab[4]; ?>
+                         </div>
+						<!-- action -->
+						<!-- <div class="action">
+							<span class="alignleft">
+								<a class="prev" href="#">prev</a>
+								<span class="text">BUSCAR MAS COWORKERS</span>
+							</span>
+							<span class="alignright">
+								<a class="next" href="#">next</a>
+								<span class="text">VISITA EL MOSTRADOR DE MIS SERVICIOS</span>
+							</span>
+						</div> -->
+					</div>
+				</div>

@@ -5,6 +5,16 @@
  * - 'display': Display the associated data in the view area.
  */
 Drupal.viewsLoadMore = function(target, response) {
+	
+	/*$("ul.load-more-pager li.pager-next").each(function()
+                  {
+                      if($(this).children("a").length == 0)
+                      {
+                          $(this).hide();
+                      }
+                  });*/
+
+
   // Find the current View
   var $view = $(target);
   // How will we identify the current pager in the View?
@@ -56,6 +66,8 @@ Drupal.viewsLoadMore = function(target, response) {
       path_to_parent = path_to_parent.split(view_content_class);
       path_to_parent = view_content_class + ' ' + path_to_parent[1];
       $(path_to_parent, $view).append(newRows);
+	  newRows.css("display", "none").slideDown("slow");
+
     }
     Drupal.attachBehaviors($view);
   }

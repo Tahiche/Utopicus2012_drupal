@@ -120,6 +120,11 @@ function utopicus_preprocess_page(&$vars, $hook) {
 
 	// $vars['page_header']="ewrewweewewew";
 
+
+		// cambio el titulo de paginas de usuario
+	/*if(arg(0)=="user" && is_numeric(arg(1))){
+		$vars['title']="Comunidad";
+		}	*/
 	if (isset($vars['node'])){
 		//$path = explode('/', drupal_get_path_alias($_GET['q']));
 		// If the node type is "blog" the template suggestion will be "page-blog.tpl.php".
@@ -139,6 +144,8 @@ function utopicus_preprocess_page(&$vars, $hook) {
 			drupal_add_css($include_style, 'theme', 'all', FALSE);
 			$vars['styles'] = drupal_get_css();
 		}
+		
+		
 	}
 	// por ejemplo empty pages, no da tipo de nodo...
 	else{
@@ -247,13 +254,36 @@ function utopicus_preprocess_node(&$vars, $hook) {
  
   // fivestar widget como variable
    $vars['fivestar_widget']="<div id='fivestardiv'>".$vars['node']->content['fivestar_widget']['#value']."</div>";
-	  
+	
+	$vars['terms_by_vocab']=utopicus_separate_terms($vars['node']->taxonomy);
   // To remove a class from $classes_array, use array_diff().
   //$vars['classes_array'] = array_diff($vars['classes_array'], array('class-to-remove'));
   if(isset($_GET['krumon'])){
 	krumo($vars);
   }
 }
+
+
+function utopicus_separate_terms($node_taxonomy) {
+   if ($node_taxonomy) {
+
+foreach ($node_taxonomy AS $term) {
+ $links[$term->vid]['taxonomy_term_'. $term->tid] = array(
+   'title' => $term->name, 
+  'href' => taxonomy_term_path($term),
+'attributes' => array(
+   'rel' => 'tag',
+   'title' => strip_tags($term->description)
+   ),
+ );
+}
+   //theming terms out
+     foreach ($links AS $key => $vid) {
+ $terms[$key] = theme_links($vid);
+   }
+  }
+      return $terms;
+    }
 
 
 /*function utopicus_pager_next($text, $limit, $element = 0, $interval = 1, $parameters = array()) {

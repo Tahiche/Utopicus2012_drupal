@@ -93,6 +93,8 @@ function theme_views_load_more_pager($text = '', $limit = 10, $element = 0, $par
   $li_next = theme('pager_next', (!empty($text) ? $text : t('Load More')), $limit, $element, 1, $parameters);
   if (empty($li_next)) {
     $li_next = "&nbsp;";
+	/********************************************** añado la clase empty para ocultar pager si vacío ***/
+	$emptyclass=" emptypager";
   }
 
   // Generate the "Load More" anchor if:
@@ -103,12 +105,12 @@ function theme_views_load_more_pager($text = '', $limit = 10, $element = 0, $par
   // - We aren't displaying ALL results.
   if ($limit > 0 || $pager_total[$element] > 1) {
     $items[] = array(
-      'class' => 'pager-next',
+      'class' => 'pager-next '.$emptyclass, 
       'data' => $li_next,
     );
     // If a custom pager class was set, ensure it is set on the pager element.
     $custom_class = !empty($settings['link_class']) ? ' ' . $settings['pager_class'] : NULL;
-    return theme('item_list', $items, NULL, 'ul', array('class' => 'pager' . $custom_class));
+    return theme('item_list', $items, NULL, 'ul', array('class' => 'load-more-pager pager' . $custom_class));
   }
 
   // There are no pages left.

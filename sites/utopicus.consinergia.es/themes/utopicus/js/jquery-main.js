@@ -1635,11 +1635,14 @@ jcf.addModule({
 		}
 	}
 });
-
+/************************************************************************  select  ************************/
+/************************************************************************  select  ************************/
+/************************************************************************  select  ************************/
+/************************************************************************  select  ************************/
 // custom select module
 jcf.addModule({
 	name:'select',
-	selector:'select.niceselector, select#edit-tid',
+	selector:'select.niceselector, select#edit-tid_==',
 	defaultOptions: {
 		handleDropPosition: false,
 		wrapperClass:'select-area',

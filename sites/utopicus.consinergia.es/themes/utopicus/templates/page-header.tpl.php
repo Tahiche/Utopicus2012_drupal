@@ -40,6 +40,8 @@ global $isloggedin;
 if (!isset($isloggedin)){
 	$isloggedin= FALSE;
 }
+global $user;
+if($user->uid) $isloggedin= TRUE;
 ?>
 
 			<!-- header -->
@@ -59,6 +61,10 @@ if (!isset($isloggedin)){
                         <?php if(!$isloggedin): ?>
 							<li><a href="/user">ÚNETE </a></li>
 							<li ><a id="toboggan-login-link" href="/user">ACCEDER</a></li>
+                         <?php else: ?>
+							<li><a href="/user">ÚNETE </a></li>
+							<li ><a id="toboggan-login-link" href="/logout">LOGOUT</a></li>
+                            
                          <?php endif; ?>
 						</ul>
 					</div>
@@ -75,7 +81,7 @@ include_once 'commonforms/login.inc.php';
 				<!-- header-holder -->
 				<div class="header-holder">
 					<!-- logo -->
-					<strong class="logo"><a href="<?php print $base_root; ?>" title="<?php print 'utopic_US Home'; ?>"  alt="<?php print 'utopic_US Home'; ?>"  rel="home">Utopic_US </a></strong>
+					<strong class="logo"><a href="<?php print $front_page; ?>" title="<?php print 'utopic_US Home'; ?>"  alt="<?php print 'utopic_US Home'; ?>"  rel="home">Utopic_US </a></strong>
 					<!-- nav -->
 <?php
 //primary-menu.tpl theme hook 
