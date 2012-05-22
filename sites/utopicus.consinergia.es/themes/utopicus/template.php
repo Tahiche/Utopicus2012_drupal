@@ -290,7 +290,7 @@ foreach ($node_taxonomy AS $term) {
 * Change submit button to search in exposed filters.
 */
 
-function utopicus_preprocess_views_exposed_form(&$vars, $hook) {
+/*function utopicus_preprocess_views_exposed_form(&$vars, $hook) {
 	// krumo($vars['form']['#id']);
   // only alter the search view exposed filter form
   if ($vars['form']['#id'] == 'views-exposed-form-coworkers-grid-page-1') {
@@ -302,7 +302,7 @@ function utopicus_preprocess_views_exposed_form(&$vars, $hook) {
     $vars['button'] = drupal_render($vars['form']['submit']);
   }
 
-}
+}*/
 
 
 

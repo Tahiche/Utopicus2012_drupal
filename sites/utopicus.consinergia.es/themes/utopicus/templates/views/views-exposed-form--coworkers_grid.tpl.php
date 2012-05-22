@@ -23,7 +23,7 @@
   <?php
     // This ensures that, if clean URLs are off, the 'q' is added first so that
     // it shows up first in the URL.
-    print $q;
+    print $q; 
   ?> 
 <?php endif; ?>
 <div class="views-exposed-form">
