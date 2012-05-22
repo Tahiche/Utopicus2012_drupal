@@ -1,0 +1,147 @@
+<?php
+/*function miKrumo($var){
+	 if (!function_exists('krumo')){
+	 include_once  drupal_get_path('module', 'devel'). '/krumo/class.krumo.php';
+			}
+	echo "<div id='krumoDiv'>	";	
+	krumo($var);
+	echo"</div>";
+}*/
+/**
+* Implementation of hook_elements().
+*
+* This extends optionwidgets_elements() to add in additional processing.
+* Note that your module must be weighted higher than optionwidgets
+* for this code to take effect.
+*/
+/******************************************** quitar N/D o N/A de opciones !!!!!!! **************/
+/*function search_mods_elements() {
+  $type['optionwidgets_buttons']['#process'][] = 'remove_radio_na';
+  return $type;
+}*/
+
+/**
+* Unset the N/A option on option widget radio buttons.
+*/
+/*function remove_radio_na($element) {
+  unset($element['value']['#options']['']);
+  return $element;
+}*/
+
+function search_mods_menu() {
+ $items['taxonomy/customtaxoautocomplete'] = array(
+    'title' => 'AHAH customtaxoautocomplete',
+    'page callback' => 'ahah_formularios_taxonomy_autocomplete',
+    'type' => MENU_CALLBACK,
+    'access arguments' => array('access content'),
+  );
+  
+  $items['taxonomy/customtitleautocomplete'] = array(
+    'title' => 'AHAH customtitleautocomplete',
+    'page callback' => 'ahah_formularios_title_autocomplete',
+    'type' => MENU_CALLBACK,
+    'access arguments' => array('access content'),
+  );
+
+  return $items;
+}
+
+
+
+function search_mods_init(){
+	//echo "<h1> search_mods_form_alter search_mods_init</h1>"; 
+	}
+
+function search_mods_form_alter(&$form, &$form_state, $form_id) {
+	if($form_id=="views_exposed_form" && $form['#id']=="views-exposed-form-coworkers-grid-page-1"){
+		$form['nombre']['#size']=12;
+		$form['nombre']['#autocomplete_path'] = 'taxonomy/customtitleautocomplete' ;
+		
+		$form['tags']['#size']=12;
+		$form['tags']['#autocomplete_path'] = 'taxonomy/customtaxoautocomplete' ;
+		
+		
+		/*krumo($form);*/
+		}
+ 
+
+ 
+}
+
+
+function ahah_formularios_taxonomy_autocomplete($string){
+ $matches = array();
+  if($string)
+  {
+   /* $result = db_query_range("SELECT title FROM {node} WHERE type = 'perfil_usuario' and LOWER(title) LIKE LOWER('%s%%')", $string, 0, 10);
+    while ($title = db_fetch_object($result)) {
+      $matches[] = check_plain($title->title);
+    }*/
+	// The user enters a comma-separated list of tags. We only autocomplete the last tag.
+  $array = drupal_explode_tags($string);
+  // Fetch last tag
+  $last_string = trim(array_pop($array));
+  $matches = array();
+  if ($last_string != '') {
+// Actividades Coworker
+ $vid_a=3;
+ // Etiquetas de usuario
+ $vid_u=4;
+ $result = db_query_range("SELECT t.tid, 
+ t.name FROM {term_data} t 
+ WHERE (t.vid = %d) OR (t.vid = %d) AND LOWER (t.name) LIKE LOWER('%%%s%%') ORDER BY t.name asc
+ ", $vid_a, $vid_u,$last_string, 0, 10);
+ 
+    $prefix = count($array) ? implode(', ', $array) .', ' : '';
+
+    while ($tag = db_fetch_object($result)) {
+      $n = $tag->name;
+      // Commas and quotes in terms are special cases, so encode 'em.
+      if (strpos($tag->name, ',') !== FALSE || strpos($tag->name, '"') !== FALSE) {
+        $n = '"'. str_replace('"', '""', $tag->name) .'"';
+      }
+      $matches[$prefix . $n] = check_plain($tag->name);
+    }
+  }
+	$matches[$last_string]=rand();
+ //print  drupal_json($matches);
+ print drupal_to_js($matches);
+  }
+  
+  //print drupal_to_js($matches);
+  exit();
+}
+
+
+
+function ahah_formularios_title_autocomplete($string){
+ $matches = array();
+  if($string)
+  {
+	  $n=0;
+    $result = db_query_range("SELECT title,nid FROM {node} WHERE type = 'perfil_usuario' and LOWER(title) LIKE LOWER('%s%%')", $string, 0, 10);
+    while ($title = db_fetch_object($result)) {
+		$n++;
+      $matches[$title->title . ' [nid:' . $title->nid . ']'] = check_plain($title->title);
+    }
+ print drupal_to_js($matches);
+  }
+  //print drupal_to_js($matches);
+  exit();
+}
+
+
+
+function search_mods_disable_validation(&$element) {
+	//if($element['#type']=="hierarchical_select") krumo($element);
+  unset($element['#needs_validation']);
+   unset($element['#required']);
+  foreach(element_children($element) as $key) {
+    search_mods_disable_validation($element[$key]);
+  }
+  //krumo($element);
+ // if($element['#type']=="hierarchical_select") krumo($element);
+}
+
+
+?>

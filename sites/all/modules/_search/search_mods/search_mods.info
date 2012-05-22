@@ -1,0 +1,6 @@
+name = Search Modifications
+project = "Search Modifications" 
+description = "Alter views exposed filters and such."
+package = " Custom"
+version = "6.x"
+core = 6.x

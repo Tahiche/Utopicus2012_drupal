@@ -1,6 +1,11 @@
 @charset "utf-8";
 /* CSS Document */
 
+
+.text-holder a{
+	text-decoration:underline;
+	}
+	
 ul.load-more-pager li.pager-next{
     background: none repeat scroll 0 0 #444444;
     border-radius: 16px 16px 16px 16px; 
