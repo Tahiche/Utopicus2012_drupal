@@ -2,6 +2,17 @@
 /* CSS Document */
 
 
+.wysiwyg_imageupload .image_meta{
+	display:none;
+	}
+
+
+.contenidonodo table, .contenidonodo table td{
+	
+	border:0 !important;
+	padding:10px !important;
+	
+	}
 .text-holder a{
 	text-decoration:underline;
 	}
@@ -103,7 +114,9 @@ p a{
 	width:223px;
 	height:223px;
 	} 
- 
+ .grayoverImage{
+	 position:relative;
+	 }
 .grayoverImage .grey-image{
 	position:absolute;
 	top:0;
@@ -119,6 +132,8 @@ p a{
 	-moz-box-shadow: 0 0 5px #bcbcbc;
 }
 .gray_link:hover .grayoverImage .grey-image{opacity:0;}
+
+.grayoverImage:hover .grey-image{opacity:0;}
 
 .grid-list li {
     display: inline-block !important;
@@ -225,3 +240,55 @@ li.comment_forbidden{
 .select-area.select-form-select {
 	background: none repeat scroll 0 0 #DDDDDD;
 	}
+	
+#edit-nombre.form-text{
+	width:auto !important;
+	}
+	
+div.views-exposed-widget.views-submit-button input.form-submit{
+	background: url("../images/bg-form.png") no-repeat scroll -311px -152px transparent;
+    border: 0 none;
+    float: left;
+    height: 29px;
+    line-height: 0;
+    /*margin: 0;*/
+    overflow: hidden;
+    padding: 0;
+    text-indent: -9999px; 
+    width: 34px; 
+	min-width:inherit !important;
+	box-shadow:none;
+	-webkit-box-shadow:none;
+	-moz-box-shadow:none;
+	
+	-webkit-transition:none;
+	-moz-transition:none;
+	-o-transition:none;
+	transition:none;
+	}
+div.views-exposed-widget.views-submit-button input.form-submit:hover{background:url(../images/bg-form.png) no-repeat -311px -118px;}
+
+
+/**************************** flickr **********************/
+
+.flickr-photoset-img-s{
+	float: left;
+    margin-right: 8px;
+	margin-bottom: 8px;
+    vertical-align: text-bottom;
+	
+	border: 1px solid #D4D4D4 !important;
+    border-radius: 5px 5px 5px 5px;
+    padding: 8px !important;
+	background-color:#FFF;
+	
+	}
+.flickr-photoset-img-s:hover{
+	box-shadow: 0 0 5px #bcbcbc;
+	-webkit-box-shadow: 0 0 5px #bcbcbc;
+	-moz-box-shadow: 0 0 5px #bcbcbc;
+	}
+.flickr-photoset-meta{
+	display:none;
+	}
+

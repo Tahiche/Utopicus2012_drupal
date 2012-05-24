@@ -88,7 +88,9 @@ $elemento=array(
 );
 
 $opciones=array("nolink"=>TRUE);
-print theme('imageformatters_grayover',$elemento,"Imagen-223x223-grid" , $opciones );
+//print theme('imageformatters_grayover',$elemento,"Imagen-223x223-grid" , $opciones );
+print theme('imageformatters_grayover',$elemento,"img223_toc_cropped" , $opciones );
+
 ?>
 
 </span>

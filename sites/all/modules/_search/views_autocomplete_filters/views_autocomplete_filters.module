@@ -1,0 +1,25 @@
+<?php
+// $Id$ 
+/**
+ * Implementation of hook_menu().
+ */
+function views_autocomplete_filters_menu() {
+ $items = array();
+ $items['autocomplete_filter'] = array(
+	 'title' => 'Autocomplete Filters',
+	 'page callback' => 'views_autocomplete_filter',
+	 'access arguments' => array('access content'),
+	 'file' => 'views_autocomplete_filters.inc',
+	 'type' => MENU_CALLBACK,
+ );
+ return $items;
+}
+
+/**
+ * Implementation of hook_views_api().
+ */
+function views_autocomplete_filters_views_api() {
+  return array(
+    'api' => 3.0,
+  );
+}

@@ -8,7 +8,22 @@ global $theme_pathabsoluto;
 		<div class="footer-area">
 			<!-- box -->
 			<div class="box">
-				<img width="210" height="83" alt="image description" src="<?php print $theme_pathabsoluto; ?>/images/img-banner.gif">
+            
+<?php 
+$imgpath=path_to_theme()."/images/fotospieweb/_us1.jpg";
+//krumo(imagecache_presets());
+$elemento=array(
+'fid'=>"001",
+'nid'=>"001",
+'filepath'=>$imgpath,
+'data'=>array('alt'=>"madrid_US_1",'title'=>"madrid_US_1")
+);
+
+$opciones=array("customlink"=>"espacios/madrid_US_1");
+//print "XXXXX".$imgpath.theme('imageformatters_grayover',$elemento,"FooterImg_210x85" , $opciones );
+?>
+
+				<?php echo theme('imageformatters_grayover',$elemento,"FooterImg_210x85" , $opciones ); ?>
 				<strong class="title">Madrid Espacio_US1</strong>
 				<address style="height: 38px;">C/ Concepción Jerónima, 22<br>28012 Madrid.</address>
 				<dl>
@@ -18,7 +33,23 @@ global $theme_pathabsoluto;
 			</div>
 			<!-- box -->
 			<div class="box">
-				<img width="211" height="83" alt="image description" src="<?php print $theme_pathabsoluto; ?>/images/img-banner.gif">
+            
+
+<?php 
+$imgpath=path_to_theme()."/images/fotospieweb/IMG_2956.JPG";
+//krumo(imagecache_presets());
+$elemento=array(
+'fid'=>"001",
+'nid'=>"001",
+'filepath'=>$imgpath,
+'data'=>array('alt'=>"madrid_US_2",'title'=>"madrid_US_2")
+);
+
+$opciones=array("customlink"=>"espacios/madrid_US_2");
+//print "XXXXX".$imgpath.theme('imageformatters_grayover',$elemento,"FooterImg_210x85" , $opciones );
+?>
+
+				<?php echo theme('imageformatters_grayover',$elemento,"FooterImg_210x85" , $opciones ); ?>
 				<strong class="title">Madrid Espacio_US2</strong>
 				<address style="height: 38px;">C/ Duque de Rivas, 5 28012 Madrid.</address>
 				<dl>
@@ -28,7 +59,23 @@ global $theme_pathabsoluto;
 			</div>
 			<!-- box -->
 			<div class="box">
-				<img width="211" height="83" alt="image description" src="<?php print $theme_pathabsoluto; ?>/images/img-banner.gif">
+            
+<?php 
+$imgpath=path_to_theme()."/images/fotospieweb/IMG_2966.JPG";
+//krumo(imagecache_presets());
+$elemento=array(
+'fid'=>"001",
+'nid'=>"001",
+'filepath'=>$imgpath,
+'data'=>array('alt'=>"open_US",'title'=>"open_US")
+);
+
+$opciones=array("customlink"=>"espacios/open_us");
+//print "XXXXX".$imgpath.theme('imageformatters_grayover',$elemento,"FooterImg_210x85" , $opciones );
+?>
+				              
+                <?php echo theme('imageformatters_grayover',$elemento,"FooterImg_210x85" , $opciones ); ?>
+                
 				<strong class="title">Open_US</strong>
 				<address style="height: 38px;">Abre un espacio Utopic_Us en tu ciudad.</address>
 				<a class="more" href="#">Más información</a>
@@ -61,31 +108,31 @@ global $theme_pathabsoluto;
 			<div class="box">
 				<strong class="title"><a href="#">COWORKING</a></strong>
 				<ul>
-                	<li><a href="#">Listado Coworkers</a></li>
-					<li><a href="#">Tour</a></li>
-					<li><a href="#">Comunidad</a></li>
-					<li><a href="#">Espacios</a></li>
-					<li><a href="#">Áreas</a></li>
-					<li><a href="#">Tarifas y planes</a></li>
+                	<li><a href="/es/coworking/tour">Tour</a></li>
+								<li><a href="/es/coworking/coworkers">Coworkers</a></li>
+                                <li><a href="/es/coworking/comunidad">Comunidad</a></li>
+                                <li><a href="/es/coworking/espacios">Espacios</a></li>
+                                <li><a href="/es/coworking/tarifas_y_planes">Tarifas y planes</a></li>
 				</ul>
 			</div>
 			<!-- box -->
 			<div class="box">
 				<strong class="title"><a href="#">FORMACION</a></strong>
 				<ul>
-					<li><a href="#">Cursos</a></li>
-					<li><a href="#">Dosis</a></li>
-					<li><a href="#">Metodología</a></li>
-					<li><a href="#">Solicitar información</a></li>
+					<li><a href="/es/formacion/tocs">Vídeos TOCS</a></li>
+                             <li><a href="/es/formacion/cursos">Cursos</a></li>
 				</ul>
 			</div>
 			<!-- box -->
 			<div class="box">
 				<strong class="title"><a href="#">ACTIVIDADES</a></strong>
 				<ul>
-					<li><a href="#">Agenda de Actividades</a></li>
-					<li><a href="#">utopic_Sundays</a></li>
-					<li><a href="#">utopic_TV</a></li>
+					<li><a href="/es/actividades/agenda">Agenda</a></li>
+                                <li><a href="/es/actividades/utopic_gallery">Utopic_Gallery</a></li>
+                                <li><a href="/es/actividades/utopic_sundays">Utopic_Sundays</a></li>
+                                <li><a href="/es/actividades/mmm_us">MMM_US</a></li>
+                                <li><a href="/es/actividades/utopic_tv">Utopic_TV</a></li>
+                                <li><a href="/es/actividades/la_transformadora">Transformadora</a></li>
 					
 				</ul>
 			</div>
@@ -93,37 +140,29 @@ global $theme_pathabsoluto;
 			<div class="box">
 				<strong class="title"><a href="#">MOSTRADOR</a></strong>
 				<ul>
-					<li><a href="#">Audiovisual</a></li>
-					<li><a href="#">Arquitectura</a></li>
-					<li><a href="#">Consultoría</a></li>
-					<li><a href="#">Diseño y comunicación</a></li>
-					<li><a href="#">Web</a></li>
-					<li><a href="#">Música</a></li>
-					<li><a href="#">Moda</a></li>
+					
 				</ul>
 			</div>
 			<!-- box -->
 			<div class="box">
 				<strong class="title"><a href="#">ESPACIOS</a></strong>
 				<ul>
-					<li><a href="#">Madrid US_1</a></li>
-					<li><a href="#">Madrid US_2</a></li>
-					<li><a href="#">La Utópica Bar</a></li>
-					<li><a href="#">Utopic_Gallery</a></li>
-					<li><a href="#">La Transformadora</a></li>
-					<li><a href="#">Alquiler de Espacios</a></li>
+					<li><a href="/es/espacios/madrid_US_1">Madrid US_1</a></li>
+                                    <li><a href="/es/espacios/madrid_US_2">Madrid US_2</a></li>
+                                    <li><a href="/es/espacios/alquiler_de_espacios">Alquiler de Espacios</a></li>
+                                    <li><a href="/es/espacios/open_us">Open_US</a></li>
 				</ul>
 			</div>
 			<!-- box -->
 			<div class="box">
 				<strong class="title"><a href="#">_US</a></strong>
 				<ul>
-					<li><a href="/proyecto">El proyecto utopic_US</a></li>
-					<li><a href="/equipo">El equipo</a></li>
-					<li><a href="/noticias">Noticias</a></li>
-					<li><a href="/patrocinadores">Patrocinadores</a></li>
-					<li><a href="/sala_de_prensa">Sala de prensa</a></li>
-					<li><a href="/contacto">Contacto</a></li>
+					<li><a href="<?php echo url("_US/el_proyecto") ?>">El proyecto</a></li>
+                                    <li><a href="<?php echo url("_US/el_equipo") ?>">El equipo</a></li>
+                                    <li><a href="<?php echo url("_US/noticias") ?>">Noticias</a></li>
+                                    <li><a href="<?php echo url("_US/patrocinadores") ?>">Patrocinadores</a></li>
+                                    <li><a href="<?php echo url("_US/sala_de_prensa") ?>">Sala de prensa</a></li>
+                                    <li><a href="<?php echo url("_US/contacto") ?>">Contacto</a></li>
 				</ul>
 			</div>
 		</div>

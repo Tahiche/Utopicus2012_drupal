@@ -1,0 +1,7 @@
+; $Id$
+name = Views Autocomplete Filters
+description = Views Autocomplete Filters
+package = Views
+core = 6.x
+dependencies[] = views
+

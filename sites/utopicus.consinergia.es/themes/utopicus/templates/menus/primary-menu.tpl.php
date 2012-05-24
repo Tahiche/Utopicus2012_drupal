@@ -1,3 +1,11 @@
+<?php if (!function_exists("url")){
+	
+	function url($string){
+		return "/es/".$string;
+		}
+	
+	}
+?>
 <ul id="nav">
 						<li class="style-1 withdrop">
 							<a href="#"><span>COWORKING</span></a>
@@ -13,7 +21,7 @@
 							<a href="#"><span>FORMACIÓN</span></a>
 							<ul class="drop" style="opacity: 0; top: 100%; display: none;">
                              <li><a href="/es/formacion/tocs">Vídeos TOCS</a></li>
-                                <li><a href="/es/formacion/cursos">Cursos</a></li>
+                             <li><a href="/es/formacion/cursos">Cursos</a></li>
                                
                                 
 							</ul>
@@ -26,15 +34,15 @@
                                 <li><a href="/es/actividades/utopic_sundays">Utopic_Sundays</a></li>
                                 <li><a href="/es/actividades/mmm_us">MMM_US</a></li>
                                 <li><a href="/es/actividades/utopic_tv">Utopic_TV</a></li>
-                                <li><a href="/es/actividades/la_transformadora">La Transformadora</a></li>
+                                <li><a href="/es/actividades/la_transformadora">Transformadora</a></li>
 							</ul>
 						</li>
-						<li class="style-4 withdrop">
+						<!-- <li class="style-4 withdrop">
 							<a href="#"><span>mostrador</span></a>
                             <ul class="drop" style="opacity: 0; top: 100%; display: none;">
                                     
 							</ul>
-						</li>
+						</li>-->
 						<li class="style-5 withdrop">
 							<a href="#"><span>espacios</span></a>
 							<ul class="drop" style="opacity: 0; top: 100%; display: none;">
@@ -47,12 +55,12 @@
 						<li class="style-6 withdrop">
 							<a href="#"><span>_US</span></a>
 							<ul class="drop" style="opacity: 0; top: 100%; display: none;">
-                                    <li><a href="es/_US/el_proyecto">El proyecto</a></li>
-                                    <li><a href="es/_US/el_equipo">El equipo</a></li>
-                                    <li><a href="es/_US/noticias">Noticias</a></li>
-                                    <li><a href="es/_US/patrocinadores">Patrocinadores</a></li>
-                                    <li><a href="es/_US/sala_de_prensa">Sala de prensa</a></li>
-                                    <li><a href="es/_US/contacto">Contacto</a></li>
+                                    <li><a href="<?php echo url("_US/el_proyecto") ?>">El proyecto</a></li>
+                                    <li><a href="<?php echo url("_US/el_equipo") ?>">El equipo</a></li>
+                                    <li><a href="<?php echo url("_US/noticias") ?>">Noticias</a></li>
+                                    <li><a href="<?php echo url("_US/patrocinadores") ?>">Patrocinadores</a></li>
+                                    <li><a href="<?php echo url("_US/sala_de_prensa") ?>">Sala de prensa</a></li>
+                                    <li><a href="<?php echo url("_US/contacto") ?>">Contacto</a></li>
 							</ul>
 						</li>
 					</ul>

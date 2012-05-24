@@ -51,18 +51,20 @@ if($user->uid) $isloggedin= TRUE;
 					<div class="alignright">
 						<!-- usermenu -->
 						<ul class="usermenu">
-							<li class="active"><a href="#">OPEN_US</a></li>
+							<li class="active"><a href="/es/espacios/open_us">OPEN_US</a></li>
 							<li><a href="#">CONTACTO</a></li>
-							<li><a href="#">AYUDA</a></li>
-							<li><a href="#">ENGLISH</a></li>
+							<!--<li><a href="#">AYUDA</a></li>
+							 <li><a href="#">ENGLISH</a></li> -->
 						</ul>
 						<!-- loginmenu -->
 						<ul class="loginmenu">
                         <?php if(!$isloggedin): ?>
-							<li><a href="/user">ÚNETE </a></li>
-							<li ><a id="toboggan-login-link" href="/user">ACCEDER</a></li>
+							<!-- <li><a href="/user">ÚNETE</a></li> -->
+							<li ><a id="toboggan-login-link" href="/user">LOG-IN</a></li>
+                            
+                            
                          <?php else: ?>
-							<li><a href="/user">ÚNETE </a></li>
+							<!--<li><a href="/user">ÚNETE </a></li> -->
 							<li ><a id="toboggan-login-link" href="/logout">LOGOUT</a></li>
                             
                          <?php endif; ?>

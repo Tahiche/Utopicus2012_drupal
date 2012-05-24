@@ -133,7 +133,7 @@ $imageGray = theme('imagecache', "grayscale", $colorpath , $item['data']['alt'],
 
 function theme_imageformatters_grayoverpic($element=NULL,$preset=NULL,$options=NULL) {
 
-//krumo($element);
+//miKrumo($element);
 
 
 // Inside a view $element may contain NULL data. In that case, just return.
@@ -179,9 +179,12 @@ function theme_imageformatters_grayoverpic($element=NULL,$preset=NULL,$options=N
 	
 $imageGray = theme('imagecache', "grayscale", $colorpath , $item['data']['alt'], $item['data']['title'],$attributes=array('class'=>"grey-image") );
 
+    
 
     $path = empty($item['nid']) ? '' : "node/".$item['nid'];
     
+	if($options['customlink'])$path =$options['customlink'];
+	
 	 $class = "imagecache imagecache-$presetname imagecache-$style imagecache-{$element['#formatter']}";
 	
 	

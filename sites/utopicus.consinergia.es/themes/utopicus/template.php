@@ -115,6 +115,8 @@ function utopicus_preprocess_page(&$vars, $hook) {
 	// añadimos css de Google Fonts
 	$vars['styles'] .= '<link href="http://fonts.googleapis.com/css?family=Asap:400,700,700italic,400italic" rel="stylesheet" type="text/css" />';
 
+//$vars['styles'] .= '<link href="/'.path_to_theme().'/css/utopicfront.css?r='.rand().'" rel="stylesheet" type="text/css" />';
+
 	$vars['page_header']=theme('page_header',$vars);
 	$vars['page_footer']=theme('page_footer',$vars);
 

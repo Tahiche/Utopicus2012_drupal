@@ -42,6 +42,7 @@ core       = 6.x
 ; stylesheets[only screen and (max-device-width: 480px)][] = css/iphone.css
 
 stylesheets[all][]   = css/all.css
+; !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!  volver a poner esta en template por el caché
 stylesheets[all][]   = css/utopicfront.css
 stylesheets[all][]   = css/fancybox.css
 stylesheets[handheld][] = css/allmobile.css

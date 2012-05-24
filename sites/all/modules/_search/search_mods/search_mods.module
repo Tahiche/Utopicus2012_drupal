@@ -54,14 +54,24 @@ function search_mods_init(){
 
 function search_mods_form_alter(&$form, &$form_state, $form_id) {
 	if($form_id=="views_exposed_form" && $form['#id']=="views-exposed-form-coworkers-grid-page-1"){
-		$form['nombre']['#size']=12;
+		$form['nombre']['#size']=18;
 		$form['nombre']['#autocomplete_path'] = 'taxonomy/customtitleautocomplete' ;
 		
-		$form['tags']['#size']=12;
-		$form['tags']['#autocomplete_path'] = 'taxonomy/customtaxoautocomplete' ;
+		
+		$form['submit']['#weight']=0;
+		/*$form['tags']['#size']=12;
+		$form['tags']['#autocomplete_path'] = 'taxonomy/customtaxoautocomplete' ;*/
 		
 		
-		/*krumo($form);*/
+ /* $form['submit'] = array(
+    '#type' => 'image_button',
+    '#value' => t(''),
+    '#src' => path_to_theme().'/images/send-button.jpg',
+  );*/
+  
+		
+		/*krumo($form);
+		krumo($form_state);*/
 		}
  
 
@@ -122,7 +132,8 @@ function ahah_formularios_title_autocomplete($string){
     $result = db_query_range("SELECT title,nid FROM {node} WHERE type = 'perfil_usuario' and LOWER(title) LIKE LOWER('%s%%')", $string, 0, 10);
     while ($title = db_fetch_object($result)) {
 		$n++;
-      $matches[$title->title . ' [nid:' . $title->nid . ']'] = check_plain($title->title);
+      //$matches[$title->title . ' [nid:' . $title->nid . ']'] = check_plain($title->title);
+	  $matches[$title->title] = check_plain($title->title);
     }
  print drupal_to_js($matches);
   }
