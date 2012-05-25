@@ -107,7 +107,9 @@ function utopicus_preprocess_page(&$vars, $hook) {
 	
 	//krumo($vars);
 	
+	drupal_add_js(path_to_theme() ."/js/jquery.blockUI.js");
 	
+	// $vars['scripts'].="<script src='/sites/all/js/jquery.blockUI.js?t' type='text/javascript'>";
 	//drupal_add_css('http://fonts.googleapis.com/css?family=Asap:400,700,700italic,400italic');
 	/*drupal_add_css('http://fonts.googleapis.com/css?family=Asap:400,700,700italic,400italic', 'theme', 'all', FALSE);
 	$vars['styles'] = drupal_get_css();*/
@@ -117,7 +119,7 @@ function utopicus_preprocess_page(&$vars, $hook) {
 
 //$vars['styles'] .= '<link href="/'.path_to_theme().'/css/utopicfront.css?r='.rand().'" rel="stylesheet" type="text/css" />';
 
-	$vars['page_header']=theme('page_header',$vars);
+	$vars['page_header']=theme('page_header',$vars); 
 	$vars['page_footer']=theme('page_footer',$vars);
 
 	// $vars['page_header']="ewrewweewewew";

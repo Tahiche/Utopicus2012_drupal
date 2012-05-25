@@ -75,7 +75,6 @@
 <?php //krumo($variables); ?> 
 
 
-
 <div class="profile-section">
 					<!-- aside -->
 					<div class="aside">
@@ -137,23 +136,22 @@
                             <?php print $field_weblink12[0]['view']; ?>
 							</dd>
 						</dl>
+                        <div id="presentate">
 						<?php print  $node->field_presentate[0]['value'] ?>
+                        </div>
 						<!-- title -->
 						<strong class="title etiquetascoworker">Etiquetas</strong>
 						<!-- tags-list -->
                         <div id="coworkertags">
 						 <?php print $terms_by_vocab[4]; ?>
                          </div>
-						<!-- action -->
-						<!-- <div class="action">
-							<span class="alignleft">
-								<a class="prev" href="#">prev</a>
+						 
+						<div class="action">
+                        <span class="alignleft">
+								<a class="prev" href="<?php echo url ("coworking/coworkers"); ?>">prev</a>
 								<span class="text">BUSCAR MAS COWORKERS</span>
-							</span>
-							<span class="alignright">
-								<a class="next" href="#">next</a>
-								<span class="text">VISITA EL MOSTRADOR DE MIS SERVICIOS</span>
-							</span>
-						</div> -->
+							</span>                            
+														
+						</div>
 					</div>
 				</div>

@@ -42,6 +42,8 @@ if (!isset($isloggedin)){
 }
 global $user;
 if($user->uid) $isloggedin= TRUE;
+
+$homelink=($variables['page_vars']['front_page']?$variables['page_vars']['front_page']:"/");
 ?>
 
 			<!-- header -->
@@ -83,7 +85,7 @@ include_once 'commonforms/login.inc.php';
 				<!-- header-holder -->
 				<div class="header-holder">
 					<!-- logo -->
-					<strong class="logo"><a href="<?php print $front_page; ?>" title="<?php print 'utopic_US Home'; ?>"  alt="<?php print 'utopic_US Home'; ?>"  rel="home">Utopic_US </a></strong>
+					<strong class="logo"><a href="<?php print $homelink; ?>" title="<?php print 'utopic_US Home'; ?>"  alt="<?php print 'utopic_US Home'; ?>"  rel="home">Utopic_US </a></strong>
 					<!-- nav -->
 <?php
 //primary-menu.tpl theme hook 

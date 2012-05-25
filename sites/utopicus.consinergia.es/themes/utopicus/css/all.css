@@ -294,6 +294,10 @@ button:hover{cursor:pointer;}
 	margin:0;
 	border:0;
 	background:url(../images/bg-form.png) no-repeat 0 -118px;
+	-webkit-transition:none;
+	-moz-transition:none;
+	-o-transition:none;
+	transition:none;
 }
 .search-section .btn:hover{background:url(../images/bg-form.png) no-repeat -39px -118px;}
 /* item-section */
@@ -308,7 +312,7 @@ button:hover{cursor:pointer;}
 	display:block;
 	margin:0 4px 31px;
 	text-transform:uppercase;
-	font-size:1.1em;
+	font-size:11px;
 	line-height:1.273em;
 	font-weight:400;
 }
@@ -321,7 +325,8 @@ button:hover{cursor:pointer;}
 	float:left;
 	width:217px;
 	padding:25px 8px 18px;
-	font-size:1.2em;
+	/*font-size:1.2em;*/
+	font-size:12px;
 	line-height:1.583em;
 	background:url(../images/transparent.gif);
 	-webkit-transition:all 500ms ease-in-out;
@@ -337,7 +342,8 @@ button:hover{cursor:pointer;}
 	margin:0 -3px 7px;
 	padding:0 4px 6px;
 	font-weight:700;
-	font-size:1.333em;
+	/*font-size:1.333em;*/
+	font-size:16px;
 	line-height:1.188em;
 	text-transform:uppercase;
 	border-bottom:1px solid #d1d1d1;
@@ -517,7 +523,7 @@ button:hover{cursor:pointer;}
 	margin:0 20px 0 0;
 	float:left;
 	text-transform:uppercase;
-	font:700 1.8em/1.111em 'Asap', Arial, Helvetica, sans-serif;
+	font:700 18px 'Asap', Arial, Helvetica, sans-serif;
 }
 /* btn-circle */
 .main-heading .btn-circle{
@@ -2243,7 +2249,7 @@ input[type=submit], input.form-submit{
     float: left;
     padding: 7px 4px;
     text-align: center;
-    min-width: 70px;
+    /*min-width: 70px;*/
 	border:0;
 	text-transform:uppercase;
 	margin:6px;

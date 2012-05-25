@@ -78,15 +78,15 @@
 <span class="image">
 
 <?php 
-//krumo(imagecache_presets());
-$imgpath=$node->field_top_image[0]['filepath'];
+//krumo($node);
+$imgpath=$node->field_img_ppal[0]['filepath'];
 $opciones=array("nolink"=>TRUE);
-print theme('imageformatters_grayover',$node->field_top_image[0],"Imagen-223x223-grid" , $opciones );
+print theme('imageformatters_grayover',$node->field_img_ppal[0],"Imagen-223x223-grid" , $opciones );
 ?>
 
 </span>
 <strong class="title"><?php print $node->title;  ?></strong>
-<span class="text-box"><?php print trim_text($node->teaser,200);  ?></span>
+<span class="text-box"><?php print trim_text($node->content['body']['#value'],200);  ?></span>
 
 
 </a>

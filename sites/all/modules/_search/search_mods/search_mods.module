@@ -50,31 +50,46 @@ function search_mods_menu() {
 
 function search_mods_init(){
 	//echo "<h1> search_mods_form_alter search_mods_init</h1>"; 
+	
+
 	}
 
 function search_mods_form_alter(&$form, &$form_state, $form_id) {
-	if($form_id=="views_exposed_form" && $form['#id']=="views-exposed-form-coworkers-grid-page-1"){
-		$form['nombre']['#size']=18;
+	
+	
+			
+	if($form['#id']=="views-exposed-form-coworkers-grid-page-coworkers" || $form['#id']=="views-exposed-form-coworkers-grid-page-3"){
+		
+				
+		 drupal_add_js(drupal_get_path('module', 'search_mods') . '/searchmods.js');
+		// firep("formmm");
+		$form['nombre']['#size']=30;
 		$form['nombre']['#autocomplete_path'] = 'taxonomy/customtitleautocomplete' ;
+		$form['nombre']['#attributes']['class']='auto_submit';
 		
+		/*unset($form['submit']);*/
+		$form['term_node_tid_depth_limited']['#options']['All']="- Todos -";
 		
-		$form['submit']['#weight']=0;
-		/*$form['tags']['#size']=12;
-		$form['tags']['#autocomplete_path'] = 'taxonomy/customtaxoautocomplete' ;*/
+		// $form['freeterm']['#type']="hidden";
 		
+		/*$form['buscarlabel']['#type']="label";
+		$form['buscarlabel']['#value']="Buscar coworkers";*/
 		
- /* $form['submit'] = array(
-    '#type' => 'image_button',
-    '#value' => t(''),
-    '#src' => path_to_theme().'/images/send-button.jpg',
-  );*/
-  
+		$form['freeterm']['#size']=30;
 		
-		/*krumo($form);
-		krumo($form_state);*/
+		// krumo($form);
+		/*krumo($form_state);*/
+		
+		if($form['#id']=="views-exposed-form-coworkers-grid-page-3"){
+			$form['#action']=url("coworking/coworkers");
 		}
+		// 
+		
+		} // si noi es una de los views de coworkers
  
-
+if(isset($_GET['krumof'])){
+			miKrumo($form);
+			}
  
 }
 

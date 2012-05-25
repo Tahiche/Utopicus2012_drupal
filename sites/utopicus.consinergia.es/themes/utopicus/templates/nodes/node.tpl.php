@@ -78,7 +78,7 @@
 
  
 
-  <div class="contenidonodo">
+  <div class="contenidonodo node-<?php print $node->type; ?>">
     <?php print $content; ?>
   </div>
   
