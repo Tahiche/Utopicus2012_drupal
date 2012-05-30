@@ -27,8 +27,8 @@
  *
  * @ingroup views_templates
  */
-?>
-<div class="post-section  <?php print $classes; ?>">
+?>  
+<div class="<?php print $classes; ?>">
 
 
   <?php if ($admin_links): ?>
@@ -54,10 +54,10 @@
     </div>
   <?php endif; ?>
 
-  <?php if ($rows): ?>
-    <div class="view-content">
+  <?php if ($rows): ?> 
+    <div class="view-content contentlist">
     
-    <div class="post-columns">
+    <div class="post-columns events-area">
       <?php print $rows; ?>
      </div>
     </div>

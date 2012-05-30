@@ -1,7 +1,7 @@
 <?php
 /**
  * @file views-view-fields.tpl.php
- * Default simple view template to all the fields as a row.
+ * Default simple view template to all the fields as a row. 
  *
  * - $view: The view in use.
  * - $fields: an array of $field objects. Each one contains:
@@ -24,39 +24,16 @@
  */  
  // krumo($fields)
 ?>
-<div class="heading">
-	<!-- date -->
-<em class="date"><?php echo $fields['created']->content?></em>
-<!-- category -->
-<strong class="category"><?php 
-//echo $fields['tid']->content
-/*switch($fields['type']->content){
-	case "actividad_agenda": 
-	$cat="Actividades";
-	break;
-	
-	case "noticia": 
-	$cat="Noticias";
-	break;
-	
-	case "curso": 
-	$cat="Cursos";
-	break;
-	
-	default:
-	$cat="";
-	break;
-	}*/
-
-echo $fields['tid']->content
-// echo $cat;
-?></strong>
-</div>
 
 <div class="image">
 <?php echo $fields['field_img_ppal_fid']->content?>
 </div>
 
+<div class="row">
+<em class="date"><?php echo $fields['created']->content?></em>
+<div class="btn-category" href="#"><?php echo $fields['tid']->content; ?></div>
+</div>
+                                    
 
 
 <div class="text">
@@ -64,9 +41,4 @@ echo $fields['tid']->content
 <p><?php echo $fields['body']->content; ?></p>
 </div>
                                                                                     
-<?php //foreach ($fields as $id => $field):?>
-
-    <?php //print $field->content; ?>
-    
-
-<?php //endforeach; ?>
+<?php echo theme("social_addthis");?>

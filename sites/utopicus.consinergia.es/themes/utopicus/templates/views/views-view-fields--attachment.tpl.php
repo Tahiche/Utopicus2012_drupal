@@ -24,44 +24,39 @@
  */  
  // krumo($fields)
 ?>
-<div class="heading">
-	<!-- date -->
-<em class="date"><?php echo $fields['created']->content?></em>
-<!-- category -->
-<strong class="category"><?php 
-//echo $fields['tid']->content
-/*switch($fields['type']->content){
-	case "actividad_agenda": 
-	$cat="Actividades";
-	break;
-	
-	case "noticia": 
-	$cat="Noticias";
-	break;
-	
-	case "curso": 
-	$cat="Cursos";
-	break;
-	
-	default:
-	$cat="";
-	break;
-	}*/
-
-echo $fields['tid']->content
-// echo $cat;
-?></strong>
-</div>
+<div id="content">
 
 <div class="image">
 <?php echo $fields['field_img_ppal_fid']->content?>
 </div>
 
 
+<div class="heading border">
+	<!-- date -->
+<em class="date"><?php echo $fields['created']->content?></em>
 
-<div class="text">
-<h3><?php echo $fields['title']->content; ?></h3>
-<p><?php echo $fields['body']->content; ?></p>
+<h2><?php echo $fields['title']->content; ?></h2>
+
+<!-- category -->
+<strong class="category"><?php  
+echo $fields['tid']->content
+?></strong>
+</div>
+
+
+
+
+
+<div class="text block border">
+
+<?php echo $fields['body']->content; ?>
+
+<div class="holder">
+<!-- social-networks -->
+<?php echo theme('social_addthis'); ?>
+<!-- categoria de la noticia -->
+<div class="btn-category" ><?php  echo $fields['tid']->content; ?></div>
+</div>
 </div>
                                                                                     
 <?php //foreach ($fields as $id => $field):?>
@@ -70,3 +65,4 @@ echo $fields['tid']->content
     
 
 <?php //endforeach; ?>
+</div>

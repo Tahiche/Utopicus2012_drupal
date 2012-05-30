@@ -23,4 +23,4 @@
     <li><a class="rss" href="#">rss<span class="mask" style="opacity: 1;">&nbsp;</span></a></li> -->
 </ul>
 </div>
-<script type="text/javascript" src="http://s7.addthis.com/js/250/addthis_widget.js#pubid=xa-4f472587705fa7b2"></script>
+<!-- <script type="text/javascript" src="http://s7.addthis.com/js/250/addthis_widget.js#pubid=xa-4f472587705fa7b2"></script> -->

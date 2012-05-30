@@ -361,5 +361,42 @@ margin: 0;
 
 /******************************/
 .contenidonodo{
-	width:800px;
+	/*width:800px;*/
 	}
+div.masvisto{
+	font-size:13px;
+	}
+	
+#sidebar .articder{
+    float: right;
+    padding: 15px 3px 0 0;
+    width: 219px;
+}
+
+/**************************** listado secciones ********************/
+.destacado #content{
+	float:none;
+	}
+.post-columns.events-area{
+	background:none;
+	}
+.events-list .btn-category {
+    float: right;
+    font-size: 0.833em;
+    line-height: 1.2em;
+    padding: 8px 0 0;
+    text-transform: uppercase;
+	padding:0;
+	
+}
+
+.events-list > li {
+height: 380px;
+position:relative;
+}
+
+.events-list > li .addthis_toolbox {
+ bottom: 10px;
+    position: absolute;
+
+}

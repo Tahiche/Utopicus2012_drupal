@@ -22,7 +22,7 @@
  * - $exposed: Exposed widget form/info to display
  * - $feed_icon: Feed icon to display, if any
  * - $more: A link to view more, if any
- * - $admin_links: A rendered list of administrative links
+ * - $admin_links: A rendered list of administrative links 
  * - $admin_links_raw: A list of administrative links suitable for theme('links')
  *
  * @ingroup views_templates
@@ -30,7 +30,26 @@
 ?>
 <div class="post-section  <?php print $classes; ?>">
 
+<!-- esto podríar ser el header -->
+<div class="post-visual">
+						<img height="151" width="923" alt="image description" src="/<?php print path_to_theme()?>/images_dummy/img26.png">
+						<h2>FEATURED POST. IMAGEN SIN TEXTO.</h2>
+</div>
 
+
+<!-- podrían ser filtros -->
+<div class="breadcrumbs-holder">
+						<h2>agenda</h2>
+						<!-- breadcrumbs -->
+						<!-- <ul class="breadcrumbs">
+							<li>todo</li>
+							<li><a href="#">CURSOS</a></li>
+							<li><a href="#">DOSIS</a></li>
+							<li><a href="#">ACTIVIDADES</a></li>
+							<li><a href="#">PRODUCTOS Y SERVICIOS</a></li>
+							<li><a href="#">NOTICIAS</a></li>
+</ul> -->
+</div>
   <?php if ($admin_links): ?>
     <div class="views-admin-links views-hide">
       <?php print $admin_links; ?>

@@ -27,7 +27,7 @@
  *
  * @ingroup views_templates
  */
-?>
+?> 
 <div class="post-section  <?php print $classes; ?>">
 
 
@@ -54,7 +54,7 @@
     </div>
   <?php endif; ?>
 
-  <?php if ($rows): ?>
+  <?php if ($rows): ?> 
     <div class="view-content">
     
     <div class="post-columns">

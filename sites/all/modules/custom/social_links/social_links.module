@@ -18,10 +18,8 @@ function social_links_theme(){
 	return  $themes;
   
 } 
- 
-/*function social_links_preprocess_node(&$vars, $hook){
-	
-	// krumo::get();
-	$vars['social_addthis']=theme('social_addthis');
-	miKrumo($vars);
-	}*/ 
+function social_links_init() {
+drupal_set_html_head("<script type='text/javascript' src='//s7.addthis.com/js/250/addthis_widget.js#pubid=xa-4f472587705fa7b2'></script>");
+//now you might have to reload the header instance
+$variables['head'] = drupal_get_html_head();
+}

@@ -1,0 +1,21 @@
+<?php
+function views_alters_preprocess_views_view($vars){
+	
+	}
+
+/**
+* Implementation of hook_views_pre_execute().
+*/
+function views_alters_views_pre_execute(&$view) {
+	
+	// miKrumo($view->name);
+  if ($view->name == 'lista_secciones' && $view->current_display == 'page_cursos') { // <-- current_display name might be different.
+  //miKrumo($view);
+    // Get the page from the URL.
+    $page = !empty($_GET['page']) ? $_GET['page'] : 0;   
+	// firep($page);    
+    // Increase the offest according to the page.
+  // if($page>0) $view->set_offset(0);
+  }
+}
+?>

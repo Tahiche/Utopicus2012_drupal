@@ -1,0 +1,6 @@
+name = views_alters
+project = "views_alters"
+description = "Alter views, change offsets, etc."
+package = " Custom"
+version = "6.x"
+core = 6.x

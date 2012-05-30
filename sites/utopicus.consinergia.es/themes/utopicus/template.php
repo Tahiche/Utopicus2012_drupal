@@ -241,11 +241,11 @@ function utopicus_preprocess_node(&$vars, $hook) {
 	  // krumo($vars);
 	  } // fin -- if($vars['type']=="pageutopicus
 	  
-  $articlenodes = array("actividad_agenda", "noticia");
+  $articlenodes = array("actividad_agenda", "noticia", "curso");
   if (in_array($vars['node']->type,$articlenodes))$vars['template_files'][] ="node-article";
   
   // añadimos social media del modulo custom/social_links si en el tipo...
-  $articlenodes = array("actividad_agenda", "noticia");
+  $articlenodes = array("actividad_agenda", "noticia", "curso");
   if (in_array($vars['node']->type,$articlenodes))$vars['social_addthis']=theme('social_addthis'); 
   
   
