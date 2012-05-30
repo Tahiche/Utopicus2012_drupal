@@ -1871,7 +1871,7 @@ h2.content{
 	width:100%;
 }
 #sidebar h2{
-	font:700 1.6em/1.125em 'Asap', Arial, Helvetica, sans-serif;
+	font:700 16px 'Asap', Arial, Helvetica, sans-serif;
 	margin:0 0 10px;
 }
 /* category-list */
@@ -2065,7 +2065,7 @@ h2.content{
 .social-networks a{
 	position:relative;
 	float:left;
-	width:26px;
+	width:25px;
 	height:25px;
 	text-indent:-9999px;
 	overflow:hidden;
@@ -2080,6 +2080,11 @@ h2.content{
 .social-networks .vimeo{background:url(../images/bg-social.png) no-repeat -263px 0;}
 .social-networks .flickr{background:url(../images/bg-social.png) no-repeat -292px 0;}
 .social-networks .rss{background:url(../images/bg-social.png) no-repeat -321px 0;}
+.social-networks .mail{
+	background:url(../images/bg-social.png) no-repeat -427px 0;
+	width:24px;
+}
+
 /* mask */
 .social-networks .mask{
 	position:absolute;
@@ -2094,6 +2099,8 @@ h2.content{
 .social-networks .vimeo .mask{background:url(../images/bg-social.png) no-repeat -87px 0;}
 .social-networks .flickr .mask{background:url(../images/bg-social.png) no-repeat -116px 0;}
 .social-networks .rss .mask{background:url(../images/bg-social.png) no-repeat -145px 0;}
+.social-networks .mail .mask{background:url(../images/bg-social.png) no-repeat -427px 0;}
+
 /* banner */
 .footer-bar .banner{float:left;}
 /* copyright */

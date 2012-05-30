@@ -1,0 +1,6 @@
+; $Id: $
+name = Social Links
+description = Adds addthis social links to node as var.
+package = " Custom"
+
+core = "6.x"

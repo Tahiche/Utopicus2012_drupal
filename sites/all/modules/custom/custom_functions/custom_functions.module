@@ -19,12 +19,16 @@ return $adminAble;
 }
 	
 function miKrumo($var){
-	// if(!user_is_admin()) return false;
-		
-		if (!function_exists('krumo')){
+	if(!user_is_editor()) return false;
+	
+	 if (!function_exists('krumo')){
 	 include_once  drupal_get_path('module', 'devel'). '/krumo/class.krumo.php';
 			}
 	echo "<div id='krumoDiv'>	";	
+	$_ = array_reverse(debug_backtrace());
+		$d = array_pop($_);
+		
+	echo "Called from:".@$d['file']." line".$d['line'];
 	krumo($var);
 	echo"</div>";
 }

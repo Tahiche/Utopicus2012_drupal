@@ -1686,7 +1686,7 @@ jcf.addModule({
 // custom select module
 jcf.addModule({
 	name:'select',
-	selector:'select.niceselector, select#edit-tid, select.form-select',
+	selector:'select.niceselector, select#edit-tid, select.form-select', 
 	defaultOptions: {
 		handleDropPosition: false,
 		wrapperClass:'select-area',
@@ -1709,7 +1709,12 @@ jcf.addModule({
 		dropSelector:'div.drop-list'
 	},
 	checkElement: function(el){
-		return (!el.size && !el.multiple);
+		//console.log($(el).is(":visible"));
+		// return (!el.size && !el.multiple );
+		/********************************************** patch *********************************/
+		// añado $(el).is(":visible") para que sólo actue sobre selects visibles al usuario
+		// POr ejemplo, que no actúe sobre el select oculto de los votos
+		return (!el.size && !el.multiple && $(el).is(":visible"));
 	},
 	setupWrapper: function(){
 		jcf.lib.addClass(this.fakeElement, this.options.wrapperClass);

@@ -119,6 +119,9 @@ function utopicus_preprocess_page(&$vars, $hook) {
 
 //$vars['styles'] .= '<link href="/'.path_to_theme().'/css/utopicfront.css?r='.rand().'" rel="stylesheet" type="text/css" />';
 
+$vars['styles'] .= '<link type="text/css" rel="stylesheet" media="all" href="/'.path_to_theme().'/css/estaticas_html.css" />';
+
+
 	$vars['page_header']=theme('page_header',$vars); 
 	$vars['page_footer']=theme('page_footer',$vars);
 
@@ -238,6 +241,14 @@ function utopicus_preprocess_node(&$vars, $hook) {
 	  // krumo($vars);
 	  } // fin -- if($vars['type']=="pageutopicus
 	  
+  $articlenodes = array("actividad_agenda", "noticia");
+  if (in_array($vars['node']->type,$articlenodes))$vars['template_files'][] ="node-article";
+  
+  // añadimos social media del modulo custom/social_links si en el tipo...
+  $articlenodes = array("actividad_agenda", "noticia");
+  if (in_array($vars['node']->type,$articlenodes))$vars['social_addthis']=theme('social_addthis'); 
+  
+  
   }
   //multiple nodes being displayed on one page in either teaser
   //or full view
@@ -289,6 +300,33 @@ foreach ($node_taxonomy AS $term) {
       return $terms;
     }
 
+
+
+function utopicus_taxonomy_links($node=NULL, $vid) {
+ 
+//if the current node has taxonomy terms, get them
+if (count($node->taxonomy)):
+ 
+$tags = array();
+foreach ($node->taxonomy as $term) {
+if ($term->vid == $vid):
+$tags[] = l($term->name, taxonomy_term_path($term));
+endif;
+}
+if ($tags):
+//get the vocabulary name and name it $name
+$vocab = taxonomy_get_vocabulary($vid);
+$name = $vocab->name;
+$output .= t("$name") . ": " . implode(' | ', $tags);
+endif;
+ 
+endif;
+ 
+if ($output):
+return $output;
+endif;
+ 
+}
 
 /**
 * Change submit button to search in exposed filters.
