@@ -45,9 +45,10 @@ Drupal.viewsLoadMore = function(target, response) {
     // we'll have to check if a tbody container exists.
 	
 	var $listRows= $(view_row_class);
-	console.log($listRows);
+	//console.log($listRows);
+	// no queremos el adjunto !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
     var newRows = $newView.find(view_row_class).not(".adjunto");
-	console.log(newRows);
+	//console.log(newRows);
 	
 	//newRows=newRows.not(".views-row");
 	//console.log(newRows);
@@ -60,7 +61,7 @@ Drupal.viewsLoadMore = function(target, response) {
 	// list,default
 	/***********************************************************************************************************************************************/
 	if (newRows.length < 1 && (style_plugin == 'list,default' || style_plugin == 'list' || style_plugin == 'default')) {
-      // console.log("estamos en if");
+     // console.log("estamos en if");
 	  newRows = $('.grid-div .grid-list', $newView);
     }
 	// list,default
@@ -94,10 +95,17 @@ Drupal.viewsLoadMore = function(target, response) {
 	  // lo cambio par alos attachment !!!!!
 	  //ppio cambio
 	  if($(".view-content .post-columns", $view)){
-	  $(".view-content .post-columns", $view).append(newRows);
+	 // $(".view-content .post-columns", $view).append(newRows);
+	var obj=  $(".view-content .post-columns", $view);
+	
+	if(  $(".view-content .post-columns ul.events-list", $view) ) obj= $(".view-content .post-columns ul.events-list", $view) ;
+	
+	  obj.append(newRows);
+	  // $(view_content_class).parent().append(newRows);
+	   console.log(obj);
 	  }
 	  else{
-		  
+		  $(path_to_parent, $view).append(newRows);
 		  }
 	// fin cambio
 	

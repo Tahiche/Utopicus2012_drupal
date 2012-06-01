@@ -423,7 +423,7 @@ button:hover{cursor:pointer;}
 /* post-columns */
 .post-columns{
 	position:relative;
-	height:1%;
+	/*height:1%;*/
 	padding:0 7px 49px 0;
 	background:url(../images/separator-grey.gif) repeat-y 461px 0;
 }

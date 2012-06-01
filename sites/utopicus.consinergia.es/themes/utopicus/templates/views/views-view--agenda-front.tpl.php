@@ -1,4 +1,4 @@
-<?php
+<?php 
 /**
  * @file views-view.tpl.php
  * Main view template
@@ -29,13 +29,6 @@
  */
 ?>
 <div class="post-section  <?php print $classes; ?>">
-
-<!-- esto podríar ser el header -->
-<div class="post-visual">
-						<img height="151" width="923" alt="image description" src="/<?php print path_to_theme()?>/images_dummy/img26.png">
-						<h2>FEATURED POST. IMAGEN SIN TEXTO.</h2>
-</div>
-
 
 <!-- podrían ser filtros -->
 <div class="breadcrumbs-holder">

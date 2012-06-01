@@ -203,7 +203,10 @@
                 
                 
                 
-        <?php print $agendaview; ?>
+        <?php
+		 print views_embed_view('agenda_front', 'banner_home');
+		// definido en modules/custom/embeded_views. module
+		 print $agendaviewfront; ?>
         
         
         

@@ -374,6 +374,9 @@ div.masvisto{
 }
 
 /**************************** listado secciones ********************/
+div.view{
+	position:relative;
+	}
 .destacado #content{
 	float:none;
 	}
@@ -393,10 +396,30 @@ div.masvisto{
 .events-list > li {
 height: 380px;
 position:relative;
+/*display: inline-block !important;*/
+float:left;
 }
+
+.events-list > li:hover .grey-image{opacity:0;}
+
 
 .events-list > li .addthis_toolbox {
  bottom: 10px;
     position: absolute;
 
 }
+
+#secciones-pager ul.load-more-pager li.pager-next{
+	 margin-left: -135px;
+	}
+	
+.view-lista-secciones .view-filters {
+    right:0;
+    position: absolute;
+    top: -80px;
+}
+
+/******************************* banner *****************/
+.post-section.banner-section{
+	margin-bottom: -60px;
+	}

@@ -56,7 +56,7 @@ function search_mods_init(){
 
 function search_mods_form_alter(&$form, &$form_state, $form_id) {
 	
-	
+	$form['terms']['#size']=45;
 			
 	if($form['#id']=="views-exposed-form-coworkers-grid-page-coworkers" || $form['#id']=="views-exposed-form-coworkers-grid-page-3"){
 		

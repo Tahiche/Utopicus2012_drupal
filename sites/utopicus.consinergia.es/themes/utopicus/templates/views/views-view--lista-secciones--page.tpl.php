@@ -68,7 +68,9 @@
   <?php endif; ?>
 
   <?php if ($pager): ?>
+  <div id="secciones-pager">
     <?php print $pager; ?>
+    </div>
   <?php endif; ?>
 
   <?php if ($attachment_after): ?>

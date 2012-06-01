@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <dwsync>
-<file name="views-view-fields--agenda-front.tpl.php" server="utopicus.teachnova.net/2011_09_18-openatrium-comunidad-1.0/" local="129828695400000000" remote="129828695400000000" />
+<file name="views-view-fields--agenda-front.tpl.php" server="utopicus.teachnova.net/2011_09_18-openatrium-comunidad-1.0/" local="129830298789316362" remote="129830298600000000" />
 <file name="views-view-field.tpl.php" server="utopicus.teachnova.net/2011_09_18-openatrium-comunidad-1.0/" local="129798427936570000" remote="129798427800000000" />
 <file name="views-view-field--agenda-front.tpl.php" server="utopicus.teachnova.net/2011_09_18-openatrium-comunidad-1.0/" local="129798428445140000" remote="129798428400000000" />
 <file name="views-view.tpl.php" server="utopicus.teachnova.net/2011_09_18-openatrium-comunidad-1.0/" local="129798432227220000" remote="129798432000000000" />
-<file name="views-view--agenda-front.tpl.php" server="utopicus.teachnova.net/2011_09_18-openatrium-comunidad-1.0/" local="129809759003787566" remote="129809758800000000" />
+<file name="views-view--agenda-front.tpl.php" server="utopicus.teachnova.net/2011_09_18-openatrium-comunidad-1.0/" local="129829655520226571" remote="129829655400000000" />
 <file name="views-view-row-node.tpl.php" server="utopicus.teachnova.net/2011_09_18-openatrium-comunidad-1.0/" local="129810578141470000" remote="129810577800000000" />
 <file name="views-exposed-form-coworkers_grid.tpl.php" server="utopicus.teachnova.net/2011_09_18-openatrium-comunidad-1.0/" local="129821093002450624" remote="129821092800000000" />
 <file name="views-exposed-form.tpl.php" server="utopicus.teachnova.net/2011_09_18-openatrium-comunidad-1.0/" local="129821093428344984" remote="129821093400000000" />
@@ -16,11 +16,13 @@
 <file name="views-view-unformatted--page.tpl.php" server="utopicus.teachnova.net/2011_09_18-openatrium-comunidad-1.0/" local="129828793200000000" remote="129828793200000000" />
 <file name="views-view--agenda-front--default.tpl.php" server="utopicus.teachnova.net/2011_09_18-openatrium-comunidad-1.0/" local="129826902600000000" remote="129826902600000000" />
 <file name="views-view--page.tpl.php" server="utopicus.teachnova.net/2011_09_18-openatrium-comunidad-1.0/" local="129828836245458770" remote="129828835800000000" />
-<file name="views-view--page´lista-seccion.tpl.php" server="utopicus.teachnova.net/2011_09_18-openatrium-comunidad-1.0/" local="129828844853861142" remote="129828844800000000" />
 <file name="views-view--lista-secciones--attachment.tpl.php" server="utopicus.teachnova.net/2011_09_18-openatrium-comunidad-1.0/" local="129828851400000000" remote="129828851400000000" />
 <file name="views-view-fields--attachment.tpl.php" server="utopicus.teachnova.net/2011_09_18-openatrium-comunidad-1.0/" local="129828887178931998" remote="129828886800000000" />
 <file name="views-view--page--lista-seccion.tpl.php" server="utopicus.teachnova.net/2011_09_18-openatrium-comunidad-1.0/" local="129828903984743235" remote="129828903600000000" />
 <file name="____views-view--page--lista-seccion.tpl.php" server="utopicus.teachnova.net/2011_09_18-openatrium-comunidad-1.0/" local="129828903600000000" remote="129828903600000000" />
-<file name="views-view--lista-secciones--page.tpl.php" server="utopicus.teachnova.net/2011_09_18-openatrium-comunidad-1.0/" local="129828906386670618" remote="129828906000000000" />
+<file name="views-view--lista-secciones--page.tpl.php" server="utopicus.teachnova.net/2011_09_18-openatrium-comunidad-1.0/" local="129829577715326386" remote="129829577400000000" />
 <file name="views-view-fields--lista-secciones--page.tpl.php" server="utopicus.teachnova.net/2011_09_18-openatrium-comunidad-1.0/" local="129828918946789015" remote="129828918600000000" />
+<file name="views-view-fields--banner-home.tpl.php" server="utopicus.teachnova.net/2011_09_18-openatrium-comunidad-1.0/" local="129829828904913608" remote="129829828800000000" />
+<file name="views-view--banner-home.tpl.php" server="utopicus.teachnova.net/2011_09_18-openatrium-comunidad-1.0/" local="129830295737941833" remote="129830295600000000" />
+<file name="views-view-unformatted--banner-home.tpl.php" server="utopicus.teachnova.net/2011_09_18-openatrium-comunidad-1.0/" local="129829823753578969" remote="129829823400000000" />
 </dwsync>
