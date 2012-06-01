@@ -70,7 +70,8 @@
  * @see zen_preprocess_node()
  * @see zen_process()
  */
-// miKrumo($node);
+//
+//if($node->nid==289) miKrumo($node); 
 /*if($node->nid==267) miKrumo($variables);
 
 if($node->nid==273) miKrumo($node);*/
@@ -100,8 +101,8 @@ print theme('imagecache',"image223_gray" ,$imgpath,$node->title,$node->title );
 
 <!-- info -->
 <span class="info">
-										<span class="note">click para ver más.</span>
-										<span class="text"> <?php print trim_text($node->field_presentate[0]['value'],280); ?> </span> 
+<span class="note">click para ver más.</span>
+<span class="text"> <?php print trim_text($node->field_presentate[0]['value'],290); ?> </span> 
 </span>
 <!-- // info -->      
                              
@@ -109,8 +110,8 @@ print theme('imagecache',"image223_gray" ,$imgpath,$node->title,$node->title );
 
 <strong class="title"><?php print $node->title;  ?></strong>
 <span class="text-box"><?php print $node->field_subtitulo[0]['value'];  ?></span>
-
-
 </a>
+<div class="coworkergrid_terms"><?php print $terms_by_vocab[4];?></div>
+
 
 

@@ -1,0 +1,6 @@
+name = sidebar_content
+project = "sidebar content"
+description = "Povee contenido para el sidebar. ültimos leídos, categorías, etc."
+package = " Custom"
+version = "6.x"
+core = 6.x

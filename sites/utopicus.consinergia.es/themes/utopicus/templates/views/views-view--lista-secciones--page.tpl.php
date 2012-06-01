@@ -27,6 +27,7 @@
  *
  * @ingroup views_templates
  */
+ // miKrumo($variables);
 ?>  
 <div class="<?php print $classes; ?>">
 
@@ -48,6 +49,11 @@
     </div>
   <?php endif; ?>
 
+
+
+
+
+<div id="content">
   <?php if ($attachment_before): ?>
     <div class="attachment attachment-before">
       <?php print $attachment_before; ?>
@@ -72,6 +78,22 @@
     <?php print $pager; ?>
     </div>
   <?php endif; ?>
+
+</div> <!-- fin id="content"> -->
+
+
+
+<div id="sidebar">
+<?php print $sidebar_categories; ?>
+<?php
+$block = module_invoke('views', 'block', 'view','agenda_front-ultimas_entradas');
+?>
+<h2><?php print t("Últimas Entradas"); ?></h2>
+<?php print $block['content']; ?>
+
+
+</div><!-- fin sidebar -->
+
 
   <?php if ($attachment_after): ?>
     <div class="attachment attachment-after">
