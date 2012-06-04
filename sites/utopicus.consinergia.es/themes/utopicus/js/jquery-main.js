@@ -6,7 +6,22 @@ $(window).load(function(){
 	}
 });
 
+/***************************** footer slideshow ****************************/
+function slideSwitch() {
+    var $active = $('#slide_patrocinios IMG.active');
+    if ( $active.length == 0 ) $active = $('#slide_patrocinios IMG:last');
+    var $next =  $active.next().length ? $active.next(): $('#slide_patrocinios IMG:first');
+    $active.addClass('last-active').animate({opacity: 0}, 1000);
+    $next.css({opacity: 0.0})
+        .addClass('active')
+        .animate({opacity: 1.0}, 1000, function() {
+            $active.removeClass('active last-active');
+        });
+}
 
+$(function() {
+    setInterval( "slideSwitch()", 4000 );
+});
 
 
 /*Drupal.behaviors.hsAutoSubmit = function(context) {
@@ -38,32 +53,94 @@ $(window).load(function(){
 	Drupal.behaviors.my_ajaxrefresh = function (context) { 
    //alert("my_ajaxrefresh");
     jcf.customForms.replaceAll();
+	
+	$('input[type="text"]').defaultText();
+	
+	/********************************************* open external links in new window ***************************/
+		$('a:not([href=""])').each(function() {
+		if (this.hostname !== location.hostname) {
+		$(this).addClass('externalLink').attr('target', "_blank");
+		}
+		});
+
    };
    
+      
 // page init
 jQuery(function(){
 	
-
-   
 	initTabs();
 	initLightbox();
 	initLayoutFix();
-	initInputs();
+	//initInputs();
 	initSameHeight();
 	
 	
-	new PlaceholderInput({
+	/*new PlaceholderInput({
 					element:"input.clearinput,text.clearinput",
 					wrapWithElement:false,
 					showUntilTyping:false,
 					getParentByClass:false,
 					placeholderAttr:'value'
-				});
+				});*/
 	/**
    * Attaches the AJAX behavior to Views Load More waypoint support.
    */
 
 });
+	/*
+	 * jQuery INPUT CLEAR
+	 */
+	;(function($){
+	jQuery.fn.defaultText = function() {
+	var self = this;
+	/* ajax call is run before submit, so we do it in $(":submit").click instead */
+	/*$('form').submit(function(e) {
+	$(self).each(function() {
+	var t = $(this);
+	console.log(t);
+	console.log("t.val()"+t.val());
+	console.log("t.attr('title')"+t.attr('title'));
+	console.log("comparoo  t.val() ==  t.attr('title')");
+	console.log( t.val() ==  t.attr('title'));
+	console.log(" t.hasClass('default_text')"+ t.hasClass('default_text'));
+	if (t.attr('title').length>0 && t.val() == t.attr('title') && t.hasClass('default_text')) {
+		console.log("es igual!!!!");
+	t.val('');
+	}
+	});
+	});*/
+	
+	$(":submit").click(function(e){
+	var form=this.form;
+	//console.log("orm-submit').click ")
+	//console.log(form);
+	$(self).each(function() {
+	var t = $(this);
+	if (t.attr('title').length>0 && t.val() == t.attr('title') && t.hasClass('default_text')) {
+	//console.log("es igual!!!!");
+	t.val('');
+	}
+	});
+		});
+	
+	return $(this).blur(function() {
+	var t = $(this);
+	//console.log(t);
+	if (t.val() == '') {
+	t.val(t.attr('title'));
+	t.addClass('default_text');
+	}
+	}).focus(function() {
+	var t = $(this);
+	if (t.val() == t.attr('title') && t.hasClass('default_text')) {
+	t.val('');
+	t.removeClass('default_text');
+	}
+	}).blur();
+	};
+	
+	}(jQuery));
 
 // clear inputs on focus
 function initInputs() {
@@ -550,6 +627,8 @@ function initLightbox() {
  * Requires: 1.2.2+
  */
 ;(function(a){function d(b){var c=b||window.event,d=[].slice.call(arguments,1),e=0,f=!0,g=0,h=0;return b=a.event.fix(c),b.type="mousewheel",c.wheelDelta&&(e=c.wheelDelta/120),c.detail&&(e=-c.detail/3),h=e,c.axis!==undefined&&c.axis===c.HORIZONTAL_AXIS&&(h=0,g=-1*e),c.wheelDeltaY!==undefined&&(h=c.wheelDeltaY/120),c.wheelDeltaX!==undefined&&(g=-1*c.wheelDeltaX/120),d.unshift(b,e,g,h),(a.event.dispatch||a.event.handle).apply(this,d)}var b=["DOMMouseScroll","mousewheel"];if(a.event.fixHooks)for(var c=b.length;c;)a.event.fixHooks[b[--c]]=a.event.mouseHooks;a.event.special.mousewheel={setup:function(){if(this.addEventListener)for(var a=b.length;a;)this.addEventListener(b[--a],d,!1);else this.onmousewheel=d},teardown:function(){if(this.removeEventListener)for(var a=b.length;a;)this.removeEventListener(b[--a],d,!1);else this.onmousewheel=null}},a.fn.extend({mousewheel:function(a){return a?this.bind("mousewheel",a):this.trigger("mousewheel")},unmousewheel:function(a){return this.unbind("mousewheel",a)}})})(jQuery) 
+
+
 
 /*
  * jQuery Tabs plugin

@@ -24,12 +24,12 @@
  */  
 //krumo($fields)
 ?>
-
-<div class="image grayoverImage">
 <a href="<?php echo url("node/".$fields['field_evento_reference_nid']->raw)?>">
+<div class="image grayoverImage">
+
 <?php echo strip_tags($fields['field_imagen_banner_fid']->content,"<img><div>"); ?>
-</a>
+
 </div>
 <h2><?php echo $fields['field_textobanner_value']->content;?></h2>
-
+</a>
 

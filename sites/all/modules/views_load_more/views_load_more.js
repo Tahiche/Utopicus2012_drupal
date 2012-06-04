@@ -100,10 +100,14 @@ Drupal.viewsLoadMore = function(target, response) {
 	
 	if(  $(".view-content .post-columns ul.events-list", $view) ) obj= $(".view-content .post-columns ul.events-list", $view) ;
 	
-	  obj.append(newRows);
+	  console.log(obj);
+	  console.log(obj.length);
 	  // $(view_content_class).parent().append(newRows);
-	   console.log(obj);
+	  
+	   
 	  }
+	 
+	 if (obj.length > 0) obj.append(newRows);
 	  else{
 		  $(path_to_parent, $view).append(newRows);
 		  }

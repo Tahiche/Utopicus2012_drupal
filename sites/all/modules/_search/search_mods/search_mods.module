@@ -67,15 +67,16 @@ function search_mods_form_alter(&$form, &$form_state, $form_id) {
 		$form['nombre']['#autocomplete_path'] = 'taxonomy/customtitleautocomplete' ;
 		$form['nombre']['#attributes']['class']='auto_submit';
 		
-		/*unset($form['submit']);*/
 		$form['term_node_tid_depth_limited']['#options']['All']="- Todos -";
-		
-		// $form['freeterm']['#type']="hidden";
-		
-		/*$form['buscarlabel']['#type']="label";
-		$form['buscarlabel']['#value']="Buscar coworkers";*/
-		
-		$form['freeterm']['#size']=30;
+		$defText = t('por ejemplo: SEO, Consultoría de Calidad, Diseñador gráfico, Videos');
+
+  // Default value del title en jquery-main plugin
+  
+  //$form['freeterm']['#default_value'] = $defText;
+  $form['freeterm']['#attributes']['title']=$defText;
+  // $form['freeterm']['#value'] = $defText;
+  
+		$form['freeterm']['#size']=40;
 		
 		// krumo($form);
 		/*krumo($form_state);*/

@@ -20,6 +20,8 @@ Drupal.behaviors.exposedfilter_mod = function (context) {
  $('select#edit-term-node-tid-depth-limited').change(function() {
 	 // alert("cambia");
 	 $('#edit-nombre').val("");
+	 $('#edit-freeterm').val("");
+	
 	 $('form#views-exposed-form-coworkers-grid-page-coworkers').submit();
  });
  /* Puts the currently highlighted suggestion into the autocomplete field.
@@ -30,9 +32,10 @@ this.input.value = $(node).data('autocompleteValue');
     if(jQuery(this.input).hasClass('auto_submit')){ 
 	
 	//alert("autosubmit???");
-	
 	  var selectElement=$('select#edit-term-node-tid-depth-limited');
 	  selectElement.val($('option:first', selectElement).val());
+	  
+	  $('#edit-freeterm').val("");
 	  // form bonito...
 	  // pero si hago trigger, el form se submit 2 veces....
 	  //selectElement.trigger("change");
@@ -46,6 +49,10 @@ this.input.value = $(node).data('autocompleteValue');
 
 $('form#views-exposed-form-coworkers-grid-page-coworkers').submit(function(e){
   //alert("Submitted");
+  if($('#edit-freeterm').val()!="")
+  { var selectElement=$('select#edit-term-node-tid-depth-limited');
+	  selectElement.val($('option:first', selectElement).val());
+  }
   $('div.view-content').block().bind("ajaxComplete", function() {
             $(this).unblock();
 			 

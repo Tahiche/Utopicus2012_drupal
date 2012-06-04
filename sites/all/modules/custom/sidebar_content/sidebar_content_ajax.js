@@ -30,7 +30,7 @@
 	form.submit(function(e){
     //alert("Submitted");
 	var elementBlock= $("#content","div.view").length>0 ? $("#content","div.view").eq(0):$('div.view-content');
-	console.log(elementBlock);
+	//console.log(elementBlock);
   elementBlock.block().bind("ajaxComplete", function() {
             $(this).unblock();
 			 

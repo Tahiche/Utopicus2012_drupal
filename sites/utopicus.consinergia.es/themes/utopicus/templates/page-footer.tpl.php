@@ -104,6 +104,10 @@ $opciones=array("customlink"=>"espacios/open_us");
 		<div class="sidemap-area">
 			<!-- banner -->
 			<a class="banner" href="#"><img width="125" height="125" alt="banner" src="<?php print $theme_pathabsoluto; ?>/images/img-banner.gif"></a>
+             <div id="slide_patrocinios" class="banner">
+    <img src="<?php print $theme_pathabsoluto; ?>/images/logos/heineken.jpg" alt="" class="active" />
+    <img src="<?php print $theme_pathabsoluto; ?>/images/logos/ministerio_c.jpg" alt="" />
+</div>
 			<!-- box -->
 			<div class="box">
 				<strong class="title"><a href="#">COWORKING</a></strong>
@@ -185,7 +189,10 @@ $opciones=array("customlink"=>"espacios/open_us");
 					<li><a class="rss" href="#">rss<span class="mask">&nbsp;</span></a></li>
 				</ul>
 				<!-- banner -->
-				<a class="banner" href="#"><img width="157" height="33" alt="banner" src="<?php print $theme_pathabsoluto; ?>/images/img-banner.gif"></a>
+                
+               
+
+				<a class="banner" href="#"><img width="157" height="33" alt="banner" src="<?php print $theme_pathabsoluto; ?>/images/logos/ministerio_bottom.gif"></a>
 			</div>
 		</div>
 		<span class="copyright">&copy; 2012 Utopicus Innovación Cultural SL - Todos los derechos reservados</span>
