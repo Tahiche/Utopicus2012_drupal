@@ -1,0 +1,33 @@
+<?php
+
+function dd_back_button_protect_init() {
+  if (arg(0) == 'node' && arg(2) == 'edit') {
+    drupal_add_js(drupal_get_path('module', 'dd_back_button_protect') . '/dd_back_button_protect.js', 'module', 'header', FALSE, TRUE, FALSE);
+  }
+}
+
+function dd_back_button_protect_form_alter(&$form, &$form_state, $form_id) {
+  $form['#submit'][] = 'dd_back_button_protect_submit';
+}
+
+function dd_back_button_protect_submit($form, &$form_state) {
+  if ($form['form_build_id']["#id"]) {
+    $_SESSION['dd_back_button_protect_last_form_build_id'] = $form['form_build_id']["#id"];
+  }
+}
+
+function dd_back_button_protect_menu() {
+  $items['dd_back_button_protect/%'] = array(
+    'title' => 'Form check', 
+    'page callback' => 'dd_back_button_protect_check', 
+    'access arguments' => array('access content'), 
+    'page arguments' => array(1),
+    'type' => MENU_CALLBACK,
+  );
+  
+  return $items;
+}
+
+function dd_back_button_protect_check($form_build_id) {
+  drupal_json(array('staleForm' => $form_build_id == $_SESSION['dd_back_button_protect_last_form_build_id']));
+}
