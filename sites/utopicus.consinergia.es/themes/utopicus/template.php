@@ -241,10 +241,10 @@ function utopicus_preprocess_node(&$vars, $hook) {
 	  // krumo($vars);
 	  } // fin -- if($vars['type']=="pageutopicus
 	  
-  $articlenodes = array("actividad_agenda", "noticia", "curso");
+  $articlenodes = array("actividad_agenda", "noticia");
   if (in_array($vars['node']->type,$articlenodes))$vars['template_files'][] ="node-article";
   
-  // añadimos social media del modulo custom/social_links si en el tipo...
+  // añadimos social media del modulo custom/social_links si en el tipo... 
   $articlenodes = array("actividad_agenda", "noticia", "curso");
   if (in_array($vars['node']->type,$articlenodes))$vars['social_addthis']=theme('social_addthis'); 
   
@@ -273,12 +273,15 @@ function utopicus_preprocess_node(&$vars, $hook) {
    $vars['fivestar_widget']="<div id='fivestardiv'>".$vars['node']->content['fivestar_widget']['#value']."</div>";
 	
 	
+	
   // To remove a class from $classes_array, use array_diff().
   //$vars['classes_array'] = array_diff($vars['classes_array'], array('class-to-remove'));
   if(isset($_GET['krumon'])){
 	krumo($vars);
   }
 }
+
+
 
 
 function utopicus_separate_terms($node_taxonomy) {

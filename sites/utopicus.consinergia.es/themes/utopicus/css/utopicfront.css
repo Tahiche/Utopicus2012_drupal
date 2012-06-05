@@ -157,7 +157,19 @@ background-color: #999999;
     text-align: center;
     width: 40px;
 	}
+
+/****************************** cajas ****************************/
+/*#content .block-boxes{
+	overflow:hidden;
+	}*/
+#content .block-boxes .box {
+	/*float:left; 
+	padding-bottom:9000px; 
+	margin-bottom:-9000px ;*/
+	height:auto;
 	
+}
+
 /********************** coworkers *******************************/
 .gray_link.coworkercell .title{
 	background: url("../images/divider-grey.gif") repeat-x scroll 0 100% transparent;
@@ -301,6 +313,9 @@ div.views-exposed-widget.views-submit-button input.form-submit{
     float: left;
     height: 29px;
     line-height: 0;
+	
+	margin-left:-10px;
+	
     /*margin: 0;*/
     overflow: hidden;
     padding: 0;
@@ -510,4 +525,25 @@ div.tweets-pulled-listing a {
 
 #slide_patrocinios IMG.last-active {
     z-index:9;
+}
+
+/****************urso node page ***********************/
+.info-curso{
+	background: none repeat scroll 0 0 #FFF;
+    border-radius: 10px 10px 10px 10px;
+	padding:15px 10px;
+	}
+	
+/********** cursos seccion *************/
+.drop-selector-jump.drop-escuela{
+	}
+#views-exposed-form-agenda-front-page-cursos  .views-widget-filter-tid{
+	float:right !important;
+	}
+	
+	/**************** formualrios *************/
+.view-filters {
+    position: absolute;
+    right: 0;
+    top: -80px;
 }

@@ -71,32 +71,59 @@
  * @see zen_process()
  */
 ?>
-<div id="content">
-<div id="node-<?php print $node->nid; ?>" class="content-area padding <?php print $classes; ?> clearfix">
-  <?php print $user_picture; ?>
 
+ <?php if($field_img_ppal [0]['filepath']): 
+  $imgTit=$field_img_ppal [0]['data']['title'];
+ ?>
+ <!-- large-image -->
+				<div class="large-image">
+                <?php print theme('imagecache','Imagen_pag_922x394',$field_img_ppal [0]['filepath'],  $imgTit ,  $imgTit, array("class"=>"photo") ); ?>
+					
+				</div>
+                
 
  
+<?php endif; ?>
 
-  <div class="contenidonodo node-<?php print $node->type; ?> info-section ">
-    <?php print $content; ?>
+<div id="content"> 
+<div id="node-<?php print $node->nid; ?>" class="content-area padding <?php print $classes; ?>">
+ 
+
+
+  
+
+ <div class="aside">
+						
+                        
+                         <?php if($group_curso_info_rendered):?>
+						<!-- quote-box -->
+						<blockquote class="info-curso">
+							<div>
+								<q><?php echo $group_curso_info_rendered; ?></q>
+							</div>
+						</blockquote>
+						<?php endif; ?>
+</div>
+ 
+ 
+ 
+   <div class="holder">
+   <div class="text-holder">
+    <?php print $content; 
+	
+	?>
+    </div>
   </div>
   
   
-   <?php if ($display_submitted || $terms): ?>
-    <div class="meta">
-      <?php if ($display_submitted): ?>
-        <span class="submitted">
-          <?php print $submitted; ?>
-        </span>
-      <?php endif; ?>
-
-      <?php if ($terms): ?>
+ <?php if ($terms): ?> 
         <div class="terms terms-inline"><?php print $terms; ?></div>
       <?php endif; ?>
-    </div>
-  <?php endif; ?>
 
-  <?php print $links; ?>
-  </div>
-</div><!-- /.node -->
+
+  
+  
+  <?php print $links; ?>   
+  </div><!-- /.node -->
+  </div><!-- /.content -->
+

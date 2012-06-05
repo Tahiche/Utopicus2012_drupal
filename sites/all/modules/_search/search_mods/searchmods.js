@@ -17,37 +17,47 @@
 
 // JavaScript Document
 Drupal.behaviors.exposedfilter_mod = function (context) {
- $('select#edit-term-node-tid-depth-limited').change(function() {
+	
+ $('select#edit-term-node-tid-depth-limited, select.selector-jump').change(function() {
 	 // alert("cambia");
 	 $('#edit-nombre').val("");
 	 $('#edit-freeterm').val("");
-	
-	 $('form#views-exposed-form-coworkers-grid-page-coworkers').submit();
+	$('#edit-title').val("");
+	 //$('form#views-exposed-form-coworkers-grid-page-coworkers').submit();
+	$(this.form).submit()
  });
+
+ 
+ 
+ 
+ 
  /* Puts the currently highlighted suggestion into the autocomplete field.
  // OVERRIDEEENN
  */
-Drupal.jsAC.prototype.select = function (node) {
-this.input.value = $(node).data('autocompleteValue');
-    if(jQuery(this.input).hasClass('auto_submit')){ 
-	
-	//alert("autosubmit???");
-	  var selectElement=$('select#edit-term-node-tid-depth-limited');
-	  selectElement.val($('option:first', selectElement).val());
-	  
-	  $('#edit-freeterm').val("");
-	  // form bonito...
-	  // pero si hago trigger, el form se submit 2 veces....
-	  //selectElement.trigger("change");
-	  jcf.customForms.refreshAll();
+ if(Drupal.jsAC){
+		Drupal.jsAC.prototype.select = function (node) {
+		this.input.value = $(node).data('autocompleteValue');
+			if(jQuery(this.input).hasClass('auto_submit')){ 
+			
+			//alert("autosubmit???");
+			  var selectElement=$('select#edit-term-node-tid-depth-limited');
+			  selectElement.val($('option:first', selectElement).val());
+			  
+			  $('#edit-freeterm').val("");
+			  // form bonito...
+			  // pero si hago trigger, el form se submit 2 veces....
+			  //selectElement.trigger("change");
+			  jcf.customForms.refreshAll();
+		
+			  // submit the form
+			  $('form#views-exposed-form-coworkers-grid-page-coworkers').submit();
+			 
+		  }
+		};
+ }
 
-	  // submit the form
-      $('form#views-exposed-form-coworkers-grid-page-coworkers').submit();
-	 
-  }
-};
-
-$('form#views-exposed-form-coworkers-grid-page-coworkers').submit(function(e){
+//$('form#views-exposed-form-coworkers-grid-page-coworkers')
+$('.view-filters form').submit(function(e){ 
   //alert("Submitted");
   if($('#edit-freeterm').val()!="")
   { var selectElement=$('select#edit-term-node-tid-depth-limited');

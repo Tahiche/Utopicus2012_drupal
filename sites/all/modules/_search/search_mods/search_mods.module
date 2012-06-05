@@ -87,6 +87,12 @@ function search_mods_form_alter(&$form, &$form_state, $form_id) {
 		// 
 		
 		} // si noi es una de los views de coworkers
+		
+if($form['#id']=="views-exposed-form-agenda-front-page-cursos"){
+			$form['escuela_tid']['#attributes']['class']='selector-jump escuela';
+			 drupal_add_js(drupal_get_path('module', 'search_mods') . '/searchmods.js');
+		}		
+
  
 if(isset($_GET['krumof'])){
 			miKrumo($form);
