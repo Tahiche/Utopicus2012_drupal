@@ -74,7 +74,7 @@ jQuery(function(){
 	initLayoutFix();
 	//initInputs();
 	initSameHeight();
-	
+	sameHboxes($(".block-boxes > .box"));
 	
 	/*new PlaceholderInput({
 					element:"input.clearinput,text.clearinput",
@@ -83,34 +83,26 @@ jQuery(function(){
 					getParentByClass:false,
 					placeholderAttr:'value'
 				});*/
-	/**
-   * Attaches the AJAX behavior to Views Load More waypoint support.
-   */
-
 });
+	
+	function sameHboxes(element){
+		var H = 0;
+		if(!element.length) return;
+		console.log(element);
+			element.each(function(i){
+				var h = element.eq(i).height();
+				if(h > H) H = h;
+			});
+			element.height(H);
+		}
+	
 	/*
 	 * jQuery INPUT CLEAR
 	 */
 	;(function($){
 	jQuery.fn.defaultText = function() {
 	var self = this;
-	/* ajax call is run before submit, so we do it in $(":submit").click instead */
-	/*$('form').submit(function(e) {
-	$(self).each(function() {
-	var t = $(this);
-	console.log(t);
-	console.log("t.val()"+t.val());
-	console.log("t.attr('title')"+t.attr('title'));
-	console.log("comparoo  t.val() ==  t.attr('title')");
-	console.log( t.val() ==  t.attr('title'));
-	console.log(" t.hasClass('default_text')"+ t.hasClass('default_text'));
-	if (t.attr('title').length>0 && t.val() == t.attr('title') && t.hasClass('default_text')) {
-		console.log("es igual!!!!");
-	t.val('');
-	}
-	});
-	});*/
-	
+		
 	$(":submit").click(function(e){
 	var form=this.form;
 	//console.log("orm-submit').click ")
@@ -183,7 +175,8 @@ function initSameHeight(){
 		multiLine: true
 	});
 	jQuery('.item-section .holder').sameHeight({elements: '.box'});
-}
+	
+	}
 
 // input type placeholder class
 ;(function(){
@@ -437,8 +430,10 @@ function initTabs() {
 			multiLine: false
 		},opt);
 		return this.each(function(){
+			
 			var holder = $(this);
 			var elements = holder.find(options.elements).not('.' + options.skipClass);
+			
 			if(!elements.length) return;
 			
 			// resize handler

@@ -157,7 +157,12 @@ background-color: #999999;
     text-align: center;
     width: 40px;
 	}
-	
+
+/****************************** cajas altura con jquery****************************/ 
+#content .block-boxes .box {
+	height:auto;	 
+}
+
 /********************** coworkers *******************************/
 .gray_link.coworkercell .title{
 	background: url("../images/divider-grey.gif") repeat-x scroll 0 100% transparent;

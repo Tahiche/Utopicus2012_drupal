@@ -78,7 +78,7 @@
 
  
 
-  <div class="contenidonodo node-<?php print $node->type; ?>">
+  <div class="contenidonodo node-<?php print $node->type; ?> info-section ">
     <?php print $content; ?>
   </div>
   
