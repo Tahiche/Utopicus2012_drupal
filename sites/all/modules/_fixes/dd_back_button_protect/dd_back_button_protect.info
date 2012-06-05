@@ -1,0 +1,5 @@
+name = Back button protect
+description = Reloads node forms if a user happens to use the back button to make additional edits to a node. This ensure the user doesn't get the "this content has been modified by another user" error after putting lots of hard work into editing the node.
+core = 6.x
+package = "User interface"
+version = "6.x-1.x-dev"

@@ -1,7 +1,7 @@
 <?php
 /**
  * @file
- * Theme implementation to display a node.
+ * Theme implementation to display a node. 
  *
  * Available variables:
  * - $title: the (sanitized) title of the node.
@@ -72,13 +72,56 @@
  */
 ?>
 <div id="content">
-<div id="node-<?php print $node->nid; ?>" class="content-area padding <?php print $classes; ?> clearfix">
-  <?php print $user_picture; ?>
+
+ 
+
+
+
+<div id="node-<?php print $node->nid; ?>" class=" <?php print $classes; ?>">
+
+<div class="heading">
+<em class="date"><?php print $date; ?></em>
+<div class="image">
+<?php 
+$imgtit=$node->field_img_ppal[0]['data']['title']?$node->field_img_ppal[0]['data']['title']:$node->title;
+print theme("imagecache","Imagen_articulo_683x350",$node->field_img_ppal[0]['filepath'],$imgtit,$imgtit); ?>
+</div>
+
+<div class="holder">
+
+<div class="addthis_toolbox addthis_default_style">
+<ul class="social-networks">
+
+<!-- AddThis Button BEGIN -->
+
+
+<li><a class="addthis_button_facebook facebook" style="cursor:pointer"><span class="mask" style="opacity: 1;">&nbsp;</span></a></li>
+<li><a class="addthis_button_twitter twitter" style="cursor:pointer"><span class="mask" style="opacity: 1;">&nbsp;</span></a></li>
+<li><a class="addthis_button_email mail" style="cursor:pointer"><span class="mask" style="opacity: 1;">&nbsp;</span></a></li>
+
+<script type="text/javascript" src="http://s7.addthis.com/js/250/addthis_widget.js#pubid=xa-4f472587705fa7b2"></script>
+<!-- AddThis Button END -->
+
+    <li><a class="facebook" href="#">facebook<span class="mask" style="opacity: 1;">&nbsp;</span></a></li>
+    <li><a class="twitter" href="#">twitter<span class="mask" style="opacity: 1;">&nbsp;</span></a></li>
+    <li><a class="igoogle" href="#">iGoogle<span class="mask" style="opacity: 1;">&nbsp;</span></a></li>
+    <li><a class="vimeo" href="#">vimeo<span class="mask" style="opacity: 1;">&nbsp;</span></a></li>
+    <li><a class="flickr" href="#">flickr<span class="mask" style="opacity: 1;">&nbsp;</span></a></li>
+    <li><a class="rss" href="#">rss<span class="mask" style="opacity: 1;">&nbsp;</span></a></li>
+</ul>
+</div>
+
+
+</div>
+
+</div>
+
+
 
 
  
 
-  <div class="contenidonodo node-<?php print $node->type; ?> info-section ">
+  <div class="contenidonodo node-<?php print $node->type; ?> ">
     <?php print $content; ?>
   </div>
   
@@ -99,4 +142,62 @@
 
   <?php print $links; ?>
   </div>
+  
+  
 </div><!-- /.node -->
+
+
+
+<div id="sidebar" class="articder">
+<div class="box">
+<?php
+//http://www.utopicus.consinergia.es/es/admin/build/block/configure/views/agenda_front-ultimas_entradas
+if ($node->type=="noticia"):
+$block = module_invoke('views', 'block', 'view','agenda_front-ultimas_entradas');
+?>
+<h2><?php print t("Últimas Entradas"); ?></h2>
+<?php print $block['content']; ?>
+
+<?php
+// es agenda
+elseif ($node->type=="actividad_agenda"):  
+// $block = module_invoke('views', 'block', 'view','agenda_front-ultimas_entradas');
+?>
+
+<h2><?php print t("Categorías"); ?></h2>
+<ul class="category-list">
+<?php 
+$items = array();
+      $tree = taxonomy_get_tree(10);
+	  //miKrumo($tree);
+      if ($tree && (count($tree) > 0)) {
+        $options = array();
+        foreach ($tree as $term) {
+         // $items[$term->tid] = str_repeat('-', $term->depth) . $term->name;
+		  $items[$term->tid] = l($term->name, "taxonomy/term/".$term->tid);
+		  print "<li>". $items[$term->tid]."</li>";
+        }
+      }
+	  // theme_item_list($items, $title, $type, $attributes);
+      
+ ?>
+ </ul>
+<?php
+else: 
+?>
+
+<?php endif; ?>
+</div> <!-- fin box if else -->
+
+    <!-- mas leido -->
+    <div class="box">
+    <h2><?php print t("Más leído"); ?></h2>
+    <?php
+    // http://www.utopicus.consinergia.es/es/admin/build/block/configure/views/-exp-coworkers_grid-page_3
+    $block = module_invoke('views', 'block', 'view','popular-masvisto_block');
+    print $block['content'];
+    ?>
+    </div>
+
+
+</div> <!-- fin sidebar -->

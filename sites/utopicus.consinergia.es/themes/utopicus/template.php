@@ -107,7 +107,9 @@ function utopicus_preprocess_page(&$vars, $hook) {
 	
 	//krumo($vars);
 	
+	drupal_add_js(path_to_theme() ."/js/jquery.blockUI.js");
 	
+	// $vars['scripts'].="<script src='/sites/all/js/jquery.blockUI.js?t' type='text/javascript'>";
 	//drupal_add_css('http://fonts.googleapis.com/css?family=Asap:400,700,700italic,400italic');
 	/*drupal_add_css('http://fonts.googleapis.com/css?family=Asap:400,700,700italic,400italic', 'theme', 'all', FALSE);
 	$vars['styles'] = drupal_get_css();*/
@@ -117,7 +119,10 @@ function utopicus_preprocess_page(&$vars, $hook) {
 
 //$vars['styles'] .= '<link href="/'.path_to_theme().'/css/utopicfront.css?r='.rand().'" rel="stylesheet" type="text/css" />';
 
-	$vars['page_header']=theme('page_header',$vars);
+$vars['styles'] .= '<link type="text/css" rel="stylesheet" media="all" href="/'.path_to_theme().'/css/estaticas_html.css" />';
+
+
+	$vars['page_header']=theme('page_header',$vars); 
 	$vars['page_footer']=theme('page_footer',$vars);
 
 	// $vars['page_header']="ewrewweewewew";
@@ -236,6 +241,9 @@ function utopicus_preprocess_node(&$vars, $hook) {
 	  // krumo($vars);
 	  } // fin -- if($vars['type']=="pageutopicus
 	  
+  $articlenodes = array("actividad-agenda", "noticia");
+  
+	  if (in_array($vars['node']->type,$articlenodes))$vars['template_files'][] ="node-article";
   }
   //multiple nodes being displayed on one page in either teaser
   //or full view
@@ -287,6 +295,33 @@ foreach ($node_taxonomy AS $term) {
       return $terms;
     }
 
+
+
+function utopicus_taxonomy_links($node=NULL, $vid) {
+ 
+//if the current node has taxonomy terms, get them
+if (count($node->taxonomy)):
+ 
+$tags = array();
+foreach ($node->taxonomy as $term) {
+if ($term->vid == $vid):
+$tags[] = l($term->name, taxonomy_term_path($term));
+endif;
+}
+if ($tags):
+//get the vocabulary name and name it $name
+$vocab = taxonomy_get_vocabulary($vid);
+$name = $vocab->name;
+$output .= t("$name") . ": " . implode(' | ', $tags);
+endif;
+ 
+endif;
+ 
+if ($output):
+return $output;
+endif;
+ 
+}
 
 /**
 * Change submit button to search in exposed filters.

@@ -21,11 +21,52 @@
  * - $row: The raw result object from the query, with all data it fetched.
  *
  * @ingroup views_templates
- */ krumo($fields)
+ */  
+// krumo($fields)
 ?>
-<?php foreach ($fields as $id => $field):?>
+<div class="heading">
+	<!-- date -->
+<em class="date"><?php echo $fields['created']->content?></em>
+<!-- category -->
+<strong class="category"><?php 
+//echo $fields['tid']->content
+switch($fields['type']->content){
+	case "actividad_agenda": 
+	$cat="Actividades";
+	break;
+	
+	case "noticia": 
+	$cat="Noticias";
+	break;
+	
+	case "curso": 
+	$cat="Cursos";
+	break;
+	
+	default:
+	$cat="";
+	break;
+	}
 
-    <?php print $field->content; ?>
+
+// echo $cat;
+?></strong>
+</div>
+
+<div class="image">
+<?php echo $fields['field_img_ppal_fid']->content?>
+</div>
+
+
+
+<div class="text">
+<h3><?php echo $fields['title']->content; ?></h3>
+<p><?php echo $fields['body']->content; ?></p>
+</div>
+                                                                                    
+<?php //foreach ($fields as $id => $field):?>
+
+    <?php //print $field->content; ?>
     
 
-<?php endforeach; ?>
+<?php //endforeach; ?>

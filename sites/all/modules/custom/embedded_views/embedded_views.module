@@ -38,7 +38,11 @@ function embedded_views_menu() {
 function embedded_views_preprocess_page(&$vars, $hook) {
 	if($vars['is_front']){
 	//krumo($vars);
-	$vars['agendaview']=views_embed_view("agenda_front","default"); 
+	$vars['agendaviewfront']=views_embed_view("agenda_front","default"); 
+	
+	$vars['coworkersfrontview']=views_embed_view("Coworkers_home","default"); 
+	
+	
 	$vars['scripts'] = drupal_get_js();
 }
 

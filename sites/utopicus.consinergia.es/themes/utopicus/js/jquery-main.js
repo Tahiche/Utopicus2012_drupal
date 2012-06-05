@@ -1,28 +1,38 @@
-Drupal.behaviors.hsAutoSubmit = function(context) {
+// back button modified other usert fix
+$(window).load(function(){
+	if($('#edit-changed')){
+	var ts = Math.round(new Date().getTime() / 1000);
+	$('#edit-changed').val(ts);
+	}
+});
+
+
+
+
+/*Drupal.behaviors.hsAutoSubmit = function(context) {
 	//alert("hsAutoSubmit");
- /* $('.views-widget .selects select').change(function() {
+ $('.views-widget .selects select').change(function() {
 	  alert("views-widget .selects select");
     $(this.parentNode.parentNode.parentNode).bind('change-hierarchical-select',function() {
       $('.view-filters form',context).submit();
     });
-  });*/
-
-$('form#views-exposed-form-coworkers-grid-page').bind('add-to-dropbox remove-from-dropbox ', function(evento) {
+  });
+//$('form#views-exposed-form-coworkers-grid-page').bind('add-to-dropbox remove-from-dropbox ', function(evento) {
 	//alert("add-to-dropbox"+evento);
-$('form#views-exposed-form-coworkers-grid-page').submit();
-});
+//$('form#views-exposed-form-coworkers-grid-page').submit();
+//});
 
-$('form#views-exposed-form-coworkers-grid-page-1').bind('add-to-dropbox remove-from-dropbox ', function(evento) {
+//$('form#views-exposed-form-coworkers-grid-page-1').bind('add-to-dropbox remove-from-dropbox ', function(evento) {
 	//alert("add-to-dropbox"+evento);
-$('form#views-exposed-form-coworkers-grid-page-1').submit();
-});
+//$('form#views-exposed-form-coworkers-grid-page-1').submit();
+//});
 
- /* $('#edit-tid-hierarchical-select-dropbox-add').click(function() {
+ $('#edit-tid-hierarchical-select-dropbox-add').click(function() {
 	  // $('.view-filters form').submit();
 	  $('form.views-processed').submit();
 	  /*alert("hola")
-	  })*/
-}
+	  })
+}*/
 
 
 	Drupal.behaviors.my_ajaxrefresh = function (context) { 
@@ -38,7 +48,7 @@ jQuery(function(){
 	initTabs();
 	initLightbox();
 	initLayoutFix();
-	initInputs();
+	/*initInputs();*/
 	initSameHeight();
 	
 	
@@ -46,8 +56,6 @@ jQuery(function(){
    * Attaches the AJAX behavior to Views Load More waypoint support.
    */
 
-	
-	
 });
 
 // clear inputs on focus

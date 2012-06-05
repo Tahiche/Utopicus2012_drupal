@@ -111,12 +111,13 @@
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="<?php print $language->language; ?>" lang="<?php print $language->language; ?>" dir="<?php print $language->dir; ?>">
 
 <head>
-  <title><?php print $head_title; ?></title>
+  <title><?php print $head_title; ?> - COWORKERS</title>
   <?php print $head; ?>
   <?php print $styles; ?>
   <?php print $scripts; ?>
 </head>
 <body class="<?php print $classes; ?>">
+
 
 <!-- wrapper -->
 	<div id="wrapper">
@@ -133,7 +134,7 @@
               
         <?php print $page_header; ?>
 
-
+<?php if ($messages) print $messages;?>
  <?php //print $highlight; ?>
         <?php //print $breadcrumb; ?>
         
@@ -147,79 +148,29 @@
         
 			<!-- main -->
 		<div id="main">
-        <div class="visual">
-        <?php print $coworkersfrontview; ?>
-        <ul class="btn-list">
-						<li><a class="btn" href="<?php echo url("coworking/tour"); ?>"><span>TOUR</span></a></li>
-						<li><a class="btn" href="user/register"><span>ÚNETE</span></a></li>
-					</ul>
-        </div>
         
-        
-        
-        <div class="search-section">
-					<form action="<?php echo url("coworking/coworkers")?>" method="get">
-						<fieldset>
-							<label for="search">¿BUSCAS TALENTO?</label>
-							<input type="text" class="text clearinput" value="por ejemplo: SEO, Consultoría de Calidad, Diseñador gráfico, Videos" id="freeterm" name="freeterm">
-							<input type="submit" class="btn" value="search">
-						</fieldset>
-					</form>
-				</div>
-                
-                
-                
-        <div class="item-section">
-					<strong class="title">Algunas de las cosas que puedes hacer en utopic_US</strong>
-					<div class="holder">
-						<!-- box -->
-						<div class="box style-1" style="height: 109px;">
-							<h2><a href="#">Trabajar y conectar</a></h2>
-							<p>Una oficina sin jefes donde profesionales independientes, artistas y pymes trabajan, comparten y colaboran.</p>
-						</div>
-						<!-- box -->
-						<div class="box style-2" style="height: 109px;">
-							<h2><a href="#">Aprender</a></h2>
-							<p>Una escuela donde los profesores son profesionales en activo que comparten sus conocimientos y experiencia.</p>
-						</div>
-						<!-- box -->
-						<div class="box style-3" style="height: 109px;">
-							<h2><a href="#">Darte a conocer</a></h2>
-							<p>Un lugar donde organizar eventos diferentes para dar a conocer tu proyecto, producto o servicio, o para lo que tu quieras.</p>
-						</div>
-						<!-- box -->
-						<div class="box style-4" style="height: 109px;">
-							<h2><a href="#">Comerciar</a></h2>
-							<p>Un escaparate donde ofrecer tus productos y servicios. Contamos con un equipo comercial captando proyectos para ti.</p>
-						</div>
-					</div>
-				</div>
-                
-                <div class="twitter-section">
-					<img width="40" height="32" alt="image description" src="<?php echo "/".path_to_theme(); ?>/images/twitter_img.gif">
-					<!-- text -->
-					<div class="text">Aquí está la entrevista que le hicimos a <a href="#">@jvolpi</a> sobre su ganadora y trágica historia de amor. <a href="#">http://aquí el link de la web del sr,</a></div>
-				</div>
-                
-                
-                
-        <?php
-		// definido en modules/custom/embeded_views. module
-		 print $agendaviewfront; ?>
-        
-        
-        
-        <?php if ($title___NOOOO): ?>
+        <?php if ($title): ?>
         <div class="main-heading">
-          <h1 class="title"><?php print $title; ?></h1>
+          <h1 class="title"><?php echo t("comunidad"); ?></h1>
+          
+          <label class="buscar_label" for="textfield1">BUSCAR COWORKERS</label>
+          
+          <div id="buscar_block">
+          
+          <?php
+// http://www.utopicus.consinergia.es/es/admin/build/block/configure/views/-exp-coworkers_grid-page_3
+$block = module_invoke('views', 'block', 'view','-exp-coworkers_grid-page_3');
+print $block['content'];
+?>
+</div>
           </div>
         <?php endif; ?>
         
         <div class="main-section">
         
-        <?php if ($messages) print $messages;?>
         
-        <?php // print $content; ?>
+        
+        <?php print $content; ?>
         
        
         </div>

@@ -13,7 +13,7 @@
 	padding:10px !important;
 	
 	}
-.text-holder a{
+.text-holder a, .contenidonodo a{
 	text-decoration:underline;
 	}
 	
@@ -57,7 +57,7 @@ ul.load-more-pager li.pager-next a{
 	
 	}
 
-ul.load-more-pager li.pager-next a.views-throbbing{
+ul.load-more-pager li.pager-next a.views-throbbing, .views-throbbing{
 	height: 16px;
 	width: 16px;
 	background: url("../images/loadingspinner.gif") no-repeat scroll 0 0 transparent;
@@ -229,8 +229,18 @@ ul.links li{
 #coworkertags .links{
 	overflow:visible;
 	}
+#coworkertags{
+	width:100%;
+	border-bottom: 1px solid #D1D1D1;
+    line-height: 14px;
+    overflow: hidden;
+    padding: 10px 0 32px;
+	}
+#presentate{
+	min-height:115px;
+	}
 	/*********************************************** QUITar 1111111111111111111111!!!!!!!!!!!!!!****/
-li.comment_forbidden{
+li.comment_forbidden, li.comment_add{
 	display:none !important;
 	} 
 	/*********************************************************   filter forms ****************/
@@ -241,10 +251,17 @@ li.comment_forbidden{
 	background: none repeat scroll 0 0 #DDDDDD;
 	}
 	
-#edit-nombre.form-text{
+.views-processed .form-text, .views-widget .form-text{
 	width:auto !important;
 	}
 	
+	.form-text:hover,  .form-item .select-form-select:hover
+.form-item.text-active{
+	/*background:#b3fef9;*/
+	background:#b3fef9 url(../images/bg-form.png) no-repeat 0 -28px;
+	
+	}
+
 div.views-exposed-widget.views-submit-button input.form-submit{
 	background: url("../images/bg-form.png") no-repeat scroll -311px -152px transparent;
     border: 0 none;
@@ -268,7 +285,17 @@ div.views-exposed-widget.views-submit-button input.form-submit{
 	}
 div.views-exposed-widget.views-submit-button input.form-submit:hover{background:url(../images/bg-form.png) no-repeat -311px -118px;}
 
-
+#buscar_block{
+	 float: right;
+    margin: -25px 6px -4px 0;
+    padding: 0;
+	}
+.main-heading .buscar_label{
+	 margin-left: 40px;
+    padding: 0;
+    position: relative;
+    top: 4px;
+	 }
 /**************************** flickr **********************/
 
 .flickr-photoset-img-s{
@@ -292,3 +319,56 @@ div.views-exposed-widget.views-submit-button input.form-submit:hover{background:
 	display:none;
 	}
 
+/*********************************************************  blockUI blockOverlay Loading ajax *********************/
+.blockUI.blockOverlay{
+	width:102% !important;
+	
+	}
+	
+.blockUI.blockMsg.blockElement{
+	cursor: pointer;
+    overflow: hidden;
+    position: fixed;
+    top: 10% !important;
+    z-index: 1104;
+	background: none repeat scroll 0 0 #444444;
+    border-radius: 16px 16px 16px 16px;
+    display: block;
+    height: 33px;
+    margin: 0 0 0 -20px;
+    overflow: hidden;
+    padding: 0;
+    width: 33px;
+	
+		}
+.blockUI.blockMsg.blockElement div {
+   height: 16px;
+	width: 16px;
+	background: url("../images/loadingspinner.gif") no-repeat scroll 0 0 transparent;
+	margin: 8px 0 0 8px;
+}
+
+/******************************************************************* front coworkers view **********************/
+ul.photo-list{
+overflow: hidden;
+margin:0;
+}
+ul.photo-list li{
+list-style: none outside none;
+margin: 0;
+}
+
+
+/******************************/
+.contenidonodo{
+	/*width:800px;*/
+	}
+div.masvisto{
+	font-size:13px;
+	}
+	
+#sidebar .articder{
+    float: right;
+    padding: 15px 3px 0 0;
+    width: 219px;
+}
