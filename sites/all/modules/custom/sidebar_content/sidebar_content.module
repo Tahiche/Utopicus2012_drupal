@@ -1,0 +1,93 @@
+<?php
+function sidebar_content_preprocess_page(&$vars,$hook){
+
+		
+}
+
+function sidebar_content_preprocess_views_view(&$vars){
+	$view=$vars['view'];
+	if ($view->name == 'lista_secciones' && !$view->is_attachment ) {
+		if($view->args[1]=="agenda") $vars['sidebar_categories']=sidebar_content_theme_ajax_category_list(10);
+		//elseif($view->args[1]=="noticias") $vars['sidebar_categories']=sidebar_content_theme_mostviewed_list();
+		else  $vars['sidebar_categories']=sidebar_content_theme_mostviewed_list();
+		//miKrumo($view);
+	}
+}
+
+function sidebar_content_theme_ajax_category_list($vocab_id=NULL){
+	if(!$vocab_id) return;
+	drupal_add_js(drupal_get_path('module', 'sidebar_content') . '/sidebar_content_ajax.js');
+$content='<h2>'.t("Categorías").'</h2>';
+$content.='<ul class="category-list" id="terms">';
+
+$items = array();
+      $tree = taxonomy_get_tree($vocab_id);
+	  //miKrumo($tree);
+      if ($tree && (count($tree) > 0)) {
+        $options = array();
+        foreach ($tree as $term) {
+         // $items[$term->tid] = str_repeat('-', $term->depth) . $term->name;
+		  //$items[$term->tid] = l($term->name, "taxonomy/term/".$term->tid);
+		  //$items[$term->tid] = l($term->name,$term->tid);
+		  $items[$term->tid] = l($term->name,"taxonomy/term/".$term->tid,array('attributes'=>array('element'=>'terms','title'=>$term->name)));
+		  $content.='<li class="term_ajaxlink">'. $items[$term->tid].'</li>';
+		  //$content.='<li class="term_ajaxlink"><a href="'.$term->name.'">'.$term->name.'</a></li>';
+        }
+      }
+	  // incluir un "TODOS"
+	  $content.='<li class="term_ajaxlink">'. l("- Todas -","",array('language'=>false,'attributes'=>array('element'=>'terms','title'=>""))).'</li>';
+	  
+	  // theme_item_list($items, $title, $type, $attributes);
+ $content.='</ul>';
+ 
+ return $content;
+ 
+	}
+
+function sidebar_content_theme_mostviewed_list($nodetype=NULL){
+	drupal_add_js(drupal_get_path('module', 'sidebar_content') . '/sidebar_content_ajax.js');
+	
+	if(!$nodetype){
+		// miKrumo(arg(2));
+		switch(arg(2)){
+			case "noticias";
+			$nodetype="noticia";
+			break;
+			case "agenda";
+			$nodetype="actividad_agenda";
+			break;
+			default:
+			$nodetype=NULL;
+			break;
+			}
+		}
+	$view = views_get_view('taxonomy_most_tagged');
+    $display_id = 'block_most_tagged';
+    $view->set_display($display_id);
+	$filter = $view->get_item($display_id, 'filter', 'type');
+	$filter['value'] = array($nodetype=>$nodetype);
+	// $filter['value'] = array("actividad_agenda"=>"actividad_agenda");
+	// type es el nombre del filtro node-type
+	if ($nodetype) $view->set_item($display_id, 'filter', 'type', $filter);
+	
+	//miKrumo($filter);
+	
+	//$view_output = $view->render();
+	$view_output = $view->execute();
+	 // miKrumo($view);
+	$content='<h2>'.t("Categorías").'</h2>';
+	$content.='<ul class="category-list" id="terms">';
+	$items = array();
+	foreach($view->result as $id=>$row){
+		
+		$items[$row->tid] = l($row->term_data_name,"taxonomy/term/".$row->tid,array('attributes'=>array('element'=>'terms','title'=>$row->term_data_name)));
+		$content.='<li class="term_ajaxlink">'. $items[$row->tid].' <span class="num_tags">('.$row->num_records.')</span>'.'</li>';
+		}
+	$content.='<li class="term_ajaxlink">'. l("- Todas -","",array('language'=>false,'attributes'=>array('element'=>'terms','title'=>""))).'</li>';
+	 $content.='</ul>';
+	return $content;
+	}
+	;
+
+/**/
+?>

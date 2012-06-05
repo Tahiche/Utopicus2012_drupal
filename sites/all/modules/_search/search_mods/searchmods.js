@@ -20,6 +20,8 @@ Drupal.behaviors.exposedfilter_mod = function (context) {
  $('select#edit-term-node-tid-depth-limited').change(function() {
 	 // alert("cambia");
 	 $('#edit-nombre').val("");
+	 $('#edit-freeterm').val("");
+	
 	 $('form#views-exposed-form-coworkers-grid-page-coworkers').submit();
  });
  /* Puts the currently highlighted suggestion into the autocomplete field.
@@ -27,32 +29,31 @@ Drupal.behaviors.exposedfilter_mod = function (context) {
  */
 Drupal.jsAC.prototype.select = function (node) {
 this.input.value = $(node).data('autocompleteValue');
-  
-  if(jQuery(this.input).hasClass('auto_submit')){ 
+    if(jQuery(this.input).hasClass('auto_submit')){ 
+	
+	//alert("autosubmit???");
 	  var selectElement=$('select#edit-term-node-tid-depth-limited');
 	  selectElement.val($('option:first', selectElement).val());
+	  
+	  $('#edit-freeterm').val("");
 	  // form bonito...
-	  selectElement.onChange();
+	  // pero si hago trigger, el form se submit 2 veces....
+	  //selectElement.trigger("change");
+	  jcf.customForms.refreshAll();
+
 	  // submit the form
-     $('form#views-exposed-form-coworkers-grid-page-coworkers').submit();
+      $('form#views-exposed-form-coworkers-grid-page-coworkers').submit();
 	 
   }
 };
 
 $('form#views-exposed-form-coworkers-grid-page-coworkers').submit(function(e){
   //alert("Submitted");
-  $('div.view-content').block({ 
-            message: '<h1>Processing</h1>', 
-            css: { 
-		    border: 'none', 
-            padding: '15px', 
-            backgroundColor: '#000', 
-            '-webkit-border-radius': '10px', 
-            '-moz-border-radius': '10px', 
-            opacity: .5, 
-            color: '#fff'
-			} 
-            }).bind("ajaxComplete", function() {
+  if($('#edit-freeterm').val()!="")
+  { var selectElement=$('select#edit-term-node-tid-depth-limited');
+	  selectElement.val($('option:first', selectElement).val());
+  }
+  $('div.view-content').block().bind("ajaxComplete", function() {
             $(this).unblock();
 			 
     });

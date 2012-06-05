@@ -119,7 +119,7 @@ $imageGray = theme('imagecache', "grayscale", $colorpath , $item['data']['alt'],
 
     $path = empty($item['nid']) ? '' : "node/".$item['nid'];
     
-	 $class = "imagecache imagecache-$presetname imagecache-$style imagecache-{$element['#formatter']}";
+	 $class = "imagecache imagecache-$presetname imagecache-$style imagecache-{$element['#formatter']} grayoverImage";
 	
 	
 								

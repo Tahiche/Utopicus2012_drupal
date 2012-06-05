@@ -29,7 +29,7 @@
 						<li class="style-3 withdrop">
 							<a href="#"><span>actividades</span></a>
 							<ul class="drop" style="opacity: 0; top: 100%; display: none;">
-                                <li><a href="/es/actividades/agenda">Agenda</a></li>
+                                <li><a href="/es/secciones/actividades/agenda">Agenda</a></li>
                                 <li><a href="/es/actividades/utopic_gallery">Utopic_Gallery</a></li>
                                 <li><a href="/es/actividades/utopic_sundays">Utopic_Sundays</a></li>
                                 <li><a href="/es/actividades/mmm_us">MMM_US</a></li>
@@ -57,7 +57,7 @@
 							<ul class="drop" style="opacity: 0; top: 100%; display: none;">
                                     <li><a href="<?php echo url("_US/el_proyecto") ?>">El proyecto</a></li>
                                     <li><a href="<?php echo url("_US/el_equipo") ?>">El equipo</a></li>
-                                    <li><a href="<?php echo url("_US/noticias") ?>">Noticias</a></li>
+                                    <li><a href="<?php echo url("secciones/_US/noticias") ?>">Noticias</a></li>
                                     <li><a href="<?php echo url("_US/patrocinadores") ?>">Patrocinadores</a></li>
                                     <li><a href="<?php echo url("_US/sala_de_prensa") ?>">Sala de prensa</a></li>
                                     <li><a href="<?php echo url("_US/contacto") ?>">Contacto</a></li>

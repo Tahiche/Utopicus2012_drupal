@@ -241,13 +241,20 @@ function utopicus_preprocess_node(&$vars, $hook) {
 	  // krumo($vars);
 	  } // fin -- if($vars['type']=="pageutopicus
 	  
-  $articlenodes = array("actividad-agenda", "noticia");
+  $articlenodes = array("actividad_agenda", "noticia", "curso");
+  if (in_array($vars['node']->type,$articlenodes))$vars['template_files'][] ="node-article";
   
-	  if (in_array($vars['node']->type,$articlenodes))$vars['template_files'][] ="node-article";
+  // añadimos social media del modulo custom/social_links si en el tipo...
+  $articlenodes = array("actividad_agenda", "noticia", "curso");
+  if (in_array($vars['node']->type,$articlenodes))$vars['social_addthis']=theme('social_addthis'); 
+  
+  
   }
   //multiple nodes being displayed on one page in either teaser
   //or full view
   else {
+	
+	$vars['node']->terms_by_vocab=utopicus_separate_terms($vars['node']->taxonomy); 
     //template suggestions for nodes in general
     $vars['template_files'][] = 'node-'.$vars['node']->type;
     $vars['template_files'][] = 'node-'.$vars['node']->nid;
@@ -261,11 +268,11 @@ function utopicus_preprocess_node(&$vars, $hook) {
 	  
     }
   }
- 
+ $vars['terms_by_vocab']=utopicus_separate_terms($vars['node']->taxonomy); 
   // fivestar widget como variable
    $vars['fivestar_widget']="<div id='fivestardiv'>".$vars['node']->content['fivestar_widget']['#value']."</div>";
 	
-	$vars['terms_by_vocab']=utopicus_separate_terms($vars['node']->taxonomy);
+	
   // To remove a class from $classes_array, use array_diff().
   //$vars['classes_array'] = array_diff($vars['classes_array'], array('class-to-remove'));
   if(isset($_GET['krumon'])){
@@ -281,17 +288,18 @@ foreach ($node_taxonomy AS $term) {
  $links[$term->vid]['taxonomy_term_'. $term->tid] = array(
    'title' => $term->name, 
   'href' => taxonomy_term_path($term),
-'attributes' => array(
+   'attributes' => array(
    'rel' => 'tag',
    'title' => strip_tags($term->description)
    ),
  );
 }
    //theming terms out
-     foreach ($links AS $key => $vid) {
- $terms[$key] = theme_links($vid);
+  foreach ($links AS $key => $vid) {
+//miKrumo($vid);
+ $terms[$key] = theme('links',$vid,array('class' => 'links taxoinline'));
    }
-  }
+  } 
       return $terms;
     }
 
@@ -323,6 +331,59 @@ endif;
  
 }
 
+
+
+function utopicus_links($links, $attributes = array('class' => 'links linkul')) {
+  global $language;
+  $output = '';
+
+  if (count($links) > 0) {
+    $output = '<ul' . drupal_attributes($attributes) . '>';
+
+    $num_links = count($links);
+    $i = 1;
+
+    foreach ($links as $key => $link) {
+      $class = $key;
+
+      // Add first, last and active classes to the list of links to help out themers.
+      if ($i == 1) {
+        $class .= ' first';
+      }
+      if ($i == $num_links) {
+        $class .= ' last';
+      }
+      if (isset($link['href']) && ($link['href'] == $_GET['q'] || ($link['href'] == '<front>' && drupal_is_front_page()))
+           && (empty($link['language']) || $link['language']->language == $language->language)) {
+        $class .= ' active';
+      }
+      $output .= '<li' . drupal_attributes(array('class' => $class)) . '>';
+
+      if (isset($link['href'])) {
+        // Pass in $link as $options, they share the same keys.
+        $output .= l($link['title'], $link['href'], $link);
+      }
+      else if (!empty($link['title'])) {
+        // Some links are actually not links, but we wrap these in <span> for adding title and class attributes
+        if (empty($link['html'])) {
+          $link['title'] = check_plain($link['title']);
+        }
+        $span_attributes = '';
+        if (isset($link['attributes'])) {
+          $span_attributes = drupal_attributes($link['attributes']);
+        }
+        $output .= '<span' . $span_attributes . '>' . $link['title'] . '</span>';
+      }
+
+      $i++;
+      $output .= "</li>\n";
+    }
+
+    $output .= '</ul>';
+  }
+
+  return $output;
+}
 /**
 * Change submit button to search in exposed filters.
 */

@@ -1,0 +1,25 @@
+<?php
+// $Id:$
+
+
+/* Implementation of hook_menu().
+*/
+// Implements hook_theme
+function social_links_theme(){
+    $themes=array();
+        $themes['social_addthis']=array(
+            // Optionally, you can make the theme use a template file:
+            // this line references the file "mydatafile.tpl.php" in the same folder as the module or in the folder of the active theme
+            'template' => 'social_links',
+            // these variables will appear in the template as $var1 and $var2
+            'arguments' => array('node'=>null)
+            
+        );
+	return  $themes;
+  
+} 
+function social_links_init() {
+drupal_set_html_head("<script type='text/javascript' src='//s7.addthis.com/js/250/addthis_widget.js#pubid=xa-4f472587705fa7b2'></script>");
+//now you might have to reload the header instance
+$variables['head'] = drupal_get_html_head();
+}

@@ -55,23 +55,42 @@ function search_mods_init(){
 	}
 
 function search_mods_form_alter(&$form, &$form_state, $form_id) {
-	if($form_id=="views_exposed_form" && $form['#id']=="views-exposed-form-coworkers-grid-page-coworkers"){
+	
+	$form['terms']['#size']=45;
+			
+	if($form['#id']=="views-exposed-form-coworkers-grid-page-coworkers" || $form['#id']=="views-exposed-form-coworkers-grid-page-3"){
 		
+				
 		 drupal_add_js(drupal_get_path('module', 'search_mods') . '/searchmods.js');
 		// firep("formmm");
 		$form['nombre']['#size']=30;
 		$form['nombre']['#autocomplete_path'] = 'taxonomy/customtitleautocomplete' ;
 		$form['nombre']['#attributes']['class']='auto_submit';
 		
-		/*unset($form['submit']);*/
-		/*$form['term_node_tid_depth_limited']['#options']['All']="- Todos -";*/
-		
+		$form['term_node_tid_depth_limited']['#options']['All']="- Todos -";
+		$defText = t('por ejemplo: SEO, Consultoría de Calidad, Diseñador gráfico, Videos');
+
+  // Default value del title en jquery-main plugin
+  
+  //$form['freeterm']['#default_value'] = $defText;
+  $form['freeterm']['#attributes']['title']=$defText;
+  // $form['freeterm']['#value'] = $defText;
+  
+		$form['freeterm']['#size']=40;
 		
 		// krumo($form);
 		/*krumo($form_state);*/
+		
+		if($form['#id']=="views-exposed-form-coworkers-grid-page-3"){
+			$form['#action']=url("coworking/coworkers");
 		}
+		// 
+		
+		} // si noi es una de los views de coworkers
  
-
+if(isset($_GET['krumof'])){
+			miKrumo($form);
+			}
  
 }
 

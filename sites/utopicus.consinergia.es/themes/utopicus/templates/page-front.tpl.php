@@ -158,10 +158,12 @@
         
         
         <div class="search-section">
-					<form action="<?php echo url("coworking/coworkers")?>" method="get">
+					<form action="<?php 
+					echo url("coworking/coworkers");
+					?>" method="get">
 						<fieldset>
 							<label for="search">¿BUSCAS TALENTO?</label>
-							<input type="text" class="text clearinput" value="por ejemplo: SEO, Consultoría de Calidad, Diseñador gráfico, Videos" id="freeterm" name="freeterm">
+							<input type="text" class="text" title="por ejemplo: SEO, Consultoría de Calidad, Diseñador gráfico, Videos" value="" id="freeterm" name="freeterm">
 							<input type="submit" class="btn" value="search">
 						</fieldset>
 					</form>
@@ -197,13 +199,19 @@
                 
                 <div class="twitter-section">
 					<img width="40" height="32" alt="image description" src="<?php echo "/".path_to_theme(); ?>/images/twitter_img.gif">
+                    
+					
+					
 					<!-- text -->
-					<div class="text">Aquí está la entrevista que le hicimos a <a href="#">@jvolpi</a> sobre su ganadora y trágica historia de amor. <a href="#">http://aquí el link de la web del sr,</a></div>
+					<div class="text">
+                    <?php if (function_exists('twitter_pull_render')) { print twitter_pull_render('@utopic_us', false, 1); } ?>
+                    </div>
 				</div>
                 
                 
                 
         <?php
+		 print views_embed_view('agenda_front', 'banner_home');
 		// definido en modules/custom/embeded_views. module
 		 print $agendaviewfront; ?>
         

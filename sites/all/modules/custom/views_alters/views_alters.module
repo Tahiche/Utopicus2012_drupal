@@ -1,0 +1,46 @@
+<?php
+function views_alters_preprocess_views_view($vars){
+$view=$vars['view'];
+// && $view->current_display == 'attachment_1'
+if ($view->name == 'lista_secciones' ) {
+	if(!empty($view->exposed_raw_input['terms'])){
+		// miKrumo($view);
+		if($view->current_display=="attachment_1"){
+			unset($view->result);
+			$view->disabled=true;
+			}
+		//unset($view->attachment_before);
+		}
+		
+	}
+		
+}
+
+
+function views_alters_views_pre_build(&$view) {
+	
+		   if ($view->name == 'lista_secciones' ) {
+				$handler=$view->display_handler;
+				  if($view->current_display == 'page_seccion'){
+					$handler->options['pager']['options']['offset']=1;
+					if(!empty($_REQUEST['terms'])){
+						// si hay busqueda no queremos offset porque ya ocultamos el destacado
+						$handler->options['pager']['options']['offset']=0;
+						}
+					}
+					
+					if($view->current_display == 'attachment_1'){
+						if(!empty($_REQUEST['terms']) ){
+							// esto oculta el attachment si hay busqueda
+							$view->built=true;
+							return NULL;
+							}
+					}
+		
+	  
+	  } //  fin if lista secciones -->
+  
+}
+
+
+?>

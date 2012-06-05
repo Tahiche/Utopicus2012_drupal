@@ -4,13 +4,19 @@
 <file name="block.tpl.php" server="utopicus.teachnova.net/2011_09_18-openatrium-comunidad-1.0/" local="129743127000000000" remote="129743127000000000" />
 <file name="header.tpl.php" server="utopicus.teachnova.net/2011_09_18-openatrium-comunidad-1.0/" local="129785389267048000" remote="129785389200000000" />
 <file name="footer.tpl.php" server="utopicus.teachnova.net/2011_09_18-openatrium-comunidad-1.0/" local="129785381199118000" remote="129785380800000000" />
-<file name="page-header.tpl.php" server="utopicus.teachnova.net/2011_09_18-openatrium-comunidad-1.0/" local="129822704868960000" remote="129822704400000000" />
-<file name="page-footer.tpl.php" server="utopicus.teachnova.net/2011_09_18-openatrium-comunidad-1.0/" local="129822727983520000" remote="129822727800000000" />
+<file name="page-header.tpl.php" server="utopicus.teachnova.net/2011_09_18-openatrium-comunidad-1.0/" local="129824360643592893" remote="129824360400000000" />
+<file name="page-footer.tpl.php" server="utopicus.teachnova.net/2011_09_18-openatrium-comunidad-1.0/" local="129833019013666959" remote="129833019000000000" />
 <file name="___page.tpl.php" server="utopicus.teachnova.net/2011_09_18-openatrium-comunidad-1.0/" local="129743127000000000" remote="129743127000000000" />
 <file name="Untitled-1.php" server="utopicus.teachnova.net/2011_09_18-openatrium-comunidad-1.0/" local="129817967734368695" remote="129817967400000000" />
 <file name="user-profile.tpl.php" server="utopicus.teachnova.net/2011_09_18-openatrium-comunidad-1.0/" local="129817993148052274" remote="129817993200000000" />
 <file name="page-user.tpl.php" server="utopicus.teachnova.net/2011_09_18-openatrium-comunidad-1.0/" local="129817975311102059" remote="129817975200000000" />
 <file name="content_profile-display-view.tpl.php" server="utopicus.teachnova.net/2011_09_18-openatrium-comunidad-1.0/" local="129817993018904887" remote="129817992600000000" />
+<<<<<<< HEAD
 <file name="page-front.tpl.php" server="utopicus.teachnova.net/2011_09_18-openatrium-comunidad-1.0/" local="129826892130130000" remote="129826891800000000" />
 <file name="page-perfil-usuario.tpl.php" server="utopicus.teachnova.net/2011_09_18-openatrium-comunidad-1.0/" local="129824391000000000" remote="129824391000000000" />
+=======
+<file name="page-front.tpl.php" server="utopicus.teachnova.net/2011_09_18-openatrium-comunidad-1.0/" local="129832995466360130" remote="129832995000000000" />
+<file name="page-perfil-usuario.tpl.php" server="utopicus.teachnova.net/2011_09_18-openatrium-comunidad-1.0/" local="129824391330398078" remote="129824391000000000" />
+<file name="twitter-pull-listing.tpl.php" server="utopicus.teachnova.net/2011_09_18-openatrium-comunidad-1.0/" local="129832866803791052" remote="129832866600000000" />
+>>>>>>> d0f6ac7f65661fc64eb1e138aff97fe01d9763d6
 </dwsync>

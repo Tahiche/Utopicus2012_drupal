@@ -19,12 +19,16 @@ return $adminAble;
 }
 	
 function miKrumo($var){
-	// if(!user_is_admin()) return false;
-		
-		if (!function_exists('krumo')){
+	if(!user_is_editor()) return false;
+	
+	 if (!function_exists('krumo')){
 	 include_once  drupal_get_path('module', 'devel'). '/krumo/class.krumo.php';
 			}
 	echo "<div id='krumoDiv'>	";	
+	$_ = array_reverse(debug_backtrace());
+		$d = array_pop($_);
+		
+	echo "Called from:".@$d['file']." line".$d['line'];
 	krumo($var);
 	echo"</div>";
 }
@@ -62,8 +66,12 @@ function _taxonomy_get_real_tree($vid){
 * Trim a post to a certain number of characters, removing all HTML.
 */
 function trim_text($text, $length = 150) {
+	
   // remove any HTML or line breaks so these don't appear in the text
   $text = trim(str_replace(array("\n", "\r"), ' ', strip_tags($text,'<a>')));
+  
+  $originalLength=strlen($text);
+  
   $text = trim(substr($text, 0, $length));
   $lastchar = substr($text, -1, 1);
   // check to see if the last character in the title is a non-alphanumeric character, except for ? or !
@@ -71,8 +79,9 @@ function trim_text($text, $length = 150) {
   if (preg_match('/[^0-9A-Za-z\!\?]/', $lastchar)) {
     $text = substr($text, 0, -1);
   }
+  
   // ? and ! are ok to end a title with since they make sense
-  if ($lastchar != '!' and $lastchar != '?') {
+  if ($lastchar != '!' and $lastchar != '?' && ( $originalLength > strlen($text))) {
     $text .= '...';
   }
 

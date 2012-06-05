@@ -22,7 +22,7 @@
  *
  * @ingroup views_templates
  */  
-// krumo($fields)
+ // krumo($fields)
 ?>
 <div class="heading">
 	<!-- date -->
@@ -48,8 +48,8 @@ switch($fields['type']->content){
 	break;
 	}
 
-
-// echo $cat;
+//echo $fields['tid']->content
+ echo $cat;
 ?></strong>
 </div>
 

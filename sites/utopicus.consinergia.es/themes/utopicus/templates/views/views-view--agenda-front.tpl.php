@@ -1,4 +1,4 @@
-<?php
+<?php 
 /**
  * @file views-view.tpl.php
  * Main view template
@@ -30,13 +30,6 @@
 ?>
 <div class="post-section  <?php print $classes; ?>">
 
-<!-- esto podríar ser el header -->
-<div class="post-visual">
-						<img height="151" width="923" alt="image description" src="/<?php print path_to_theme()?>/images_dummy/img26.png">
-						<h2>FEATURED POST. IMAGEN SIN TEXTO.</h2>
-</div>
-
-
 <!-- podrían ser filtros -->
 <div class="breadcrumbs-holder">
 						<h2>agenda</h2>
@@ -49,7 +42,9 @@
 							<li><a href="#">PRODUCTOS Y SERVICIOS</a></li>
 							<li><a href="#">NOTICIAS</a></li>
 </ul> -->
+<div class="calendar_links"><a href="http://www.google.com/calendar/ical/comunicacion%40utopicus.es/public/basic.ics">iCAL</a><a href="http://www.google.com/calendar/embed?src=comunicacion%40utopicus.es&ctz=Europe/Madrid">HTML</a></div>
 </div>
+
   <?php if ($admin_links): ?>
     <div class="views-admin-links views-hide">
       <?php print $admin_links; ?>

@@ -78,7 +78,8 @@
 		// override these in your code to change the default behavior and style
 		$.blockUI.defaults = {
 			// message displayed when blocking (use null for no message)
-			message:  '<h1>Buscando...</h1>',
+			/*message:  '<h1>Buscando...</h1>',*/
+			 message: "<div></div>",
 
 			title: null,	  // title string; only used when theme == true
 			draggable: true,  // only used when theme == true (requires jquery-ui.js to be loaded)
@@ -89,22 +90,26 @@
 			// these and use an external stylesheet then do this in your code:
 			// $.blockUI.defaults.css = {};
 			css: {
-				padding:	0,
+				
+				/*padding:	"15px",
+				'-webkit-border-radius': '10px', 
+                '-moz-border-radius': '10px', 
 				margin:		0,
-				width:		'30%',
-				top:		'40%',
+				width:		'20%',
+				top:		'10%',
 				left:		'35%',
 				textAlign:	'center',
-				color:		'#000',
-				border:		'3px solid #aaa',
-				backgroundColor:'#fff',
-				cursor:		'wait'
+				color:		'#999',
+				border:		'none',
+				background: 'none',
+				opacity: 1, 
+				cursor:		'default'*/
 			},
 
 			// minimal style set used when themes are used
 			themedCSS: {
 				width:	'30%',
-				top:	'40%',
+				top:	'10%',
 				left:	'35%'
 			},
 
@@ -112,7 +117,7 @@
 			overlayCSS:  {
 				backgroundColor: '#E7E7E7',
 				opacity:	  	 0.8,
-				cursor:		  	 'wait'
+				cursor:		  	 'default'
 			},
 
 			// styles applied when using $.growlUI
@@ -164,7 +169,7 @@
 			fadeOut:  600,
 
 			// time in millis to wait before auto-unblocking; set to 0 to disable auto-unblock
-			timeout: 6000,
+			timeout: 0,
 
 			// disable if you don't want to show the overlay
 			showOverlay: true,

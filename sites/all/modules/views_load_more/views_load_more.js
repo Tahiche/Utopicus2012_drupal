@@ -44,10 +44,14 @@ Drupal.viewsLoadMore = function(target, response) {
     // If we are using a grid or table-driven style plugin,
     // we'll have to check if a tbody container exists.
 	
+	var $listRows= $(view_row_class);
+	//console.log($listRows);
+	// no queremos el adjunto !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+    var newRows = $newView.find(view_row_class).not(".adjunto");
+	//console.log(newRows);
 	
-    var newRows = $newView.find(view_row_class);
-	
-	
+	//newRows=newRows.not(".views-row");
+	//console.log(newRows);
     // Default tables in views 6.x do not include .views-row on the row class.
     // Therefore, jQuery has trouble identifying rows.
     // If the first query didn't find any results, check if the style plugin uses a table.
@@ -57,7 +61,7 @@ Drupal.viewsLoadMore = function(target, response) {
 	// list,default
 	/***********************************************************************************************************************************************/
 	if (newRows.length < 1 && (style_plugin == 'list,default' || style_plugin == 'list' || style_plugin == 'default')) {
-      console.log("  style_plugin style_pluginstyle_pluginstyle_plugin style_plugin@@");
+     // console.log("estamos en if");
 	  newRows = $('.grid-div .grid-list', $newView);
     }
 	// list,default
@@ -81,9 +85,36 @@ Drupal.viewsLoadMore = function(target, response) {
       // Index 0 will be everything from <html> to the view.
       // Index 1 will be everything from the view's contents down.
       path_to_parent = path_to_parent.split(view_content_class);
+	  
+	  
+	  
       path_to_parent = view_content_class + ' ' + path_to_parent[1];
-	  console.log(" path_to_parent  "+path_to_parent);
-      $(path_to_parent, $view).append(newRows);
+	  // el original!!!!! 
+      //$(path_to_parent, $view).append(newRows);
+	  
+	  // lo cambio par alos attachment !!!!!
+	  //ppio cambio
+	  if($(".view-content .post-columns", $view)){
+	 // $(".view-content .post-columns", $view).append(newRows);
+	var obj=  $(".view-content .post-columns", $view);
+	
+	if(  $(".view-content .post-columns ul.events-list", $view) ) obj= $(".view-content .post-columns ul.events-list", $view) ;
+	
+	  console.log(obj);
+	  console.log(obj.length);
+	  // $(view_content_class).parent().append(newRows);
+	  
+	   
+	  }
+	 
+	 if (obj.length > 0) obj.append(newRows);
+	  else{
+		  $(path_to_parent, $view).append(newRows);
+		  }
+	// fin cambio
+	
+	 // console.log( $(path_to_parent, $view));
+	  
 	  /****************************************************************** efecto IN ************************/
 	  newRows.css("display", "none").slideDown(1500);
     }

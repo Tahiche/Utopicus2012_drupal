@@ -104,6 +104,10 @@ $opciones=array("customlink"=>"espacios/open_us");
 		<div class="sidemap-area">
 			<!-- banner -->
 			<a class="banner" href="#"><img width="125" height="125" alt="banner" src="<?php print $theme_pathabsoluto; ?>/images/img-banner.gif"></a>
+             <div id="slide_patrocinios" class="banner">
+    <img src="<?php print $theme_pathabsoluto; ?>/images/logos/heineken.jpg" alt="" class="active" />
+    <img src="<?php print $theme_pathabsoluto; ?>/images/logos/ministerio_c.jpg" alt="" />
+</div>
 			<!-- box -->
 			<div class="box">
 				<strong class="title"><a href="#">COWORKING</a></strong>
@@ -120,14 +124,14 @@ $opciones=array("customlink"=>"espacios/open_us");
 				<strong class="title"><a href="#">FORMACION</a></strong>
 				<ul>
 					<li><a href="/es/formacion/tocs">Vídeos TOCS</a></li>
-                             <li><a href="/es/formacion/cursos">Cursos</a></li>
+                             <li><a href="/es/secciones/formacion/cursos">Cursos</a></li>
 				</ul>
 			</div>
 			<!-- box -->
 			<div class="box">
 				<strong class="title"><a href="#">ACTIVIDADES</a></strong>
 				<ul>
-					<li><a href="/es/actividades/agenda">Agenda</a></li>
+					<li><a href="/es/secciones/actividades/agenda">Agenda</a></li>
                                 <li><a href="/es/actividades/utopic_gallery">Utopic_Gallery</a></li>
                                 <li><a href="/es/actividades/utopic_sundays">Utopic_Sundays</a></li>
                                 <li><a href="/es/actividades/mmm_us">MMM_US</a></li>
@@ -159,7 +163,7 @@ $opciones=array("customlink"=>"espacios/open_us");
 				<ul>
 					<li><a href="<?php echo url("_US/el_proyecto") ?>">El proyecto</a></li>
                                     <li><a href="<?php echo url("_US/el_equipo") ?>">El equipo</a></li>
-                                    <li><a href="<?php echo url("_US/noticias") ?>">Noticias</a></li>
+                                    <li><a href="<?php echo url("_US/secciones/noticias") ?>">Noticias</a></li>
                                     <li><a href="<?php echo url("_US/patrocinadores") ?>">Patrocinadores</a></li>
                                     <li><a href="<?php echo url("_US/sala_de_prensa") ?>">Sala de prensa</a></li>
                                     <li><a href="<?php echo url("_US/contacto") ?>">Contacto</a></li>
@@ -185,7 +189,10 @@ $opciones=array("customlink"=>"espacios/open_us");
 					<li><a class="rss" href="#">rss<span class="mask">&nbsp;</span></a></li>
 				</ul>
 				<!-- banner -->
-				<a class="banner" href="#"><img width="157" height="33" alt="banner" src="<?php print $theme_pathabsoluto; ?>/images/img-banner.gif"></a>
+                
+               
+
+				<a class="banner" href="#"><img width="157" height="33" alt="banner" src="<?php print $theme_pathabsoluto; ?>/images/logos/ministerio_bottom.gif"></a>
 			</div>
 		</div>
 		<span class="copyright">&copy; 2012 Utopicus Innovación Cultural SL - Todos los derechos reservados</span>
