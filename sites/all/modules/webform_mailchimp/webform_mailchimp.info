@@ -1,0 +1,13 @@
+
+name = Webform Mailchimp
+description = Creates a Mailchimp Webform component.
+core = 6.x
+dependencies[] = webform
+dependencies[] = mailchimp
+package = Webform
+; Information added by drupal.org packaging script on 2012-01-31
+version = "6.x-1.0"
+core = "6.x"
+project = "webform_mailchimp"
+datestamp = "1328014271"
+

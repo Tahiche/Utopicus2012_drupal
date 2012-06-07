@@ -1,0 +1,6 @@
+; $Id: $
+name = node_slider_galleria
+description = Añade Galleria (js) a nodos utopicus con varias imágenes.
+package = " Custom"
+
+core = "6.x"

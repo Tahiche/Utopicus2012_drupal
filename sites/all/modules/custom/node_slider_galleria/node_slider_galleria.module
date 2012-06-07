@@ -1,0 +1,32 @@
+<?php
+// $Id:$
+
+
+/* Implementation of hook_menu().
+*/
+// Implements hook_theme
+function node_slider_galleria_theme(){
+    $themes=array();
+        $themes['top_image_or_gallery']=array(
+            // Optionally, you can make the theme use a template file:
+            // this line references the file "mydatafile.tpl.php" in the same folder as the module or in the folder of the active theme
+            'template' => 'node_slider_galleria',
+            // these variables will appear in the template as $var1 and $var2
+            'arguments' => array('pics'=>null,'image_preset'=>null)
+            
+        );
+	return  $themes;
+  
+} 
+
+function node_slider_galleria_preprocess_node(&$vars, $hook) {
+	/*miKrumo($vars);
+ if(count($vars['field_top_image']) >1){
+	 $vars['top_image_slider']=theme('galleria_pics',$vars['field_top_image'],$vars);
+		 }*/
+}
+/*function social_links_init() {
+drupal_set_html_head("<script type='text/javascript' src='//s7.addthis.com/js/250/addthis_widget.js#pubid=xa-4f472587705fa7b2'></script>");
+//now you might have to reload the header instance
+$variables['head'] = drupal_get_html_head();
+}*/

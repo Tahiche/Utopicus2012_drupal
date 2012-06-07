@@ -1,0 +1,218 @@
+<?php
+// $Id: InsertNode.module,v 1.2.2.16 2010/04/21 11:18:29 alexiswilke Exp $
+// Author: Mark Burton
+// Conversion & enhancements for D6: Alexis Wilke
+
+/**
+ * @file InsertNode.module
+ *
+ * Defines the InsertNode module. A filter used to replace [node] entries with the
+ * content of another node (or even the current node's title or CCK fields.)
+ */
+
+/**
+ * Implementation of hook_help().
+ */
+function InsertNode_help($path, $arg) {
+  switch ($path) {
+  case 'admin/help#InsertNode':
+    $tips = str_replace('<br />', "<br /><br />\n", InsertNode_filter_tips(0, 0));
+    $tips = preg_replace('%^([^-]+) - %m', '<strong>\1</strong> - ', $tips);
+    $output = '<p>' . t('Please, read the complete !url on the website of Made to Order Software.',
+                 array('!url' => l(t('Insert Node book'), 'http://www.m2osw.com/doc_insert_node')))
+      . '</p>'
+      . '<p>&nbsp;</p>'
+      . '<h4>' . t('Brief recap of available parameters') . '</h4>'
+      . '<p>' . $tips . '</p>'
+      . '<h4>' . t('Common problems') . '</h4>'
+      . '<p>' . t('The wrong syntax will make the tag fail and appear as not transformed. Please, make sure that you separate each parameter by a space, and that you end parameters including a value with a semi-colon. For instance, adding the title with the CCK parameter is written like this:') . '</p>'
+      . '<pre>[node:* cck=title;]</pre>';
+    return $output;
+
+  }
+}
+
+/**
+ * Implementation of hook_init().
+ */
+function InsertNode_init() {
+  // If you experience side effects, feel free to comment out this add.
+  // All you lose is the coming back to the correct node when commenting
+  // an included node.
+  if (function_exists('jquery_plugin_add')) {
+    jquery_plugin_add('cookie');
+  }
+  drupal_add_js(drupal_get_path('module', 'InsertNode') . '/back_from_comment.js');
+}
+
+/**
+ * Implementation of hook_filter().
+ */
+function InsertNode_filter($op, $delta = 0, $format = -1, $text = '') {
+  global $_InsertNode_format;
+
+  switch ($op) {
+  case 'list':
+    return array(0 => t('Insert node [re-renamed]'));
+
+  case 'description':
+    return t('Insert the body, teaser, title, comments of a node defined by its ID or URL name');
+
+  case 'settings':
+    module_load_include('admin.inc', 'InsertNode');
+    return _InsertNode_settings($format);
+
+  case 'prepare':
+    return $text;
+
+  case 'no cache':
+    return TRUE;
+
+  case "process":
+    // any node tag (or at least seemingly such)?
+    if (strpos($text, "[node:") !== FALSE) {
+      $_InsertNode_format = $format;
+      module_load_include('pages.inc', 'InsertNode');
+      $text = preg_replace_callback('/\[node:([^\s\]]+)((?:\s+[a-zA-Z]+(?:=[^;]*;)?)*)\s*\]/', '_InsertNode_replacer', $text);
+    }
+    return $text;
+
+  }
+}
+
+/**
+ * Implementation of hook_filter_tips()
+ */
+function InsertNode_filter_tips($delta, $format, $long = FALSE) {
+  return t('[node:123|* <em>parameters</em>] - insert a node content<br />'
+    . 'themed, content, body, teaser, or page - insert the node\'s content themed in different ways<br />'
+    . 'cck - insert a cck field, or unthemed title, teaser or body<br />'
+    . 'title, link, more or edit - insert link to node with title, edit or "Read more..."<br />'
+    . 'collapsed or collapsible - display the selection collapsible and eventually collapsed<br />'
+    . 'created, modified - insert the date when the node was created, modified<br />'
+    . 'comments - insert node comments<br />'
+    . 'demote - increment (>0) or decrement (<0) the headers level<br />'
+    . 'noterms - remove all the terms so as to hide them<br />'
+    . 'plain - do not insert the output inside any tag<br />'
+    . 'repeat - repeat the filter on the inserted content<br />'
+    . 'imagefield - insert an image from a CCK field with links<br />'
+    . 'booktree - insert a booktree');
+}
+
+/**
+ * Implementation of hook_theme
+ */
+function InsertNode_theme() {
+  return array(
+    'InsertNode_default' => array(
+      'arguments' => array(
+        'node' => NULL,
+      ),
+      'file' => 'InsertNode.pages.inc',
+    ),
+    'InsertNode_themed' => array(
+      'arguments' => array(
+        'node' => NULL,
+      ),
+      'file' => 'InsertNode.pages.inc',
+    ),
+    'InsertNode_page' => array(
+      'arguments' => array(
+        'node' => NULL,
+      ),
+      'file' => 'InsertNode.pages.inc',
+    ),
+    'InsertNode_body' => array(
+      'arguments' => array(
+        'node' => NULL,
+      ),
+      'file' => 'InsertNode.pages.inc',
+    ),
+    'InsertNode_content' => array(
+      'arguments' => array(
+        'node' => NULL,
+      ),
+      'file' => 'InsertNode.pages.inc',
+    ),
+    'InsertNode_title' => array(
+      'arguments' => array(
+        'node' => NULL,
+      ),
+      'file' => 'InsertNode.pages.inc',
+    ),
+    'InsertNode_teaser' => array(
+      'arguments' => array(
+        'node' => NULL,
+      ),
+      'file' => 'InsertNode.pages.inc',
+    ),
+    'InsertNode_more' => array(
+      'arguments' => array(
+        'node' => NULL,
+      ),
+      'file' => 'InsertNode.pages.inc',
+    ),
+    'InsertNode_link' => array(
+      'arguments' => array(
+        'node' => NULL,
+      ),
+      'file' => 'InsertNode.pages.inc',
+    ),
+    'InsertNode_edit' => array(
+      'arguments' => array(
+        'node' => NULL,
+      ),
+      'file' => 'InsertNode.pages.inc',
+    ),
+    'InsertNode_created' => array(
+      'arguments' => array(
+        'node' => NULL,
+      ),
+      'file' => 'InsertNode.pages.inc',
+    ),
+    'InsertNode_modified' => array(
+      'arguments' => array(
+        'node' => NULL,
+      ),
+      'file' => 'InsertNode.pages.inc',
+    ),
+    'InsertNode_comments' => array(
+      'arguments' => array(
+        'node' => NULL,
+        'comments' => '',
+      ),
+      'file' => 'InsertNode.pages.inc',
+    ),
+    'InsertNode_node' => array(
+      'arguments' => array(
+        'node' => NULL,
+        'output' => '',
+        'insert_node_count' => 0,
+      ),
+      'file' => 'InsertNode.pages.inc',
+    ),
+    'InsertNode_book_children' => array(
+      'arguments' => array(
+        'book_link' => NULL,
+      ),
+      'template' => 'InsertNode-book-children',
+      'file' => 'InsertNode.pages.inc',
+    ),
+    'InsertNode_imagefield' => array(
+      'arguments' => array(
+        'filename' => NULL,
+        'imagecache' => NULL,
+        'type' => NULL,
+      ),
+      'file' => 'InsertNode.pages.inc',
+    ),
+    'InsertNode_webform' => array(
+      'arguments' => array(
+        'node' => NULL,
+      ),
+      'file' => 'InsertNode.pages.inc',
+    ),
+  );
+}
+
+// vim: ts=2 sw=2 et syntax=php

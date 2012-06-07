@@ -1,0 +1,15 @@
+; Declaration for this module
+name = Insert Node
+description = A filter to include content from one node in another, or anywhere a filter is used (i.e. a block)
+package = "Input filters"
+dependencies[] = filter
+version = "6.x-1.x"
+core = 6.x
+
+
+; Information added by drupal.org packaging script on 2010-04-29
+version = "6.x-1.3"
+core = "6.x"
+project = "InsertNode"
+datestamp = "1272504008"
+
