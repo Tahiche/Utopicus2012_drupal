@@ -133,7 +133,7 @@
               
         <?php print $page_header; ?>
 
-
+<?php if ($messages) print $messages;?>
  <?php //print $highlight; ?>
         <?php //print $breadcrumb; ?>
         

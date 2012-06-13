@@ -1,3 +1,12 @@
+<div id="fb-root"></div>
+<script>(function(d, s, id) {
+  var js, fjs = d.getElementsByTagName(s)[0];
+  if (d.getElementById(id)) return;
+  js = d.createElement(s); js.id = id;
+  js.src = "//connect.facebook.net/es_ES/all.js#xfbml=1&appId=137450526276416";
+  fjs.parentNode.insertBefore(js, fjs);
+}(document, 'script', 'facebook-jssdk'));</script>
+
 <?php
 global $theme_pathabsoluto;
 // $theme_path -> var global definida en page-header
@@ -83,22 +92,24 @@ $opciones=array("customlink"=>"espacios/open_us");
 			<!-- facebook-box -->
 			<div class="facebook-box">
 				<!-- facebook -->
-				<div class="facebook"><img width="210" height="60" alt="facebook" src="<?php print $theme_pathabsoluto; ?>/images/img-facebook.gif"></div>
+				<div class="facebook">
+                <!-- <img width="210" height="60" alt="facebook" src="<?php print $theme_pathabsoluto; ?>/images/img-facebook.gif">-->
+                <div class="fb-like" data-href="http://www.utopicus.es" data-send="false" data-layout="button_count" data-width="450" data-show-faces="true"></div>
+                </div>
 				<strong class="title">Suscríbete a nuestro boletín</strong>
-				<form action="#">
-					<fieldset>
-						<div class="row">
-							<div class="text-field"><input type="text" value="TU NOMBRE"></div>
-						</div>
-						<div class="row">
-							<div class="text-field"><input type="text" value="TU EMAIL"></div>
-						</div>
-						<div class="row">
-							<strong class="btn"><input type="submit" value="SUSCRIBIRME">SUSCRIBIRME</strong>
-						</div>
-					</fieldset>
-				</form>
-			</div>
+                
+                <?php 
+
+				// funcion en template.php, para que siempre muestre los campos, aún registrado.
+				$blockChimp =  utopicus_mailchimp_block('view','a66e7d45f0');
+				
+				print $blockChimp['content'];
+				
+				// miKrumo($blockChimp);
+				?>
+                
+				
+		</div>
 		</div>
 		<!-- sidemap-area -->
 		<div class="sidemap-area">
@@ -174,9 +185,9 @@ $opciones=array("customlink"=>"espacios/open_us");
 		<div class="footer-bar">
 			<!-- footer-nav -->
 			<ul class="footer-nav">
-				<li><a href="#">Condiciones de uso</a></li>
-				<li><a href="#">Política de privacidad</a></li>
-				<li><a href="#">Mapa del sitio</a></li>
+				<li><a href="/es/legal/condiciones-de-uso">Condiciones de uso</a></li>
+				<li><a href="/es/legal/politica-de-privacidad">Política de privacidad</a></li>
+				<li><a href="/sitemap">Mapa del sitio</a></li>
 			</ul>
 			<div class="alignright">
 				<!-- social-networks -->
@@ -186,7 +197,7 @@ $opciones=array("customlink"=>"espacios/open_us");
 					<li><a class="igoogle" href="#">iGoogle<span class="mask">&nbsp;</span></a></li>
 					<li><a class="vimeo" href="#">vimeo<span class="mask">&nbsp;</span></a></li>
 					<li><a class="flickr" href="#">flickr<span class="mask">&nbsp;</span></a></li>
-					<li><a class="rss" href="#">rss<span class="mask">&nbsp;</span></a></li>
+					<li><a class="rss" href="/es/rss.xml">rss<span class="mask">&nbsp;</span></a></li>
 				</ul>
 				<!-- banner -->
                 
@@ -199,7 +210,7 @@ $opciones=array("customlink"=>"espacios/open_us");
 	</div> 
     <!-- FIN FOOTER -->
     
-<iframe id="font-resize-frame-336" class="font-resize-helper" style="width: 100em; height: 10px; position: absolute; border-width: 0px; top: -9999px; left: -9999px;"></iframe>
+<!-- <iframe id="font-resize-frame-336" class="font-resize-helper" style="width: 100em; height: 10px; position: absolute; border-width: 0px; top: -9999px; left: -9999px;"></iframe>
 
 <div id="fancybox-tmp"></div>
 
@@ -207,4 +218,4 @@ $opciones=array("customlink"=>"espacios/open_us");
 
 <div id="fancybox-overlay"></div>
 
-<div id="fancybox-wrap"><div id="fancybox-outer"><div id="fancybox-bg-n" class="fancybox-bg"></div><div id="fancybox-bg-ne" class="fancybox-bg"></div><div id="fancybox-bg-e" class="fancybox-bg"></div><div id="fancybox-bg-se" class="fancybox-bg"></div><div id="fancybox-bg-s" class="fancybox-bg"></div><div id="fancybox-bg-sw" class="fancybox-bg"></div><div id="fancybox-bg-w" class="fancybox-bg"></div><div id="fancybox-bg-nw" class="fancybox-bg"></div><div id="fancybox-content"></div><a id="fancybox-close"></a><div id="fancybox-title"></div><a id="fancybox-left" href="javascript:;"><span id="fancybox-left-ico" class="fancy-ico"></span></a><a id="fancybox-right" href="javascript:;"><span id="fancybox-right-ico" class="fancy-ico"></span></a></div></div>
+<div id="fancybox-wrap"><div id="fancybox-outer"><div id="fancybox-bg-n" class="fancybox-bg"></div><div id="fancybox-bg-ne" class="fancybox-bg"></div><div id="fancybox-bg-e" class="fancybox-bg"></div><div id="fancybox-bg-se" class="fancybox-bg"></div><div id="fancybox-bg-s" class="fancybox-bg"></div><div id="fancybox-bg-sw" class="fancybox-bg"></div><div id="fancybox-bg-w" class="fancybox-bg"></div><div id="fancybox-bg-nw" class="fancybox-bg"></div><div id="fancybox-content"></div><a id="fancybox-close"></a><div id="fancybox-title"></div><a id="fancybox-left" href="javascript:;"><span id="fancybox-left-ico" class="fancy-ico"></span></a><a id="fancybox-right" href="javascript:;"><span id="fancybox-right-ico" class="fancy-ico"></span></a></div></div> -->

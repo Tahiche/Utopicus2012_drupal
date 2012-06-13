@@ -6,12 +6,7 @@
  * Licensed under the MIT license.
  */
 
-(function($) {
-// uso el jquery noconflict incluido en el tpl 1.4.4, incomptabilidad con menus, etc de la otra versión de jquery
-if(window.$jq144) {
-	$=$jq144;
-}
-
+(function($) { 
 Galleria.addTheme({
     name: 'fullscreen',
     author: 'Galleria',

@@ -71,14 +71,13 @@
  * @see zen_process()
  */
 ?>
-
  <?php if($field_top_image[0]['filepath']): 
-  $imgTit=$field_top_image[0]['data']['title'];
- ?>
+  ?>
  <!-- large-image -->
 				<div class="large-image">
-                <?php print theme('imagecache','Imagen_pag_922x394',$field_top_image[0]['filepath'],  $imgTit ,  $imgTit, array("class"=>"photo") ); ?>
-					
+                <?php 
+				print theme('top_image_or_gallery',$field_top_image,'Imagen_pag_922x394');
+				?>
 				</div>
                 
 
@@ -123,7 +122,7 @@
 
   
   
-  <?php print $links; ?>   
+  <?php // print $links; ?>   
   </div><!-- /.node -->
   </div><!-- /.content -->
 

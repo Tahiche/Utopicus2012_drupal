@@ -78,13 +78,19 @@
 
   
  <?php if($field_top_image[0]['filepath']): 
- $imgTit=$field_top_image[0]['data']['title'];
- 
+
  ?>
- <div class="fotoarticulo">
+ <div class="fotoarticulo Imagen_articulo_683x350">
 						<!-- photo -->
-                        <?php print theme('imagecache','Imagen_articulo_683x350',$field_top_image[0]['filepath'],  $imgTit ,  $imgTit, array("class"=>"photo") ); ?>
-                         
+                        <!-- large-image -->
+				
+                <?php 
+				 print theme('top_image_or_gallery',$field_top_image,'Imagen_articulo_683x350');
+				
+				// print theme('imagecache','Imagen_articulo_683x350',$field_top_image[0]['filepath']);
+				?>
+				
+                                           
 						<!-- quote-box -->
 						<blockquote class="quote-box">
 							<div>

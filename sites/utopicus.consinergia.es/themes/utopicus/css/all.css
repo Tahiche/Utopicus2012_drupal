@@ -1402,7 +1402,7 @@ button:hover{cursor:pointer;}
 	margin:-10px auto 27px;
 	position:relative;
 	padding:0;
-	border-bottom:1px solid #d1d1d1;
+	/*border-bottom:1px solid #d1d1d1;*/
 }
 /* aside */
 .info-section .aside{
@@ -1685,7 +1685,7 @@ button:hover{cursor:pointer;}
 	width:924px;
 	margin:0 auto 35px;
 	padding:0 0 30px;
-	border-bottom:1px solid #d1d1d1;
+	/*border-bottom:1px solid #d1d1d1;*/
 }
 /* content */
 #content{
@@ -1987,10 +1987,15 @@ h2.content{
 	position:relative;
 	overflow:hidden;
 	float:right;
-	height:14px;
+	/*height:14px;*/
 	padding:5px 8px 4px;
 	font:11px/14px 'Asap', Arial, Helvetica, sans-serif;
 	background:#c4c4c4 url(../images/bg-form.png) repeat-x 0 -62px;
+	color:#666;
+	-webkit-transition: 0;
+	-moz-transition:0;
+	-o-transition:0;
+	transition:0;
 }
 .footer-area .btn:hover{background:#b3e1ed url(../images/bg-form.png) repeat-x 0 -90px;}
 .footer-area .btn input{
@@ -2143,6 +2148,7 @@ ul li:after,
 	float: left;
 	width: 19px;
 	height: 19px;
+	margin-right: 5px;
 }
 .chk-unchecked {background:url(../images/bg-form.png) no-repeat 0 -175px;}
 .chk-checked {background:url(../images/bg-form.png) no-repeat -24px -175px;}
@@ -2221,7 +2227,7 @@ a.imagecache-Image454x145 .image{
 	}
 	/********************************************* FORMS *******************************************************/
 	
-.form-text {
+.form-text, .form-textarea {
 	/*float:left;*/
 	/*height:14px;*/
 	width:373px;

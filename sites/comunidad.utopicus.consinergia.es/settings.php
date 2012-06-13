@@ -104,10 +104,10 @@ $db_prefix = array(
 	
 'filters'   => 'shared_',
 'filter_formats'   => 'shared_',
-'permission'   => 'shared_',
+//'permission'   => 'shared_',
 
 'wysiwyg'   => 'shared_',
-'wysiwyg_user'   => 'shared_',
+'wysiwyg_user'   => 'shared_',  
 
 //Taxonomy related...
   //Taxonomy related...

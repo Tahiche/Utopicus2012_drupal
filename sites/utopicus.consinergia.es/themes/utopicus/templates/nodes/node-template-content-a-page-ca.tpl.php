@@ -71,19 +71,21 @@
  * @see zen_process()
  */
 ?>
-<div id="content">
-<div id="node-<?php print $node->nid; ?>" class="content-area padding <?php print $classes; ?>">
+<div id="node-<?php print $node->nid; ?>" class="content_a_template <?php print $classes; ?>">
  
 
-
-  
  <?php if($field_top_image[0]['filepath']): 
- $imgTit=$field_top_image[0]['data']['title'];
- 
- ?>
- <div class="aside">
+  ?>
+
+<div class="aside"> 
 						<!-- photo -->
-                        <?php print theme('imagecache','Imagen_template_327x327',$field_top_image[0]['filepath'],  $imgTit ,  $imgTit, array("class"=>"photo") ); ?>
+                <!-- large-image -->
+				<div class="fotoarticulo Imagen_template_327x327">
+                <?php 
+				print theme('top_image_or_gallery',$field_top_image,'Imagen_template_327x327');
+				// print theme('imagecache','Imagen_template_327x327',$field_top_image[0]['filepath']);
+				?>
+				</div> 
                          <?php if($field_image_footer [0]['value']):?>
 						<!-- quote-box -->
 						<blockquote class="quote-box">
@@ -92,7 +94,7 @@
 							</div>
 						</blockquote>
 						<?php endif; ?>
-</div>
+ </div>                
  <?php endif; ?>
  
  
@@ -114,5 +116,5 @@
   
   <?php print $links; ?>
   </div><!-- /.node -->
-  </div>
+
 

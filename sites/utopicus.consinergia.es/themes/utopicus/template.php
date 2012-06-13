@@ -106,7 +106,12 @@ function utopicus_theme(&$existing, $type, $theme, $path) {
 function utopicus_preprocess_page(&$vars, $hook) {
 	
 	//krumo($vars);
+	drupal_add_feed(url('rss.xml',array('absolute' => TRUE)), 'Utopicus');
 	
+$vars['head'] = drupal_get_html_head();
+
+$vars['feed_icons'] = drupal_get_feeds();
+
 	drupal_add_js(path_to_theme() ."/js/jquery.blockUI.js");
 	
 	// $vars['scripts'].="<script src='/sites/all/js/jquery.blockUI.js?t' type='text/javascript'>";
@@ -178,7 +183,7 @@ $vars['styles'] .= '<link type="text/css" rel="stylesheet" media="all" href="/'.
 
 	if(isset($_GET['krumo'])){ /***************************** quitar en produccion ********************/
 		
-		 krumo($vars);
+		 miKrumo($vars);
 		
 	}
 	// me cargo los comments del output por defecto y los asigno a variables
@@ -187,6 +192,7 @@ $vars['styles'] .= '<link type="text/css" rel="stylesheet" media="all" href="/'.
     $vars['comments'] = comment_render($vars['node']);
     $vars['comment_form'] = drupal_get_form('comment_form', array('nid' => $vars['node']->nid));
   }
+	
 	//$vars['template_files'][]="page-miguel-es-un-capullo";
 
 	//print_r($vars['node']->links['print']['title']);
@@ -238,6 +244,9 @@ function utopicus_preprocess_node(&$vars, $hook) {
 		  default:
 		  break;
 		  }
+	// creo la galeria si hay más de una imagen, necesita jquery 1.4, lo añado!!!!!!!!!!!!
+    $path = drupal_get_path('module', 'jquery_update') .'/replace/jquery/1.4/jquery.min.js';
+    drupal_add_js($path);
 	  // krumo($vars);
 	  } // fin -- if($vars['type']=="pageutopicus
 	  
@@ -386,6 +395,43 @@ function utopicus_links($links, $attributes = array('class' => 'links linkul')) 
   }
 
   return $output;
+}
+
+
+/**
+ * implementation of hook_block
+ * Provides a block for each available list for a given user
+ */
+function utopicus_mailchimp_block($op='list', $delta=0) { 
+    $block = array();
+    global $user;
+    $lists = _mailchimp_get_available_lists($user);
+	
+    if (!empty($lists)) {
+		
+		// krumo(_mailchimp_get_api_object());
+		
+      if (!empty($lists[$delta]) && $q = _mailchimp_get_api_object()) {
+        $list = $lists[$delta];
+		
+		
+		
+        $block['subject'] = t('Subscribe to @title', array('@title' => $list->name));;
+
+       /* if ($user->uid) {
+          $block['content'] = drupal_get_form('mailchimp_subscribe_auth_form_' . $list->id, $user, 1, $list);
+        }
+        else {
+          $block['content'] = drupal_get_form('mailchimp_subscribe_anon_form_' . $list->id, $list, $q);
+        }*/
+		$mailchimpForm=drupal_get_form('mailchimp_subscribe_anon_form_' . $list->id, $list, $q);
+		
+		$block['content'] = $mailchimpForm;
+      }
+    }
+
+    return $block;
+  
 }
 /**
 * Change submit button to search in exposed filters.

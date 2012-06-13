@@ -449,7 +449,7 @@ var DEBUG = false,
                     }, 10);
                 }
 
-                if (typeof callback == 'function') {
+                if (typeof callback == 'function') { 
 
                     Utils.wait({
                         until: function() {
@@ -1415,7 +1415,7 @@ Galleria.prototype = {
             max_scale_ratio: undef,
             min_scale_ratio: undef,
             on_image: function(img,thumb) {},
-            overlay_opacity: .85,
+            overlay_opacity: .65,
             overlay_background: '#0b0b0b',
             pause_on_interaction: true, // 1.9.96
             popup_links: false,
@@ -1556,9 +1556,9 @@ Galleria.prototype = {
                 },
                 error: function() {
                     // Height was probably not set, raise a hard error
-                    Galleria.raise('Width & Height not found.', true);
+                    Galleria.raise('Width & Height not found!!!.', true);
                 },
-                timeout: 2000
+                timeout: 4000
             });
         });
 
@@ -3408,7 +3408,7 @@ Galleria.loadTheme = function( src, options ) {
                 _galleries = refreshed;
             }
         },
-        timeout: 2000
+        timeout: 4000
     });
 };
 

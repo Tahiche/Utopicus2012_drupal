@@ -1,12 +1,31 @@
 @charset "utf-8";
 /* CSS Document */
 
+.form-item a{
+	text-decoration:underline;
+	}
+td {
+    margin: 5px;
+    padding: 5px;
+}
 
+ul.pager li{
+	display:inline-block !important;
+	clear:none;
+	background-color:#EEEEEE;
+	}
+ul.tabset a.tab{
+	text-decoration:none;
+	font-size :13px;
+	}
 .wysiwyg_imageupload .image_meta{
 	display:none;
 	}
 
-
+.terms-inline {
+    background-color: #EEEEEE;
+    width: 100%;
+}
 .contenidonodo table, .contenidonodo table td{
 	
 	border:0 !important;
@@ -20,7 +39,7 @@
 ul.load-more-pager li.pager-next{
     background: none repeat scroll 0 0 #444444;
     border-radius: 16px 16px 16px 16px; 
-    display: block;
+    display: block !important;
     height: 33px;
     left: 50%;
     margin: 0 0 0 -20px;
@@ -245,7 +264,9 @@ background-color: #999999;
     padding: 15px 0 25px;
     width: 928px;
 }
-
+.about-tabs {
+   float: left;
+}
 .profile-section .holder {
     font-size: 12px;;
     height: 100%;
@@ -284,6 +305,25 @@ ul.links li{
 #presentate{
 	min-height:115px;
 	}
+	
+.fieldgroup.group-perfil-privado{
+	}
+.fieldgroup.group-perfil-privado legend{
+	display:none;
+	}	
+.fieldgroup.group-perfil-privado p{
+	margin: 0 0 2px;
+	}
+.fieldgroup.group-perfil-privado > .field{
+	margin-bottom:15px;
+	}
+.fieldgroup.group-perfil-privado > .field .field-label{
+	font-size:12px;
+font-weight:700;
+color:#5E5E5E;
+text-transform:uppercase;
+}
+	
 	/*********************************************** QUITar 1111111111111111111111!!!!!!!!!!!!!!****/
 li.comment_forbidden, li.comment_add{
 	display:none !important;
@@ -301,12 +341,14 @@ li.comment_forbidden, li.comment_add{
 	}
 	
 	.form-text:hover,  .form-item .select-form-select:hover
-.form-item.text-active{
+.form-item.text-active {
 	/*background:#b3fef9;*/
 	background:#b3fef9 url(../images/bg-form.png) no-repeat 0 -28px;
 	
 	}
-
+.form-textarea:hover{
+	background:#b3fef9 scroll;
+	}
 div.views-exposed-widget.views-submit-button input.form-submit{
 	background: url("../images/bg-form.png") no-repeat scroll -311px -152px transparent;
     border: 0 none;
@@ -339,7 +381,7 @@ div.views-exposed-widget.views-submit-button input.form-submit:hover{background:
     padding: 0;
 	}
 .main-heading .buscar_label{
-	 margin-left: 40px;
+	 margin-left: 0px;
     padding: 0;
     position: relative;
     top: 4px;
@@ -547,3 +589,143 @@ div.tweets-pulled-listing a {
     right: 0;
     top: -80px;
 }
+
+/******************************** mensajes messages ****************/
+div.messages.status {
+
+    background: none repeat scroll 0 0 #4B4B4B;
+    border: 0 none;
+    border-radius: 5px 5px 5px 5px;
+    box-shadow: 0 0 5px #BCBCBC;
+    color: #E8E8E8;
+    font-size: 13px;
+    margin: 15px auto;
+    padding: 10px 0;
+    text-align: center;
+    width: 924px;
+}
+div.messages.status a{
+	color:#FFF;
+	}
+/************************ mailchimp *********************/
+
+
+
+/************ facebook *************/
+.facebook-box .facebook{
+	background:url(../images/img-facebook-transp.gif) no-repeat  scroll 0 transparent;
+	width:210px;
+	height:60px;
+	position:relative;
+	}
+.facebook-box .facebook .fb-like{	
+left: 60px;
+    position: absolute;
+    top: 30px;
+}
+
+/***************************** galleria galeria slider ************/
+#galleria {
+    height: 100%;
+	width: 100%;
+}
+.galleria-image img{
+	width:auto !important;
+	height:auto !important;
+	}
+.Imagen_articulo_683x350{
+	width:683px;
+	height:350px;
+	}
+.Imagen_template_327x327{
+	width:327px;;
+	height:327px;
+	position:relative;
+	}
+#galleria.size_Imagen_pag_922x394{
+	width:922px;
+	height:394px;
+	}
+
+.content_a_template .holder{
+	float: right;
+    width: 578px;
+	}
+.content_a_template .aside{
+	float:left;
+	}
+.content_a_template .terms-inline{
+	float:right;
+	width: 100%;
+	}
+.galleria-info-description{
+	display:none !important;
+	}
+/******************************** webform *****************************/
+
+div.node-webform{
+	font-size:11px;
+	}
+
+div.node-webform label{
+	clear: both;
+    float: left;
+    font-weight: normal;
+	font-size:12px;
+	width:373px;
+	}
+
+div.node-webform input.form-text, div.node-webform textarea, div.node-webform .form-submit,div.node-webform  fieldset{
+	float:left;
+	clear:both;
+	}
+div.node-webform  fieldset{
+margin-top: 30px;
+}
+
+div.node-webform  fieldset legend{
+	font-size:14px;
+}
+
+
+
+.quote-box {
+    margin: 20px 0;
+}
+
+ul.links li.statistics_counter{
+	display:none;
+	}
+.itu-attachments{
+	margin: 20px 0;
+	}
+/****************************** edit tabs primary ****************/
+ul.primary li {
+    display: inline-block;
+}
+
+
+/***************************** plus1 voting me gusta ***************************/
+.plus1-voting{
+	font-size:11px;
+	}
+.plus1-voting div{
+	display:inline-block;
+	}
+.plus1-voting div.plus1-votescore{
+	font-weight:bold;
+	font-size:13px;
+	padding: 2px 17px 0 0;
+	}
+.plus1-voting div.plus1-mensaje{
+	background: url("../images/bg-form.png") no-repeat scroll 0 -267px #D2D2D2;
+    font-size: 11px;
+    line-height: 14px;
+    padding: 4px 17px 5px 24px;
+	
+	}
+.plus1-voting div.plus1-mensaje button{
+border:0;
+background:none;
+text-transform:uppercase;
+	}

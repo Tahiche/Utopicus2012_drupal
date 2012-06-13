@@ -105,7 +105,7 @@ $db_prefix = array(
 	
 'filters'   => 'shared_',
 'filter_formats'   => 'shared_',
-'permission'   => 'shared_',
+//'permission'   => 'shared_',  
 
 'wysiwyg'   => 'shared_',
 'wysiwyg_user'   => 'shared_',
@@ -192,9 +192,6 @@ $update_free_access = FALSE;
  * settings are used there. Settings defined here should not be
  * duplicated there so as to avoid conflict issues.
  */
- ini_set('memory_limit', '256M');
- 
- 
 ini_set('arg_separator.output',     '&amp;');
 ini_set('magic_quotes_runtime',     0);
 ini_set('magic_quotes_sybase',      0);

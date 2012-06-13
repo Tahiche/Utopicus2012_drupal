@@ -11,7 +11,7 @@ if(!$image_preset) $image_preset="Imagen_pag_922x394";
 
 <?php else:?>
  
-<div id='galleria' class='images_galleria'>
+<div id='galleria' class='images_galleria <?php echo "size_".$image_preset; ?>'>
 <?php 
 
 
@@ -23,26 +23,27 @@ echo '<a href="'.$largepic_path.'">'.theme('imagecache','slider_thumbnail',$pic[
 		}?>
 </div>
  <link id="galleria-theme" rel="stylesheet" href="/<?php print drupal_get_path('module', 'node_slider_galleria')?>/themes/fullscreen/galleria.fullscreen.css">
- <script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.4.4/jquery.min.js"></script>
-
-
+ <!-- <script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.4.4/jquery.min.js"></script> -->
+          
 
 <script src="/<?php print drupal_get_path('module', 'node_slider_galleria')?>/galleria.js"></script>
 
 
-    <script>Galleria.loadTheme("/<?php print drupal_get_path('module', 'node_slider_galleria')?>/themes/fullscreen/galleria.fullscreen.js");</script>
+<script type="text/javascript">
+ 	// var $jq144 = jQuery.noConflict(true);</script>
            
-      <script type="text/javascript">
- 	var $jq144 = jQuery.noConflict(true);</script>     
+
+    
+        <script>Galleria.loadTheme("/<?php print drupal_get_path('module', 'node_slider_galleria')?>/themes/fullscreen/galleria.fullscreen.js");</script> 
                
 		<script>
 	// Code that uses other library's $ can follow here.
-	$jq144('.images_galleria').galleria({	
+	$('.images_galleria').galleria({	
 		image_crop: false,
 		transition: 'fade',
 		autoplay: 5000,
-		show_info:false,
-		idle_time:2000
+		show_info:true,
+		idle_time:1500
      
    		});</script>
  <?php endif;?>

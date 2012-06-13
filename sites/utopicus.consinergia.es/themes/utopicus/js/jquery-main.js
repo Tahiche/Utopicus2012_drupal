@@ -119,7 +119,7 @@ jQuery(function(){
 	return $(this).blur(function() {
 	var t = $(this);
 	//console.log(t);
-	if (t.val() == '') {
+	if (t.val() == '' || t.val()==t.attr('title')) {
 	t.val(t.attr('title'));
 	t.addClass('default_text');
 	}
@@ -413,6 +413,9 @@ function initLayoutFix(){
 
 // tabs init
 function initTabs() {
+	var firstLi=$('ul.tabset li:first');
+	if(!firstLi.hasClass("active")) firstLi.addClass("active");
+	
 	$('ul.tabset').contentTabs({
 		addToParent:true
 	});

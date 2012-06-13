@@ -101,8 +101,10 @@
 								<span>karma</span>
 							</dt> -->
 							<dd>
-								<strong class="number">25</strong>
-								<a class="like" href="#">ME GUSTA</a>
+                            <?php // print theme ('plus1_widget',$node); 
+							//print plus1_jquery_widget($node,NULL,TRUE);
+							print $node->content['plus1_widget']['#value'];
+							?>
 							</dd>
 						</dl>
 					</div>
@@ -125,10 +127,30 @@
 							<dt>
 								<!-- social-networks -->
 								<span class="social-networks">
-									<a class="facebook" href="#">facebook<span class="mask" style="opacity: 1;">&nbsp;</span></a>
-									<a class="twitter" href="#">twitter<span class="mask" style="opacity: 1;">&nbsp;</span></a>
-									<a class="igoogle" href="#">iGoogle<span class="mask" style="opacity: 1;">&nbsp;</span></a>
-									<a class="mail" href="#">mail<span class="mask" style="opacity: 1;">&nbsp;</span></a>
+                                <?php if($field_facebook[0]['url']):?>
+									<a class="facebook" href="<?php echo $field_facebook[0]['url'] ?>">facebook<span class="mask" style="opacity: 1;">&nbsp;</span></a>
+								<?php endif; ?>
+                                <?php if($field_twitter[0]['url']):?>
+									<a class="twitter" href="<?php echo $field_twitter[0]['url'] ?>">twitter<span class="mask" style="opacity: 1;">&nbsp;</span></a>
+                                    <?php endif; ?>
+                                <?php if($field_linkedin[0]['url']):?>
+									<a class="LinkedIn" href="<?php echo $field_linkedin[0]['url'] ?>">LinkedIn<span class="mask" style="opacity: 1;">&nbsp;</span></a>
+                                <?php endif; ?>
+                                <?php 
+								// no tenemos forma de saber si ha habilitado contact form o no.
+								// si la ha habilitado (menu_valid_path) , se ha creado un path al form (true)... si no, devuelve false
+
+								if(_contact_user_tab_access($node) && menu_valid_path(array('link_path' => 'user/'.arg(1).'/contact')) ):
+								//313
+								// Anonymous users cannot use or have contact forms.
+								// contact.module 120
+								// _contact_user_tab_access
+								
+								?>
+                                
+									<a class="mail" href="<?php echo url('user/'.arg(1).'/contact'); ?>">mail<span class="mask" style="opacity: 1;">&nbsp;</span></a>
+                                <?php endif; ?>
+                                    
 								</span>
 							</dt>
 							<dd>
@@ -153,5 +175,33 @@
 							</span>                            
 														
 						</div>
+					</div>
+				</div> <!-- fin rofile section -->
+                
+                
+                
+                
+                
+<div class="about-tabs">
+					<!-- tabset -->
+					<ul class="tabset">
+						<li ><a class="tab" href="#tab1">ENTREVISTA</a></li>
+						<li><a class="tab" href="#tab2">DOSIS</a></li>
+					</ul>
+					<!-- tab-content -->
+					<div class="tab-content">
+							<div id="tab1" style="display: block;">
+							<?php 
+							global $user;
+							if($user->uid) print $group_perfil_privado_rendered ;
+							else print t("Contenido exclusivo para coworkers. ¿Eres coworker? ")."<u><b>".l(t('Login'), 'user/login')."</b></u>";
+							?>
+								
+						</div>
+						<div id="tab2" style="display: none;"><?php 
+						print views_embed_view('view_grid', 'tocs_by_user',arg(1));
+						
+						?></div>
+						
 					</div>
 				</div>

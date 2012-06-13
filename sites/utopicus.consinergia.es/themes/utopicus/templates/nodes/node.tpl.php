@@ -74,10 +74,6 @@
 <div id="content">
 <div id="node-<?php print $node->nid; ?>" class="content-area padding <?php print $classes; ?> clearfix">
   <?php print $user_picture; ?>
-
-
- 
-
   <div class="contenidonodo node-<?php print $node->type; ?> info-section ">
     <?php print $content; ?>
   </div>
@@ -97,6 +93,6 @@
     </div>
   <?php endif; ?>
 
-  <?php print $links; ?>
+  <?php //print $links; ?>
   </div>
 </div><!-- /.node -->

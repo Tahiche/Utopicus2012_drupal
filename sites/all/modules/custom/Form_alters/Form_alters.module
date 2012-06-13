@@ -163,9 +163,30 @@ $nid=$form['uid']['#value'];
 
   }
     
+// cambiamos el mailchimp form !!!!!!!!!!!!
+if (!empty($form['mailchimp_lists'])) {
+// krumo($form);
+$form['submit']['#value']=t("Suscribirme");
 
- 
+$form['submit']['#attributes']['class']= "btn";
+
+$form['mailchimp_lists']['a66e7d45f0']['EMAIL']['#title']="TU EMAIL";
+$form['mailchimp_lists']['a66e7d45f0']['EMAIL']['#attributes']['title']= $form['mailchimp_lists']['a66e7d45f0']['EMAIL']['#title'];
+unset($form['mailchimp_lists']['a66e7d45f0']['EMAIL']['#title']);
+
+$form['mailchimp_lists']['a66e7d45f0']['FNAME']['#title']="NOMBRE";
+$form['mailchimp_lists']['a66e7d45f0']['FNAME']['#attributes']['title']= $form['mailchimp_lists']['a66e7d45f0']['FNAME']['#title'];
+unset($form['mailchimp_lists']['a66e7d45f0']['FNAME']['#title']);
+
+$form['mailchimp_lists']['a66e7d45f0']['LNAME']['#title']="APELLIDOS";
+$form['mailchimp_lists']['a66e7d45f0']['LNAME']['#attributes']['title']= $form['mailchimp_lists']['a66e7d45f0']['LNAME']['#title'];
+unset($form['mailchimp_lists']['a66e7d45f0']['LNAME']['#title']);
 }
+ 
+ 
+ 
+ 
+} //fin form alter //
 
 
 /*************************************   MULTISTEP ************/ 

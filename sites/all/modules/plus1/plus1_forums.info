@@ -1,0 +1,11 @@
+name = Plus 1 Forums
+description = "Limit which forums allow voting."
+package = Voting
+dependencies[] = plus1
+core = 6.x
+; Information added by drupal.org packaging script on 2011-12-13
+version = "6.x-2.x-dev"
+core = "6.x"
+project = "plus1"
+datestamp = "1323736647"
+
