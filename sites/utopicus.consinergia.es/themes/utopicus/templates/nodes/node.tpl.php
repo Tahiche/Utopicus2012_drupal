@@ -75,7 +75,12 @@
 <div id="node-<?php print $node->nid; ?>" class="content-area padding <?php print $classes; ?> clearfix">
   <?php print $user_picture; ?>
   <div class="contenidonodo node-<?php print $node->type; ?> info-section ">
+  
+  <!-- contenido pagina ----------------------->
     <?php print $content; ?>
+    
+    <!-- fin contenido pagina ----------------------->
+    
   </div>
   
   

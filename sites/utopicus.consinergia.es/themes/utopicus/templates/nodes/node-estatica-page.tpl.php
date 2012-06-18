@@ -71,60 +71,32 @@
  * @see zen_process()
  */
 ?>
+<link type="text/css" rel="stylesheet" media="all" href="/<?php echo path_to_theme()?>/css/estaticas_html.css?<?php echo rand()?>">
 
- <?php if($field_img_ppal [0]['filepath']): 
-  $imgTit=$field_img_ppal [0]['data']['title'];
- ?>
- <!-- large-image -->
-				<div class="large-image">
-                <?php print theme('imagecache','Imagen_pag_922x394',$field_img_ppal [0]['filepath'],  $imgTit ,  $imgTit, array("class"=>"photo") ); ?>
-					
-				</div>
-                
-
- 
-<?php endif; ?>
-
-<div id="content"> 
-<div id="node-<?php print $node->nid; ?>" class="content-area padding <?php print $classes; ?>">
- 
-
-
+  <div class="estaticas_nodo node-<?php print $node->type; ?> info-section ">
   
-
- <div class="aside">
-						
-                        
-                         <?php if($group_curso_info_rendered):?>
-						<!-- quote-box -->
-						<blockquote class="info-curso">
-							<div>
-								<q><?php echo $group_curso_info_rendered; ?></q>
-							</div>
-                            <div id="curso_info"><a href="<?php echo url("info/informacion-cursos");?>?curso=<?php echo  urlencode($node->title) ?>">SOLICITAR INFORMACIÓN</a></div>
-						</blockquote>
-						<?php endif; ?>
-</div>
- 
- 
- 
-   <div class="holder">
-   <div class="text-holder">
-    <?php print $content; 
-	
-	?>
-    </div>
+  <!-- contenido pagina ----------------------->
+    <?php print $content; ?>
+    
+    <!-- fin contenido pagina ----------------------->
+    
   </div>
   
   
- <?php if ($terms): ?> 
-        <div class="terms terms-inline"><?php print $terms; ?></div>
+   <?php if ($display_submitted || $terms): ?>
+    <div class="meta">
+      <?php if ($display_submitted): ?>
+        <span class="submitted">
+          <?php print $submitted; ?>
+        </span>
       <?php endif; ?>
 
+      <?php if ($terms): ?>
+        <div class="terms terms-inline"><?php print $terms; ?></div>
+      <?php endif; ?>
+    </div>
+  <?php endif; ?>
 
-  
-  
-  <?php print $links; ?>   
-  </div><!-- /.node -->
-  </div><!-- /.content -->
+  <?php //print $links; ?>
+
 

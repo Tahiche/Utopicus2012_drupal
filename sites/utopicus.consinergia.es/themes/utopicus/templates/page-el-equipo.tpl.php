@@ -157,10 +157,143 @@
         
         <div class="main-section">
         
+        <div id="equipo_intro_text">
         
+       <?php print $node->body; ?> 
+       
+</div>
         
-        <?php print $content; ?>
-        
+   
+   
+   <div class="post-columns">
+<div class="grid-div">
+<ul class="grid-list size">
+
+<h2 class="secc_equipo">FUNDADORES</h2>
+<li class="views-row views-row-1 views-row-odd views-row-first">     
+<?php //RAFA
+$nid = 155;
+$node = node_load($nid);
+$node_tpl_output = node_view($node,TRUE);
+print $node_tpl_output; //
+// node_load(155)
+?> 
+<div class="cargo_equipo">
+Socio fundador, CEO<br />
+Desarrollo de negocio
+</div>
+  </li>
+  
+
+<li class="views-row views-row-1 views-row-odd views-row-first">     
+<?php //jUAN
+$nid = 359;
+$node = node_load($nid);
+$node_tpl_output = node_view($node,TRUE);
+print $node_tpl_output; //
+// node_load(155)
+?> 
+<div class="cargo_equipo">
+Socio fundador<br />
+Comunidad coworkers
+</div>
+  </li>
+
+<h2 class="secc_equipo">EQUIPO</h2>
+
+<li class="views-row views-row-1 views-row-odd views-row-first">     
+<?php //yago
+$nid = 261;
+$node = node_load($nid);
+$node_tpl_output = node_view($node,TRUE);
+print $node_tpl_output; //
+// node_load(155)
+?> 
+<div class="cargo_equipo">
+Gestión de espacios y eventos
+</div>
+  </li>
+  
+ 
+ 
+
+<li class="views-row views-row-1 views-row-odd views-row-first">     
+<?php //olivia
+$nid = 257;
+$node = node_load($nid);
+$node_tpl_output = node_view($node,TRUE);
+print $node_tpl_output; //
+// node_load(155)
+?> 
+<div class="cargo_equipo">
+Comunicación y proyectos
+</div>
+  </li>
+  
+ 
+ 
+ <li class="views-row views-row-1 views-row-odd views-row-first">     
+<?php //aurea
+$nid = 149;
+$node = node_load($nid);
+$node_tpl_output = node_view($node,TRUE);
+print $node_tpl_output; //
+// node_load(155)
+?> 
+<div class="cargo_equipo">
+Responsable utopic_US virtual
+</div>
+  </li>
+  
+  
+ 
+  <li class="views-row views-row-1 views-row-odd views-row-first">     
+<?php //susana
+$nid = 257;
+$node = node_load($nid);
+$node_tpl_output = node_view($node,TRUE);
+print $node_tpl_output; //
+// node_load(155)
+?> 
+<div class="cargo_equipo">
+Administración
+</div>
+  </li>
+  
+  
+    <li class="views-row views-row-1 views-row-odd views-row-first">     
+<?php //santi
+$nid = 147;
+$node = node_load($nid);
+$node_tpl_output = node_view($node,TRUE);
+print $node_tpl_output; //
+// node_load(155)
+?> 
+<div class="cargo_equipo">
+ Contenido audiovisual
+</div>
+  </li>
+  
+ 
+   <li class="views-row views-row-1 views-row-odd views-row-first">     
+<?php //lorena
+$nid = 316;
+$node = node_load($nid);
+$node_tpl_output = node_view($node,TRUE);
+print $node_tpl_output; //
+// node_load(155)
+?> 
+<div class="cargo_equipo">
+Programación cultural
+</div>
+  </li>
+  
+    
+  </ul>
+  
+  </div>
+  </div>      
+       
         </div>
         
         

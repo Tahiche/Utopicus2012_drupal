@@ -720,7 +720,7 @@ div.node-webform label{
 	width:373px;
 	}
 
-div.node-webform input.form-text, div.node-webform textarea, div.node-webform .form-submit,div.node-webform  fieldset{
+div.node-webform input.form-text, div.node-webform textarea, div.node-webform .form-submit,div.node-webform  fieldset, div.node-webform  .form-item{
 	float:left;
 	clear:both;
 	}
