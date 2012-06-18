@@ -1,0 +1,7 @@
+name = Views Remove Duplicates
+description = Removes duplicate nodes. Requires editing the module file to identify the views you want to affect.
+dependencies[] = views 
+package = Views
+core = 6.x
+
+project = "viewsremoveduplicates" 

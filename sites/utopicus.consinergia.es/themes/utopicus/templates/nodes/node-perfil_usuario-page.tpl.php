@@ -186,7 +186,7 @@
 					<!-- tabset -->
 					<ul class="tabset">
 						<li ><a class="tab" href="#tab1">ENTREVISTA</a></li>
-						<li><a class="tab" href="#tab2">DOSIS</a></li>
+						<li><a class="tab" href="#tab2">VIDEOCÁPSULAS</a></li>
 					</ul>
 					<!-- tab-content -->
 					<div class="tab-content">

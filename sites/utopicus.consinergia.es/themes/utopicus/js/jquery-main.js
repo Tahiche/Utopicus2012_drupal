@@ -23,6 +23,28 @@ $(function() {
     setInterval( "slideSwitch()", 4000 );
 });
 
+// extension del js de logintoboggan, que no se incluye cando el usuario esta registrado
+Drupal.behaviors.userPopup= function(context) {
+	console.log("Drupal.behaviors.userPopup");
+	$("#toboggan-user:not(.toboggan-login-processed)", context).each(
+	  function() {
+		 console.log($(this));
+		  $(this).addClass('toboggan-login-processed').hide();
+		  Drupal.logintoboggan_toggleuserpop();
+		}
+	  );
+}
+Drupal.logintoboggan_toggleuserpop = function() {
+	console.log("logintoboggan_toggleuserpop");
+$("#toboggan-user-link").click(
+    function () {
+	console.log("toboggan-user-link");	
+      $("#toboggan-user").slideToggle("fast");
+      this.blur();
+      return false;
+    }
+  );
+}
 
 /*Drupal.behaviors.hsAutoSubmit = function(context) {
 	//alert("hsAutoSubmit");

@@ -990,6 +990,11 @@ function watchdog($type, $message, $variables = array(), $severity = WATCHDOG_NO
  */
 function drupal_set_message($message = NULL, $type = 'status', $repeat = TRUE) {
 	
+	// DEBUG: Go track down that stinkin' error...
+  if ($type == 'error') {
+    // $message .= '<pre>'. print_r(debug_backtrace(), 0) .'</pre>';
+  }
+  // END DEBUG
   
    
   if ($message) {

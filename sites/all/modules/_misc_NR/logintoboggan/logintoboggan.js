@@ -1,5 +1,5 @@
 Drupal.behaviors.LoginToboggan = function (context) {
-	console.log("LoginToboggan");
+	//console.log("LoginToboggan");
   $("#toboggan-login:not(.toboggan-login-processed)", context).each(
     function() {
 	 console.log($(this));
@@ -7,11 +7,15 @@ Drupal.behaviors.LoginToboggan = function (context) {
       Drupal.logintoboggan_toggleboggan();
     }
   );
+  
+  
+  
  // Drupal.logintoboggan_toggleboggan();
 };
 
 Drupal.logintoboggan_toggleboggan = function() {
-	console.log("logintoboggan_toggleboggan");
+//console.log("logintoboggan_toggleboggan");
+
   $("#toboggan-login-link").click(
     function () {
       $("#toboggan-login").slideToggle("fast");
@@ -19,4 +23,8 @@ Drupal.logintoboggan_toggleboggan = function() {
       return false;
     }
   );
+  
+   
+  
+  
 };

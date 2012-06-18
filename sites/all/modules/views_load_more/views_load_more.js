@@ -30,6 +30,10 @@ Drupal.viewsLoadMore = function(target, response) {
 	 // console.log(" response.status  "+response.status);
     // Grab the new contents.
     var $newView = $(response.display);
+	
+	
+	//console.log($newView);
+	
     // Find the new pager element, if it exists within the new contents.
     // If it doesn't exist, we've reached the last page, and this will be empty.
     var $pager = $newView.find(pager_class);
@@ -45,9 +49,23 @@ Drupal.viewsLoadMore = function(target, response) {
     // we'll have to check if a tbody container exists.
 	
 	var $listRows= $(view_row_class);
-	//console.log($listRows);
+	
+	console.log($listRows);
+	
 	// no queremos el adjunto !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+   console.log("view_row_class");
+    console.log(view_row_class);
+	
+	if($newView.find('.view-content')){
+		$newView=$newView.find('.view-content');
+		//console.log("había content !!!!!!!!!!!!!!!");
+		}
+		
     var newRows = $newView.find(view_row_class).not(".adjunto");
+	//var newRows = $newView.find(view_row_class);
+	
+	
+	
 	//console.log(newRows);
 	
 	//newRows=newRows.not(".views-row");
@@ -94,20 +112,24 @@ Drupal.viewsLoadMore = function(target, response) {
 	  
 	  // lo cambio par alos attachment !!!!!
 	  //ppio cambio
-	  if($(".view-content .post-columns", $view)){
+	 //if($(".view-content .post-columns", $view)){
 	 // $(".view-content .post-columns", $view).append(newRows);
 	var obj=  $(".view-content .post-columns", $view);
+	//}
 	
-	if(  $(".view-content .post-columns ul.events-list", $view) ) obj= $(".view-content .post-columns ul.events-list", $view) ;
+	if(  $(".view-content .post-columns ul.events-list", $view) ) {
+		var obj= $(".view-content .post-columns ul.events-list", $view) ;
+	}
 	
 	  console.log(obj);
 	  console.log(obj.length);
 	  // $(view_content_class).parent().append(newRows);
 	  
 	   
-	  }
-	 
+	  
+		 
 	 if (obj.length > 0) obj.append(newRows);
+	 
 	  else{
 		  $(path_to_parent, $view).append(newRows);
 		  }

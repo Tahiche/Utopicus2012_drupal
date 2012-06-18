@@ -116,8 +116,8 @@ $opciones=array("customlink"=>"espacios/open_us");
 			<!-- banner -->
 			<a class="banner" href="#"><img width="125" height="125" alt="banner" src="<?php print $theme_pathabsoluto; ?>/images/img-banner.gif"></a>
              <div id="slide_patrocinios" class="banner">
-    <img src="<?php print $theme_pathabsoluto; ?>/images/logos/heineken.jpg" alt="" class="active" />
-    <img src="<?php print $theme_pathabsoluto; ?>/images/logos/ministerio_c.jpg" alt="" />
+    <img src="<?php print $theme_pathabsoluto; ?>/images/logos/heineken_logo.png" alt="HEINEKEN" class="active" />
+    <img src="<?php print $theme_pathabsoluto; ?>/images/logos/edisa.png" alt="EDISA" />
 </div>
 			<!-- box -->
 			<div class="box">
@@ -134,7 +134,7 @@ $opciones=array("customlink"=>"espacios/open_us");
 			<div class="box">
 				<strong class="title"><a href="#">FORMACION</a></strong>
 				<ul>
-					<li><a href="/es/formacion/tocs">Vídeos TOCS</a></li>
+					<li><a href="/es/formacion/tocs">Videocápsulas</a></li>
                              <li><a href="/es/secciones/formacion/cursos">Cursos</a></li>
 				</ul>
 			</div>
@@ -203,7 +203,7 @@ $opciones=array("customlink"=>"espacios/open_us");
                 
                
 
-				<a class="banner" href="#"><img width="157" height="33" alt="banner" src="<?php print $theme_pathabsoluto; ?>/images/logos/ministerio_bottom.gif"></a>
+				<a class="banner" href="#" ><img width="157" height="33" alt="Ministerio de cultura" src="<?php print $theme_pathabsoluto; ?>/images/logos/ministerio_cuadrado.png"></a>
 			</div>
 		</div>
 		<span class="copyright">&copy; 2012 Utopicus Innovación Cultural SL - Todos los derechos reservados</span>

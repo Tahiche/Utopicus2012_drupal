@@ -1,0 +1,24 @@
+<?php
+function viewsremoveduplicates_views_pre_render(&$view)
+{
+  $used_nids = array();
+
+  if ($view->name == 'coworkers_grid')
+  {
+    if ($view->current_display == 'page_coworkers')
+    {
+		//miKrumo($view->result);
+      foreach ($view->result as $row)
+      {
+        if (!in_array($row->nid, $used_nids))
+        {
+          $new_view_result[] = $row;
+          $used_nids[] = $row->nid;
+        }
+      }
+   
+      $view->result = $new_view_result;
+	 // miKrumo($view->result); 
+    }
+  }
+}

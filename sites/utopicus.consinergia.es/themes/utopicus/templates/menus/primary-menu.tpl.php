@@ -20,7 +20,7 @@
 						<li class="style-2 withdrop">
 							<a href="#"><span>FORMACIÓN</span></a>
 							<ul class="drop" style="opacity: 0; top: 100%; display: none;">
-                             <li><a href="/es/formacion/tocs">Vídeos TOCS</a></li>
+                             <li><a href="/es/formacion/tocs">Videocápsulas</a></li>
                              <li><a href="/es/formacion/cursos">Cursos</a></li>
                                
                                 

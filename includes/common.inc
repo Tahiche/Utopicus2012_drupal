@@ -1850,7 +1850,6 @@ function drupal_add_css($path = NULL, $type = 'module', $media = 'all', $preproc
       $css[$media] = array('module' => array(), 'theme' => array());
     }
     $css[$media][$type][$path] = $preprocess;
-
     // If the current language is RTL, add the CSS file with RTL overrides.
     if ($language->direction == LANGUAGE_RTL) {
       $rtl_path = str_replace('.css', '-rtl.css', $path);

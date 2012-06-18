@@ -41,18 +41,32 @@ function Form_alters_form_alter(&$form, &$form_state, $form_id) {
 
  if (isset($form_id) && $form_id == "perfil_usuario_node_form") {
 	 //
-//miKrumo($form);
+
 	 unset($form['locale']);
 	 unset($form['theme_select']);
 	 unset($form['timezone']);
 	 unset($form['status']);
 	 unset($form['roles']);
 	  unset($form['picture']);
+	  
+	 unset($form['flickr']);
 	// $form['buttons']['previous']['#validate' ]=array();
 	//'#validate' => array(),
 	//krumo(_multistep_get_current_step($type)); 
 	//drupal_set_message( krumo($form) ); 
+	$form['taxonomy']['#collapsible']=FALSE;
+	$form['taxonomy']['#title']="";
 	
+	$form['buttons']['previous']['#type']="hidden";
+	$form['buttons']['save']['#type']="hidden";
+	
+	// añado bloque de pasos multistep
+	$block = module_invoke('multistep', 'block', 'view', 'perfil_usuario');
+	$form['steps_block']['#type']='fieldset';
+	$form['steps_block']['#attributes']['id']="multistep-block";
+	$form['steps_block']['#weight']=-20;
+   $form['steps_block']['#description']=$block['content'];
+
 	// el hierarchicAL select riompia la validacion,contaba como oblñigatorio en paso 1 a pesar de estar en paso 2
 	$type = $form['#node']->type;
 	$step=_multistep_get_current_step($type);
@@ -61,24 +75,16 @@ function Form_alters_form_alter(&$form, &$form_state, $form_id) {
 		$form['taxonomy'][3]['#required']=1;
 	}
 	else{$form['taxonomy'][3]['#required']=0; }
-	
-	// legal en paso 3 obliogatorio, rompe validación
-	/*if($step==3){
-		// unset($form['taxonomy']);
-		$form['legal']['legal_accept']['#required']=1;
-	}
-	else{$form['legal']['legal_accept']['#required']=0; }*/
 	// como hay registro que redirige a content profile, me cargo el legal
 	unset($form['legal']);
-	
-	
-	// para boton anterior
+		
+	// para boton anterior, que no valide...
 	array_unshift($form['#after_build'], 'Form_alters_form_after_build');
 	// $form['#after_build'][] = 'Form_alters_form_after_build';
 
    //krumo($form);
 
-
+// miKrumo($form);
  }
  //pageutopicus_node_form
  if (isset($form_id) && $form_id == "pageutopicus_node_form") {
@@ -124,12 +130,14 @@ function Form_alters_form_alter(&$form, &$form_state, $form_id) {
 
  
  
+  // || $form_id == "user_login"
+  if ($form_id == "user_register"  ) {	
   
-  if ($form_id == "user_register" || $form_id == "user_login" ) {	
+  $form['submit']['#value']=t("Aceptar");
 
 }
 
-
+//miKrumo($form);
 
 
 
@@ -164,7 +172,7 @@ $nid=$form['uid']['#value'];
   }
     
 // cambiamos el mailchimp form !!!!!!!!!!!!
-if (!empty($form['mailchimp_lists'])) {
+if (!empty($form['mailchimp_lists']) && $form_id == 'mailchimp_subscribe_anon_form_a66e7d45f0') {
 // krumo($form);
 $form['submit']['#value']=t("Suscribirme");
 

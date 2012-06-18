@@ -70,7 +70,7 @@
  * @see zen_preprocess_node()
  * @see zen_process()
  */
-// krumo($variables);
+//miKrumo($variables);
 ?>
 <div id="content">
 <div id="node-<?php print $node->nid; ?>" class="content-area padding <?php print $classes; ?> clearfix">
@@ -82,12 +82,17 @@
 <?php endif; ?>
  
 
-  <div class="contenidonodo">
+  <div class="contenidonodo videocapsula">
   <div id="tocplayer">
     <?php //print $content; 
 	echo $field_video_embed[0]['view']; 
 	?>
     </div>
+    
+     <?php //print $content; 
+	echo $node->content['body']['#value']; 
+	?>
+    
   </div>
   
   <?php if ($fivestar_widget) echo $fivestar_widget ?>

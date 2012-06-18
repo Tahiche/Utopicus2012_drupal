@@ -54,7 +54,7 @@ $homelink=($variables['page_vars']['front_page']?$variables['page_vars']['front_
 						<!-- usermenu -->
 						<ul class="usermenu">
 							<li class="active"><a href="/es/espacios/open_us">OPEN_US</a></li>
-							<li><a href="#">CONTACTO</a></li>
+							<li><a href="/es/contacto">CONTACTO</a></li>
 							<!--<li><a href="#">AYUDA</a></li>
 							 <li><a href="#">ENGLISH</a></li> -->
 						</ul>
@@ -67,7 +67,7 @@ $homelink=($variables['page_vars']['front_page']?$variables['page_vars']['front_
                             
                          <?php else: ?>
 							<!--<li><a href="/user">ÚNETE </a></li> -->
-							<li ><a id="toboggan-login-link" href="/logout">LOGOUT</a></li>
+							<li ><a id="toboggan-user-link" href="/logout"><?php echo $user->name?$user->name:"CUENTA" ?></a></li>
                             
                          <?php endif; ?>
 						</ul>

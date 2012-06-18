@@ -120,14 +120,21 @@ $vars['feed_icons'] = drupal_get_feeds();
 	$vars['styles'] = drupal_get_css();*/
 
 	// añadimos css de Google Fonts
-	$vars['styles'] .= '<link href="http://fonts.googleapis.com/css?family=Asap:400,700,700italic,400italic" rel="stylesheet" type="text/css" />';
+	/*$vars['styles'] .= '<link href="http://fonts.googleapis.com/css?family=Asap:400,700,700italic,400italic" rel="stylesheet" type="text/css" />';
+	
+	miKrumo($vars['styles']);*/
+	
+	
+	drupal_add_css(path_to_theme() .'/css/google_font_api.css');
+	$vars['styles'] = drupal_get_css();
 
 //$vars['styles'] .= '<link href="/'.path_to_theme().'/css/utopicfront.css?r='.rand().'" rel="stylesheet" type="text/css" />';
 
-$vars['styles'] .= '<link type="text/css" rel="stylesheet" media="all" href="/'.path_to_theme().'/css/estaticas_html.css" />';
+/*$vars['styles'] .= '<link type="text/css" rel="stylesheet" media="all" href="/'.path_to_theme().'/css/estaticas_html.css" />';*/
 
 
 	$vars['page_header']=theme('page_header',$vars); 
+	
 	$vars['page_footer']=theme('page_footer',$vars);
 
 	// $vars['page_header']="ewrewweewewew";
@@ -141,20 +148,32 @@ $vars['styles'] .= '<link type="text/css" rel="stylesheet" media="all" href="/'.
 		//$path = explode('/', drupal_get_path_alias($_GET['q']));
 		// If the node type is "blog" the template suggestion will be "page-blog.tpl.php".
 		$vars['template_files'][] = 'page-'. str_replace('_', '-', $vars['node']->type);
-
+		 $vars['template_files'][] = 'page-'.str_replace('_', '-',end(split("/",$vars['node']->path)));
+//
 		if(arg(2)=="delete" ){
 			$vars['template_files'][] = 'page-delete';
 		}
-
+		//miKrumo($vars['node']);
+		
+		// miKrumo(end(split("/",$vars['node']->path)));
+        $include_style=array();
 		/* CSS para cada tipo de nodo */
 		$path_style = path_to_theme() .'/css/'. $vars['node']->type .'.css';
 			if (file_exists($path_style)) {
-			$include_style = $path_style;
-		}
-
-		if (isset($include_style)) {
-			drupal_add_css($include_style, 'theme', 'all', FALSE);
+			$include_style[] = $path_style;
+			drupal_add_css($path_style); 
 			$vars['styles'] = drupal_get_css();
+		}
+		/* CSS para cada nombre de paginA */
+        $name_style = path_to_theme() .'/css/'. end(split("/",$vars['node']->path)) .'.css';
+			if (file_exists($name_style)) {
+			//miKrumo($name_style);
+			$include_style[] = $name_style;
+			drupal_add_css($name_style);
+			$vars['styles'] = drupal_get_css();
+		}
+		if (count($include_style)) {
+			//drupal_add_css($path_style, 'theme', 'all', FALSE); 
 		}
 		
 		
@@ -172,11 +191,11 @@ $vars['styles'] .= '<link type="text/css" rel="stylesheet" media="all" href="/'.
 	//echo "    path_style ".$path_style;
 
 	if (file_exists($path_style)) {
-		$include_style = $path_style;
+		$include_styler = $path_style;
 	}
 	//echo "    include_style ".$include_style;
-	if (isset($include_style)) {
-		drupal_add_css($include_style, 'theme', 'all', FALSE);
+	if (isset($include_styler)) {
+		drupal_add_css($include_styler, 'theme', 'all', FALSE);
 		$vars['styles'] = drupal_get_css();
 	}
 	//drupal_set_html_head('<link type="text/css" rel="stylesheet" href="http://fonts.googleapis.com/css?family=Asap:400,700,700italic,400italic" />');

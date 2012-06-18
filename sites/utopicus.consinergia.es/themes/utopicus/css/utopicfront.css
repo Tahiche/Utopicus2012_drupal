@@ -1,6 +1,8 @@
 @charset "utf-8";
 /* CSS Document */
-
+form{
+	max-width:750px;
+	}
 .form-item a{
 	text-decoration:underline;
 	}
@@ -119,11 +121,19 @@ p a{
 		border-bottom:1px solid #999;
 		border-top:1px solid #999;
 		display: inline-block;
-		margin: 20px 0}
+		margin: 20px 0
 		}
-		
-		
 
+		
+		
+.videocapsula{
+	width:683px;
+	}
+	
+.autor a{
+	font-style:italic;
+	font-weight:bold;
+	}
 	
  		
 .imagegrid {
@@ -386,13 +396,44 @@ div.views-exposed-widget.views-submit-button input.form-submit:hover{background:
     position: relative;
     top: 4px;
 	 }
-
+.node-form .form-text {
+    width: 373px;
+}
 input.default_text{
 	color:#999;
 	}
 form#views-exposed-form-coworkers-grid-page-coworkers .views-widget-filter-title, form#views-exposed-form-coworkers-grid-page-coworkers .views-widget-filter-term_node_tid_depth_limited{
 	float:right;
 	}
+
+.form-item .description {
+    font-size: 11px;
+	padding:10px 0 ;
+	color:#7F7F7F;
+}
+	
+/************************ multistep block ***********************/
+div.multistep-progress-bar-wrapper{
+	display:none;
+	}
+#multistep-block{
+	position:relative;
+	width:900px;}
+	
+#multistep-block ul li{
+	list-style: none outside none;
+	display:inline-block;
+	text-transform:uppercase;
+	margin:0;
+	padding:5px;
+	margin-right:15px;
+	border-bottom:#DDDDDD 2px solid;
+	
+	}
+#multistep-block ul li span.active{ 
+font-weight:bold;
+color:#5E5E5E;
+}
 /**************************** flickr **********************/
 
 .flickr-photoset-img-s{
@@ -523,6 +564,10 @@ span.num_tags{
 	color:#999;
 	padding-left:5px;}
 
+.main-heading h2{
+	font-size:18px;
+	font-style:italic;
+	}
 /******************************* banner *****************/
 .post-section.banner-section{
 	margin-bottom: -60px;
@@ -699,6 +744,9 @@ ul.links li.statistics_counter{
 .itu-attachments{
 	margin: 20px 0;
 	}
+table#attachments, table#attachments td{
+	padding: 5px !important;
+	}
 /****************************** edit tabs primary ****************/
 ul.primary li {
     display: inline-block;
@@ -728,4 +776,12 @@ ul.primary li {
 border:0;
 background:none;
 text-transform:uppercase;
+	}
+/****************************** prensa *********************/
+.upload-file-view{
+	background-color:#D6D6D6;
+	padding:5px;
+	}
+a.enlaceprensa.externalLink{
+	font-style:italic;
 	}
