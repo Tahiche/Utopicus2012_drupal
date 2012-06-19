@@ -87,7 +87,7 @@ $opciones=array("customlink"=>"espacios/open_us");
                 
 				<strong class="title">Open_US</strong>
 				<address style="height: 38px;">Abre un espacio Utopic_Us en tu ciudad.</address>
-				<a class="more" href="#">Más información</a>
+				<a class="more" href="/es/espacios/open_us">Más información</a>
 			</div>
 			<!-- facebook-box -->
 			<div class="facebook-box">

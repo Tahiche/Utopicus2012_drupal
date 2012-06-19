@@ -22,6 +22,7 @@
 							<ul class="drop" style="opacity: 0; top: 100%; display: none;">
                              <li><a href="/es/formacion/tocs">Videocápsulas</a></li>
                              <li><a href="/es/formacion/cursos">Cursos</a></li>
+                             <li><a href="/es/formacion/escuelas">Escuelas</a></li>
                                
                                 
 							</ul>
