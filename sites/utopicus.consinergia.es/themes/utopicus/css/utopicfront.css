@@ -389,6 +389,7 @@ div.views-exposed-widget.views-submit-button input.form-submit:hover{background:
 	 float: right;
     margin: -25px 6px -4px 0;
     padding: 0;
+	height: 30px;
 	}
 .main-heading .buscar_label{
 	 margin-left: 0px;
@@ -401,8 +402,12 @@ div.views-exposed-widget.views-submit-button input.form-submit:hover{background:
 }
 input.default_text{
 	color:#999;
-	}
-form#views-exposed-form-coworkers-grid-page-coworkers .views-widget-filter-title, form#views-exposed-form-coworkers-grid-page-coworkers .views-widget-filter-term_node_tid_depth_limited{
+	}  
+form#views-exposed-form-coworkers-grid-page-coworkers .views-widget-filter-title,
+form#views-exposed-form-coworkers-grid-page-3 .views-widget-filter-title,
+ form#views-exposed-form-coworkers-grid-page-coworkers .views-widget-filter-term_node_tid_depth_limited,
+  form#views-exposed-form-coworkers-grid-page-3 .views-widget-filter-term_node_tid_depth_limited
+ {
 	float:right;
 	}
 
@@ -633,6 +638,7 @@ div.tweets-pulled-listing a {
     position: absolute;
     right: 0;
     top: -80px;
+	height: 30px;
 }
 
 /******************************** mensajes messages ****************/

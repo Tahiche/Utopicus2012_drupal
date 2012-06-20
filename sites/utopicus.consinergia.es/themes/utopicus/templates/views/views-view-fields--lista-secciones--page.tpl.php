@@ -22,7 +22,11 @@
  *
  * @ingroup views_templates
  */  
- // krumo($fields)
+ // 
+/* if($fields['nid']->content=="515"){
+	  //krumo($fields);
+	 }*/
+
 ?>
 
 <div class="image">
@@ -30,7 +34,10 @@
 </div>
 
 <div class="row">
-<em class="date"><?php echo $fields['created']->content?></em>
+<em class="date"><?php 
+if($fields['field_fecha_value']->content) echo $fields['field_fecha_value']->content;
+else echo $fields['created']->content;
+?></em>
 <div class="btn-category" href="#"><?php echo $fields['tid']->content; ?></div>
 </div>
                                     

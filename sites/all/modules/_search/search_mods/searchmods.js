@@ -34,9 +34,16 @@ Drupal.behaviors.exposedfilter_mod = function (context) {
  /* Puts the currently highlighted suggestion into the autocomplete field.
  // OVERRIDEEENN
  */
+ var valorNombre="";
  if(Drupal.jsAC){
 		Drupal.jsAC.prototype.select = function (node) {
+		
+		valorNombre=$(node).data('autocompleteValue');
+		
 		this.input.value = $(node).data('autocompleteValue');
+		
+		
+		
 			if(jQuery(this.input).hasClass('auto_submit')){ 
 			
 			//alert("autosubmit???");
@@ -44,13 +51,25 @@ Drupal.behaviors.exposedfilter_mod = function (context) {
 			  selectElement.val($('option:first', selectElement).val());
 			  
 			  $('#edit-freeterm').val("");
+			  
+			 /* console.log($(node)[0].autocompleteValue);
+			  console.log($(node)[0]['autocompleteValue']);*/
+			  			  
+			 $('#edit-nombre').val($(node)[0].autocompleteValue);
 			  // form bonito...
 			  // pero si hago trigger, el form se submit 2 veces....
 			  //selectElement.trigger("change");
 			  jcf.customForms.refreshAll();
-		
-			  // submit the form
-			  $('form#views-exposed-form-coworkers-grid-page-coworkers').submit();
+			  //console.log("form,mmm");
+
+					  
+$('form#views-exposed-form-coworkers-grid-page-3, form#views-exposed-form-coworkers-grid-page-coworkers').get(0).submit();
+			 //
+			 
+			// $('').submit();
+			/* var forme=$(this.input).get(0).form;
+			   forme.submit();*/ 
+
 			 
 		  }
 		};

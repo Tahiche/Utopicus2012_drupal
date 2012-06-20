@@ -124,9 +124,13 @@ $vars['feed_icons'] = drupal_get_feeds();
 	
 	miKrumo($vars['styles']);*/
 	
-	
-	drupal_add_css(path_to_theme() .'/css/google_font_api.css');
-	$vars['styles'] = drupal_get_css();
+	$vars['head'] .= '<link '. drupal_attributes(array(
+    'rel' => 'stylesheet',
+    'type' => 'text/css',
+    'href' => 'http://fonts.googleapis.com/css?family=Asap:400,400italic,700,700italic')
+  ) ." />\n";
+	/*drupal_add_css(path_to_theme() .'/css/google_font_api.css');
+	$vars['styles'] = drupal_get_css();*/
 
 //$vars['styles'] .= '<link href="/'.path_to_theme().'/css/utopicfront.css?r='.rand().'" rel="stylesheet" type="text/css" />';
 
@@ -229,6 +233,9 @@ function utopicus_preprocess_node(&$vars, $hook) {
   // me cargo los comments del output por defecto y los asigno a variables en page
     $vars['node']->comment = 0;
 	
+	if($vars['node']->field_fecha[0]['view']){
+		$vars['date']=$vars['node']->field_fecha[0]['view'];
+		}
   // krumo($vars);
   //default template suggestions for all nodes
   $vars['template_files'] = array();

@@ -22,11 +22,16 @@
  *
  * @ingroup views_templates
  */  
- // krumo($fields)
+ /*if($fields['nid']->raw=='514'){
+//krumo($fields);
+ }*/
 ?>
 <div class="heading">
 	<!-- date -->
-<em class="date"><?php echo $fields['created']->content?></em>
+<em class="date"><?php 
+if($fields['field_fecha_value']->content) echo $fields['field_fecha_value']->content;
+else echo $fields['created']->content;
+?></em>
 <!-- category -->
 <strong class="category"><?php 
 //echo $fields['tid']->content

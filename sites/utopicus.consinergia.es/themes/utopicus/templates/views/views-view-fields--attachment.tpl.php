@@ -33,7 +33,10 @@
 
 <div class="heading border">
 	<!-- date -->
-<em class="date"><?php echo $fields['created']->content?></em>
+<em class="date"><?php 
+if($fields['field_fecha_value']->content) echo $fields['field_fecha_value']->content;
+else echo $fields['created']->content;
+?></em>
 
 <h2><?php echo $fields['title']->content; ?></h2>
 

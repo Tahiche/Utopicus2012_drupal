@@ -948,7 +948,7 @@ jcf = {
 				for(var i = 0; i<els.length; i++) {
 					if(els[i].jcf) {
 						// refresh form element state
-						console.log(els[i].jcf);
+						//console.log(els[i].jcf);
 						els[i].jcf.refreshState();
 						
 					}
