@@ -38,7 +38,7 @@ function embedded_views_menu() {
 function embedded_views_preprocess_page(&$vars, $hook) {
 	if($vars['is_front']){
 	//krumo($vars);
-	$vars['agendaview']=views_embed_view("agenda_front","default"); 
+	$vars['agendaviewfront']=views_embed_view("agenda_front","default"); 
 	
 	$vars['coworkersfrontview']=views_embed_view("Coworkers_home","default"); 
 	
@@ -46,6 +46,13 @@ function embedded_views_preprocess_page(&$vars, $hook) {
 	$vars['scripts'] = drupal_get_js();
 }
 
-
+if (isset($vars['node']) && $vars['node']->type=="perfil_usuario"){
+	//krumo($vars);
+	
+$block = module_invoke('views', 'block', 'view','-exp-coworkers_grid-page_3');
+//print $block['content'];
+$vars['perfil_busca_form']=$block['content'];
+$vars['scripts'] = drupal_get_js();
+}
 
 }

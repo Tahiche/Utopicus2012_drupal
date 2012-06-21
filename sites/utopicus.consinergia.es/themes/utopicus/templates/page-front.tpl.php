@@ -148,10 +148,12 @@
 			<!-- main -->
 		<div id="main">
         <div class="visual">
-        <?php print $coworkersfrontview; ?>
+        <?php
+		// embedded_views.module
+		 print $coworkersfrontview; ?>
         <ul class="btn-list">
 						<li><a class="btn" href="<?php echo url("coworking/tour"); ?>"><span>TOUR</span></a></li>
-						<li><a class="btn" href="user/register"><span>ÚNETE</span></a></li>
+						<li><a class="btn" href="<?php echo url("coworking/tarifas_y_planes"); ?>"><span>ÚNETE</span></a></li>
 					</ul>
         </div>
         
@@ -176,23 +178,23 @@
 					<div class="holder">
 						<!-- box -->
 						<div class="box style-1" style="height: 109px;">
-							<h2><a href="#">Trabajar y conectar</a></h2>
+							<h2><a href="<?php echo url("coworking/tarifas_y_planes"); ?>">Trabajar y conectar</a></h2>
 							<p>Una oficina sin jefes donde profesionales independientes, artistas y pymes trabajan, comparten y colaboran.</p>
 						</div>
 						<!-- box -->
 						<div class="box style-2" style="height: 109px;">
-							<h2><a href="#">Aprender</a></h2>
-							<p>Una escuela donde los profesores son profesionales en activo que comparten sus conocimientos y experiencia.</p>
+							<h2><a href="<?php echo url("formacion/cursos"); ?>">Aprender</a></h2>
+							<p>Un espacio de formación presencial  y virtual  donde los profesores son profesionales en activo que comparten sus conocimientos y experiencia.</p>
 						</div>
 						<!-- box -->
 						<div class="box style-3" style="height: 109px;">
-							<h2><a href="#">Darte a conocer</a></h2>
+							<h2><a href="<?php echo url("espacios/madrid_US_1"); ?>">Darte a conocer</a></h2>
 							<p>Un lugar donde organizar eventos diferentes para dar a conocer tu proyecto, producto o servicio, o para lo que tu quieras.</p>
 						</div>
 						<!-- box -->
 						<div class="box style-4" style="height: 109px;">
-							<h2><a href="#">Comerciar</a></h2>
-							<p>Un escaparate donde ofrecer tus productos y servicios. Contamos con un equipo comercial captando proyectos para ti.</p>
+							<h2><a href="<?php echo url("secciones/actividades/agenda"); ?>">Disfrutar</a></h2>
+							<p>Una agenda de actividades donde se dan cita exposiciones, conciertos, charlas, conferencias, encuentros y casi todo lo que nos propongas.</p>
 						</div>
 					</div>
 				</div>

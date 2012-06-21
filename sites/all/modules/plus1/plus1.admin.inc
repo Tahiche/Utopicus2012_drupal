@@ -113,14 +113,14 @@ function plus1_settings() {
   $form['plus1_text']['plus1_vote'] = array(
     '#type' => 'textfield',
     '#title' => t('Suggest voting'),
-    '#default_value' => variable_get('plus1_vote', 'Vote'),
+    '#default_value' => variable_get('plus1_vote', 'Vota'),
     '#description' => t('Feedback provided to voter when he (she) has not voted. Enter, for example, <em>Digg</em>, <em>Vote</em>, or <em>Like</em>.'),
     );
 
   $form['plus1_text']['plus1_you_voted'] = array(
     '#type' => 'textfield',
     '#title' => t('User already voted'),
-    '#default_value' => variable_get('plus1_you_voted', 'You voted'),
+    '#default_value' => variable_get('plus1_you_voted', 'Has votado'),
     '#description' => t('Feedback provided to voter when he (she) has already voted. Enter, for example, <em>Dugg</em>, <em>You voted</em>, or <em>Voted</em>.'),
     );
 
@@ -134,14 +134,14 @@ function plus1_settings() {
   $form['plus1_text']['plus1_author_text'] = array(
     '#type' => 'textfield',
     '#title' => t('Author text'),
-    '#default_value' => variable_get('plus1_author_text', 'Your content'),
+    '#default_value' => variable_get('plus1_author_text', 'Es tuyo!!'),
     '#description' => t('Feedback provided to voter when he/she is the author and is allowed to vote on it. Leave this blank to disable the notification. Enter, for example, <em>&lt;small>My post&lt;/small></em>.'),
     );
 
   $form['plus1_text']['plus1_after_vote_text'] = array(
     '#type' => 'textfield',
     '#title' => t('Author text'),
-    '#default_value' => variable_get('plus1_after_vote_text', 'Thank you for your vote.'),
+    '#default_value' => variable_get('plus1_after_vote_text', 'Gracias por votar.'),
     '#description' => t('Feedback provided to voter after the vote. Leave ths blank to disable the notification. Enter, for example, <em>We\'re glad you like this post</em>.'),
     );
 

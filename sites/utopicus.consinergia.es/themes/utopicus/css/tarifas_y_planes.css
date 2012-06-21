@@ -16,6 +16,10 @@
 .unetebt{
 	position:relative;
 	top: -90px;
+	left:
+	}
+.unetebt strong{
+	font-size:20px !important;
 	}
 .heading-section.style2 .btn-cell{padding:14px 0 0;}
 /* title */
@@ -71,7 +75,7 @@
 }
 .heading-section h2 em{
 	text-transform:none;
-	font:italic 22px 'Asap', Arial, Helvetica, sans-serif;
+	font:italic 23px 'Asap', Arial, Helvetica, sans-serif;
 }
 /* columns-section */
 .columns-section{
@@ -111,7 +115,7 @@
 }
 
 	.columns-section .heading h2 em {
-    font: italic 22px 'Asap',Arial,Helvetica,sans-serif;
+    font: italic 23px 'Asap',Arial,Helvetica,sans-serif;
     text-transform: none;
 }
 
@@ -125,7 +129,7 @@
 	padding:18px 6px 13px;
 	margin:0;
 	font:13px 'Asap', Arial, Helvetica, sans-serif;
-	min-height: 272px;
+	/*min-height: 272px;*/
 }
 .columns-section .list li{
 	vertical-align:top;
@@ -284,4 +288,4 @@ font:13px 'Asap', Arial, Helvetica, sans-serif;
 	font-size:1.3em;
 	line-height:1.692em;
 }
-.list-section .text p{margin:0 0 22px;}
+.list-section .text p{margin:0 0 23px;}

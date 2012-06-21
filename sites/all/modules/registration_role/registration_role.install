@@ -1,0 +1,15 @@
+<?php
+// $Id: registration_role.install,v 1.1 2009/03/14 15:58:38 agaric Exp $
+
+/**
+ * @file
+ * Includes implementation of hook_delete().
+ */
+
+
+/**
+ * Implementation of hook_delete().
+ */
+function registration_role_delete() {
+  variable_del('registration_role_roles');
+}

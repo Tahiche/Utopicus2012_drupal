@@ -1,0 +1,29 @@
+<?php
+// $Id:$
+
+
+/* Implementation of hook_menu().
+*/
+function redirects_menu(){
+  $items = array();
+
+  $items['coworking/tour'] = array(
+    'title' => 'Tour', 
+    /*'access callback' => 'node_access',
+    'access arguments' => array('delete', 1),*/
+    'page callback' => 'redirect_tour',
+    /*'page arguments' => array(1),*/
+    'type' => MENU_LOCAL_TASK,
+	'access callback' => TRUE,
+    /*'weight' => 10,   */
+  ); 
+   
+  return $items;
+} 
+
+/* Redirects to default Drupal delete path
+*/
+function redirect_tour() {
+	//http://www.utopicus.consinergia.es/es/coworking/tour/que-es
+  drupal_goto('coworking/tour/que-es');
+}

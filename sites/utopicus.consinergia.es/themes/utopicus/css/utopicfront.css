@@ -11,6 +11,16 @@ td {
     padding: 5px;
 }
 
+h3 {
+    font: 700 1.333em/1.438em 'Asap',Arial,Helvetica,sans-serif;
+    margin: 0 0 3px;
+}
+h2 {
+    font: 700 1.333em/1.438em 'Asap',Arial,Helvetica,sans-serif;
+    margin: 0 0 8px;
+    text-transform: uppercase;
+}
+
 ul.pager li{
 	display:inline-block !important;
 	clear:none;
@@ -499,6 +509,7 @@ margin:0;
 ul.photo-list li{
 list-style: none outside none;
 margin: 0;
+width: 116px;
 }
 
 
@@ -790,4 +801,15 @@ text-transform:uppercase;
 	}
 a.enlaceprensa.externalLink{
 	font-style:italic;
+	}
+	
+.ultimas-entradas .text h3{
+	font:inherit !important;
+	}
+.calendar_links.agendasecc{
+	float:none;
+	}
+	
+.ministerio_subv{
+	float:right;
 	}

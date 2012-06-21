@@ -29,6 +29,9 @@
  */
  // miKrumo($variables);
 ?>  
+
+   
+    
 <div class="<?php print $classes; ?>">
 
 
@@ -45,15 +48,19 @@
 
   <?php if ($exposed): ?>
     <div class="view-filters">
+    
       <?php print $exposed; ?>
     </div>
   <?php endif; ?>
 
 
-
+ <div class="calendar_links agendasecc"><a href="http://www.google.com/calendar/ical/comunicacion%40utopicus.es/public/basic.ics">iCAL</a><a href="http://www.google.com/calendar/embed?src=comunicacion%40utopicus.es&ctz=Europe/Madrid">HTML</a></div>
 
 
 <div id="content">
+
+
+
   <?php if ($attachment_before): ?>
     <div class="attachment attachment-before">
       <?php print $attachment_before; ?>

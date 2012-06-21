@@ -1,0 +1,6 @@
+; $Id: $
+name = Redirects
+description = Redirecciona páginas a otros (hook_menu)
+package = " Custom"
+project = "redirects"
+core = "6.x"

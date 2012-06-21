@@ -1,0 +1,78 @@
+<?php
+/* $Id: registration_role.module,v 1.3 2009/03/14 15:56:08 agaric Exp $ */
+
+// untested Drupal 5 version
+// auto-assign role at registration
+// Registration Role
+
+/* based on
+   http://drupal.org/node/28379#comment-132430
+   code snippet by Pauly Jura
+   This module actually does less than the snippet
+*/
+
+/**
+ * Implementation of hook_help().
+ *
+ */
+function registration_role_help($section='') {
+  $output = '';
+  switch ($section) {
+    case "admin/modules#description":
+      $output = t("Auto-assign role at registration.");
+      break;
+  }
+  return $output;
+}
+
+/**
+ * Implementation of hook_menu().
+ *
+ * This is the Drupal 5 way but it should work for 4.7 settings
+ */
+function registration_role_menu() {
+  $items = array();
+
+  $items['admin/user/registration_role'] = array(
+    'title' => t('Registration role'),
+    'description' => t('Assign users an extra role at signup.'),
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('registration_role_admin_settings'),
+    'access arguments' => array('administer users'),
+  );
+
+  return $items;
+}
+
+/**
+ * Define the settings form.
+ */
+function registration_role_admin_settings() {
+  $roles = user_roles(TRUE);
+  unset($roles['2']);
+  $form['registration_role_roles'] = array(
+    '#type' => 'radios',
+    '#title' => t('Select role to automatically assign to new users'),
+    '#options' => $roles,
+    '#default_value' => variable_get('registration_role_roles', ''),
+    '#description' => t('The selected role will be assigned to new registrants from now on.  Be sure this role does not have any privileges you fear giving out without reviewing who receives it.'),
+  );
+  // $form['array_filter'] = array('#type' => 'hidden');  
+  // Drupal 5, mysterious, needed for multiple check box values using settings hook  
+  return system_settings_form($form);
+}
+
+/**
+ * Implementation of hook_user().
+ *
+ * Catch every registration and insert role
+ */
+function registration_role_user($op, &$edit, &$user, $category=null) {
+  if ($op == "insert" && $rid = variable_get('registration_role_roles', '')){
+    // get the role in question
+	$roles = user_roles(TRUE);
+	
+	// add it to the user
+    $edit['roles'][$rid] = $roles[$rid];
+  }
+}
