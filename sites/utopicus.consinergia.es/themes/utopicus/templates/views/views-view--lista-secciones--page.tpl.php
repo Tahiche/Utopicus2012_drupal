@@ -54,7 +54,7 @@
   <?php endif; ?>
 
 
- <div class="calendar_links agendasecc"><a href="http://www.google.com/calendar/ical/comunicacion%40utopicus.es/public/basic.ics">iCAL</a><a href="http://www.google.com/calendar/embed?src=comunicacion%40utopicus.es&ctz=Europe/Madrid">HTML</a></div>
+ <div class="calendar_links agendasecc"><span class="calendartext">Descarga el calendario</span><a href="http://www.google.com/calendar/ical/comunicacion%40utopicus.es/public/basic.ics">iCAL</a><a href="http://www.google.com/calendar/embed?src=comunicacion%40utopicus.es&ctz=Europe/Madrid">HTML</a></div>
 
 
 <div id="content">

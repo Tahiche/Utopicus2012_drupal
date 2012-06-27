@@ -187,6 +187,12 @@ div.calendar_links{
    float: right;
     width: auto;
 		}
+div.calendar_links .calendartext{
+	text-transform:none;
+	margin-right:10px;
+	font-style:italic;
+	
+	}
 div.calendar_links	a{
 background-color: #999999;
     color: #DBDBDB;
@@ -812,4 +818,14 @@ a.enlaceprensa.externalLink{
 	
 .ministerio_subv{
 	float:right;
+	}
+	
+/******************************************* mensaje bienvenida usuario nuevo ********/
+#edit-welcome-message-body-wrapper{
+	display:none;
+	}
+	
+/********* toboggan *********/
+ul.login_list li{
+	clear:both;
 	}

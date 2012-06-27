@@ -89,46 +89,7 @@
  *   $db_url = 'pgsql://username:password@localhost/databasename';
  */
 $db_url = 'mysqli://utopicuser:ZmgkOkRa9gNx@localhost/oa_utopicomu';
-$db_prefix = array( 
-    'default'   => 'oa_',
-    'users'     => 'shared_',
-'users_roles'   => 'shared_',
-    'sessions'  => 'shared_',
-    'role'      => 'shared_',
-    'authmap'   => 'shared_',
-	'profile_fields' => 'shared_',
-    'profile_values' => 'shared_',
-	// necesario para poder ver los datos de usuarios
-	'content_type_profile' => 'shared_',
-	
-	
-'filters'   => 'shared_',
-'filter_formats'   => 'shared_',
-// los permisos son diferentes para los dos sites!!!!!!!!!
-//'permission'   => 'shared_',
-
-'wysiwyg'   => 'shared_',
-'wysiwyg_user'   => 'shared_',  
-
-//Taxonomy related...
-  //Taxonomy related...
-    'vocabulary' => 'shared_',         
-    'vocabulary_node_types' => 'shared_',         
-    'term_data' => 'shared_',         
-    'term_hierarchy' => 'shared_',         
-    'term_image' => 'shared_',         
-    'term_lineage' => 'shared_',         
-    'term_node' => 'shared_',         
-    'term_relation' => 'shared_',         
-    'term_synonym' => 'shared_',         
-           
-    'taxonomy_manager_merge' => 'shared_', 
-'i18n_blocks' => 'shared_',      
-'i18n_strings' => 'shared_',   
-'i18n_variable' => 'shared_',   
-         
-     
-  );
+$db_prefix = '';
 
 /**
  * Database default collation.
@@ -180,8 +141,7 @@ $update_free_access = FALSE;
  * It is not allowed to have a trailing slash; Drupal will add it
  * for you.
  */
- $base_url = 'http://comunidad.utopicus.es';  // NO trailing slash!
-// $base_url = 'http://comunidad.utopicus.consinergia.es';  // NO trailing slash!
+# $base_url = 'http://www.example.com';  // NO trailing slash!
 
 /**
  * PHP settings:
@@ -225,9 +185,7 @@ ini_set('url_rewriter.tags',        '');
  * shared base domain. Doing so assures that users remain logged in as they
  * cross between your various domains.
  */
-//$cookie_domain = 'utopicus.consinergia.es';
-
-$cookie_domain = 'utopicus.es';
+# $cookie_domain = 'example.com';
 
 /**
  * Variable overrides:

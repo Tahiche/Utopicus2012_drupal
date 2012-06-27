@@ -3,7 +3,7 @@
   var js, fjs = d.getElementsByTagName(s)[0];
   if (d.getElementById(id)) return;
   js = d.createElement(s); js.id = id;
-  js.src = "//connect.facebook.net/es_ES/all.js#xfbml=1&appId=137450526276416";
+  js.src = "//connect.facebook.net/en_US/all.js#xfbml=1&appId=137450526276416";
   fjs.parentNode.insertBefore(js, fjs);
 }(document, 'script', 'facebook-jssdk'));</script>
 
@@ -94,7 +94,10 @@ $opciones=array("customlink"=>"espacios/open_us");
 				<!-- facebook -->
 				<div class="facebook">
                 <!-- <img width="210" height="60" alt="facebook" src="<?php print $theme_pathabsoluto; ?>/images/img-facebook.gif">-->
-                <div class="fb-like" data-href="http://www.utopicus.es" data-send="false" data-layout="button_count" data-width="450" data-show-faces="true"></div>
+                <!-- Facebook code -->
+<div class="fb-like" data-href="http://www.utopicus.es" data-send="false" data-layout="button_count" data-width="450" data-show-faces="false"></div>
+                <!-- //Facebook code -->
+                
                 </div>
 				<strong class="title">Suscríbete a nuestro boletín</strong>
                 

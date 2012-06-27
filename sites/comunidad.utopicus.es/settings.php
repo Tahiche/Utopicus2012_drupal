@@ -96,7 +96,7 @@ $db_prefix = array(
     'sessions'  => 'shared_',
     'role'      => 'shared_',
     'authmap'   => 'shared_',
-	'profile_fields' => 'shared_',
+	    'profile_fields' => 'shared_',
     'profile_values' => 'shared_',
 	// necesario para poder ver los datos de usuarios
 	'content_type_profile' => 'shared_',
@@ -104,7 +104,6 @@ $db_prefix = array(
 	
 'filters'   => 'shared_',
 'filter_formats'   => 'shared_',
-// los permisos son diferentes para los dos sites!!!!!!!!!
 //'permission'   => 'shared_',
 
 'wysiwyg'   => 'shared_',
@@ -181,7 +180,6 @@ $update_free_access = FALSE;
  * for you.
  */
  $base_url = 'http://comunidad.utopicus.es';  // NO trailing slash!
-// $base_url = 'http://comunidad.utopicus.consinergia.es';  // NO trailing slash!
 
 /**
  * PHP settings:
@@ -206,6 +204,8 @@ ini_set('session.use_only_cookies', 1);
 ini_set('session.use_trans_sid',    0);
 ini_set('url_rewriter.tags',        '');
 
+
+
 /**
  * If you encounter a situation where users post a large amount of text, and
  * the result is stripped out upon viewing but can still be edited, Drupal's
@@ -225,9 +225,7 @@ ini_set('url_rewriter.tags',        '');
  * shared base domain. Doing so assures that users remain logged in as they
  * cross between your various domains.
  */
-//$cookie_domain = 'utopicus.consinergia.es';
-
-$cookie_domain = 'utopicus.es';
+$cookie_domain = '.utopicus.es';
 
 /**
  * Variable overrides:

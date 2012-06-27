@@ -32,6 +32,7 @@ if($user->uid):
 <label><b>USUARIO</b> </label>
 <a href="user/<?php echo $user->uid; ?>">>> Ver mi perfil</a>
 <a href="user/<?php echo $user->uid; ?>/profile/perfil_usuario">>> Editar mi perfil</a>
+<a href="http://comunidad.utopicus.es" target="_blank">>> Comunidad</a>
 <?php else:?>
 <a href="/user">>> Cuenta</a>
 <?php endif; ?>

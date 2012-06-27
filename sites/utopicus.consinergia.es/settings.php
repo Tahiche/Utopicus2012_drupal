@@ -97,7 +97,7 @@ $db_prefix = array(
     'sessions'  => 'shared_',
     'role'      => 'shared_',
     'authmap'   => 'shared_',
-	    'profile_fields' => 'shared_',
+	'profile_fields' => 'shared_',
     'profile_values' => 'shared_',
 	// necesario para poder ver los datos de usuarios
 	'content_type_profile' => 'shared_',
@@ -180,7 +180,8 @@ $update_free_access = FALSE;
  * It is not allowed to have a trailing slash; Drupal will add it
  * for you.
  */
- $base_url = 'http://www.utopicus.consinergia.es';  // NO trailing slash!
+ $base_url = 'http://www.utopicus.es';  // NO trailing slash!
+ // $base_url = 'http://www.utopicus.consinergia.es';  // NO trailing slash!
 
 /**
  * PHP settings:
@@ -224,8 +225,8 @@ ini_set('url_rewriter.tags',        '');
  * shared base domain. Doing so assures that users remain logged in as they
  * cross between your various domains.
  */
-$cookie_domain = 'utopicus.consinergia.es';
-
+//$cookie_domain = 'utopicus.consinergia.es';
+$cookie_domain = 'utopicus.es'; 
 /**
  * Variable overrides:
  *

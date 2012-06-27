@@ -54,7 +54,7 @@ $homelink=($variables['page_vars']['front_page']?$variables['page_vars']['front_
 						<!-- usermenu -->
 						<ul class="usermenu">
 							<li class="active"><a href="/es/espacios/open_us">OPEN_US</a></li>
-							<li><a href="/es/contacto">CONTACTO</a></li>
+							<li><a href="/es/_US/contacto">CONTACTO</a></li>
 							<!--<li><a href="#">AYUDA</a></li>
 							 <li><a href="#">ENGLISH</a></li> -->
 						</ul>

@@ -42,7 +42,7 @@
 							<li><a href="#">PRODUCTOS Y SERVICIOS</a></li>
 							<li><a href="#">NOTICIAS</a></li>
 </ul> -->
-<div class="calendar_links"><a href="http://www.google.com/calendar/ical/comunicacion%40utopicus.es/public/basic.ics">iCAL</a><a href="http://www.google.com/calendar/embed?src=comunicacion%40utopicus.es&ctz=Europe/Madrid">HTML</a></div>
+<div class="calendar_links"><span class="calendartext">Descarga el calendario</span><a href="http://www.google.com/calendar/ical/comunicacion%40utopicus.es/public/basic.ics">iCAL</a><a href="http://www.google.com/calendar/embed?src=comunicacion%40utopicus.es&ctz=Europe/Madrid">HTML</a></div>
 </div>
 
   <?php if ($admin_links): ?>
