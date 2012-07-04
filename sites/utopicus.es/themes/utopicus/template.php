@@ -308,6 +308,26 @@ function utopicus_preprocess_node(&$vars, $hook) {
    $vars['fivestar_widget']="<div id='fivestardiv'>".$vars['node']->content['fivestar_widget']['#value']."</div>";
 	
 	
+	// Strip tags from teaser
+  if ($vars['teaser']) {
+	  //miKrumo($vars['node']);
+    // $coreteaser is the teaser without extra cck fields
+    $coreteaser = $vars['node']->content['body']['#value'];
+    // Make sure there is content to strip tags from
+    if ($coreteaser) {
+      $teaser = $vars['content'];
+      // Calculate position of $coreteaser in $teaser
+      $start = strpos($teaser, $coreteaser);
+      // Calculate length of core teaser with tags
+      $length = strlen($coreteaser);
+      // Strip tags from $coreteaser
+      $replacement = strip_tags($coreteaser);
+      // Replace corresponding part of $teaser with stripped $coreteaser
+      $vars['strip_body'] = substr_replace($teaser, $replacement, $start, $length);
+    }
+  }
+  
+  
 	
   // To remove a class from $classes_array, use array_diff().
   //$vars['classes_array'] = array_diff($vars['classes_array'], array('class-to-remove'));

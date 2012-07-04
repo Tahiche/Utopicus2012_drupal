@@ -197,11 +197,11 @@ $opciones=array("customlink"=>"espacios/open_us");
 			<div class="alignright">
 				<!-- social-networks -->
 				<ul class="social-networks">
-					<li><a class="facebook" href="#">facebook<span class="mask">&nbsp;</span></a></li>
-					<li><a class="twitter" href="#">twitter<span class="mask">&nbsp;</span></a></li>
-					<li><a class="igoogle" href="#">iGoogle<span class="mask">&nbsp;</span></a></li>
-					<li><a class="vimeo" href="#">vimeo<span class="mask">&nbsp;</span></a></li>
-					<li><a class="flickr" href="#">flickr<span class="mask">&nbsp;</span></a></li>
+					<li><a class="facebook" href="http://www.facebook.com/utopicus">facebook<span class="mask">&nbsp;</span></a></li>
+					<li><a class="twitter" href="http://www.twitter.con/utopic_US">twitter<span class="mask">&nbsp;</span></a></li>
+					<li><a class="igoogle" href="https://plus.google.com/u/0/117771370417955141765/posts">Google+<span class="mask">&nbsp;</span></a></li>
+					<li><a class="vimeo" href="http://www.vimeo.com/utopicus">vimeo<span class="mask">&nbsp;</span></a></li>
+					<li><a class="flickr" href="http://www.flickr.com/photos/utopicus/sets/">flickr<span class="mask">&nbsp;</span></a></li>
 					<li><a class="rss" href="/es/rss.xml">rss<span class="mask">&nbsp;</span></a></li>
 				</ul>
 				<!-- banner -->
