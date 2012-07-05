@@ -137,3 +137,24 @@ function content_profile_update_6004() {
   }
   return $ret;
 }
+
+/**
+ * Give any users with 'administer nodes' permission the new 
+ * 'administer content profiles' permission.
+ */
+function content_profile_update_6005() {
+  $ret = array();
+  $admins = user_roles(TRUE, 'administer users');
+  $result = db_query('SELECT * FROM {role}');
+  while ($role = db_fetch_object($result)) {
+    if (in_array($role->name, $admins)) {
+      $permissions = db_fetch_object(db_query('SELECT * FROM {permission} WHERE rid = %d', $role->rid));
+      $permissions = explode(', ', $permissions->perm);
+      $permissions[] = 'administer content profiles';
+      $ret[] = update_sql('DELETE FROM {permission} WHERE rid = '. $role->rid);
+      $ret[] = update_sql("INSERT INTO {permission} (rid, perm) VALUES ($role->rid, '". implode(', ', $permissions) ."')");
+    }
+  }
+
+  return $ret;
+}
