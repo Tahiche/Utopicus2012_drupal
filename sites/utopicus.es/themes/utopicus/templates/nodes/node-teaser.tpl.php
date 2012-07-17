@@ -79,14 +79,20 @@
 
 <?php 
 //miKrumo($variables);
-$imgpath=$node->field_img_ppal[0]['filepath'];
+if($node->field_img_ppal[0]['filepath'])$imgElement=$node->field_img_ppal[0];
+else if($node->field_top_image[0]['filepath']) $imgElement=$node->field_top_image[0];
+
+
 $opciones=array("nolink"=>TRUE);
-print theme('imageformatters_grayover',$node->field_img_ppal[0],"Imagen-223x223-grid" , $opciones );
+print theme('imageformatters_grayover',$imgElement,"Imagen-223x223-grid" , $opciones );
 ?>
 
 </span>
 <strong class="title"><?php print $node->title;  ?></strong>
-<span class="text-box"><?php print strip_tags(check_markup($node->content['body']['#value']));// trim_text(,200);  ?></span>
+
+<span class="text-box"><?php 
+
+print strip_tags($node->content['body']['#value']);// trim_text(,200);  ?></span>
 
 
 </a>

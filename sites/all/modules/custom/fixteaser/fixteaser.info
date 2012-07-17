@@ -1,0 +1,6 @@
+; $Id: $
+name = Fixteaser
+description = Arregla (hope) el hecho de que se muestren escaped etiquetas html en los teasers (node_teaser)
+package = " Custom"
+project = "fixteaser"
+core = "6.x"

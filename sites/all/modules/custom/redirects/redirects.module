@@ -17,9 +17,21 @@ function redirects_menu(){
 	'access callback' => TRUE,
     /*'weight' => 10,   */
   ); 
+  
+  // http://www.utopicus.es/es/admin/user/user/create
    
+   
+  // miKrumo($items);
   return $items;
 } 
+
+function redirects_menu_alter(&$items) {
+//miKrumo($items);
+$items['admin/user/user/create']['page callback']="redirect_usercreate";
+
+//miKrumo($items['admin/user/user/create']);
+}
+
 
 /* Redirects to default Drupal delete path
 */
@@ -27,3 +39,7 @@ function redirect_tour() {
 	//http://www.utopicus.consinergia.es/es/coworking/tour/que-es
   drupal_goto('coworking/tour/que-es');
 }
+
+function redirect_usercreate(){
+	drupal_goto('user/add');
+	}

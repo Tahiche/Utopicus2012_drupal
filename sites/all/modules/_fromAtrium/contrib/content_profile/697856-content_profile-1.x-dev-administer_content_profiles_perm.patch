@@ -1,0 +1,114 @@
+diff -urp ./content_profile.install ../content_profile.new/content_profile.install
+--- ./content_profile.install	2009-01-10 02:55:07.000000000 +1100
++++ ../content_profile.new/content_profile.install	2010-11-10 15:14:28.000000000 +1100
+@@ -137,3 +137,24 @@ function content_profile_update_6004() {
+   }
+   return $ret;
+ }
++
++/**
++ * Give any users with 'administer nodes' permission the new 
++ * 'administer content profiles' permission.
++ */
++function content_profile_update_6005() {
++  $ret = array();
++  $admins = user_roles(TRUE, 'administer users');
++  $result = db_query('SELECT * FROM {role}');
++  while ($role = db_fetch_object($result)) {
++    if (in_array($role->name, $admins)) {
++      $permissions = db_fetch_object(db_query('SELECT * FROM {permission} WHERE rid = %d', $role->rid));
++      $permissions = explode(', ', $permissions->perm);
++      $permissions[] = 'administer content profiles';
++      $ret[] = update_sql('DELETE FROM {permission} WHERE rid = '. $role->rid);
++      $ret[] = update_sql("INSERT INTO {permission} (rid, perm) VALUES ($role->rid, '". implode(', ', $permissions) ."')");
++    }
++  }
++
++  return $ret;
++}
+diff -urp ./content_profile.module ../content_profile.new/content_profile.module
+--- ./content_profile.module	2010-04-08 01:09:17.000000000 +1000
++++ ../content_profile.new/content_profile.module	2010-11-10 13:50:55.000000000 +1100
+@@ -15,6 +15,13 @@ function content_profile_init() {
+ }
+ 
+ /**
++ * Implementation of hook_perm().
++ */
++ function content_profile_perm() {
++  return array('administer content profiles');
++}
++
++/**
+  * Implementation of hook_ctools_plugin_directory().
+  */
+ function content_profile_ctools_plugin_directory($module, $plugin) {
+@@ -41,7 +48,7 @@ function content_profile_menu() {
+       'page callback' => 'drupal_get_form',
+       'page arguments' => array('content_profile_admin_settings', $type),
+       'access callback' => 'user_access',
+-      'access arguments' => array('administer nodes'),
++      'access arguments' => array('administer content profiles'),
+       'type' => MENU_LOCAL_TASK,
+       'weight' => 1,
+     );
+@@ -91,7 +98,7 @@ function content_profile_page_access($ty
+   // Else user may view the page when they are going to create their own profile
+   // or have permission to create it for others.
+   global $user;
+-  if ($user->uid == $account->uid || user_access('administer nodes') ){
++  if ($user->uid == $account->uid || user_access('administer content profiles') ){
+     return node_access('create', $type);
+   }
+   return FALSE;
+@@ -282,6 +289,24 @@ function content_profile_form_alter(&$fo
+     if (!empty($_GET['uid']) && ($uid = intval($_GET['uid'])) && ($user = user_load($uid))) {
+       $form['author']['name']['#default_value'] = $user->name;
+     }
++    if (user_access('administer content profiles')) {
++      $form['author']['#access'] = TRUE;
++      $form['#submit'] = array_merge(array('content_profile_form_submit'), (array)$form['#submit']);
++    }
++  }
++}
++
++/**
++ * Special submit handler for users with 'administer content profiles' role.
++ */
++function content_profile_form_submit($form, &$form_state) {
++  if (user_access('administer content profiles')) {
++    if ($account = user_load(array('name' => $form_state['values']['name']))) {
++      $form_state['values']['uid'] = $account->uid;
++    }
++    else {
++      $form_state['values']['uid'] = 0;
++    }
+   }
+ }
+ 
+@@ -376,14 +401,14 @@ function _content_profile_node_delete($n
+  */
+ function content_profile_nodeapi(&$node, $op, $a3 = NULL, $a4 = NULL) {
+ 
+-  if ($op == 'prepare' && is_content_profile($node) && !isset($node->nid) && $node->uid && !user_access('administer nodes') && arg(0) != 'admin') {
++  if ($op == 'prepare' && is_content_profile($node) && !isset($node->nid) && $node->uid && !user_access('administer content profiles') && arg(0) != 'admin') {
+     // Check if this nodetype already exists
+     if ($nid = content_profile_profile_exists($node, $node->uid)) {
+       // This node already exists, redirect to edit page
+       drupal_goto('node/'. $nid .'/edit', 'destination=user/'. $node->uid);
+     }
+   }
+-  elseif ($op == 'validate' && is_content_profile($node) && user_access('administer nodes')) {
++  elseif ($op == 'validate' && is_content_profile($node) && user_access('administer content profiles')) {
+     $form = $a3;
+     // Only validate if the user-name changed or we add a new node
+     if (!empty($node->nid) && $form['author']['name']['#default_value'] == $node->name) {
+@@ -538,7 +563,7 @@ function content_profile_show_profiles($
+       // Working around the bug described at http://drupal.org/node/302873
+       module_load_include('inc', 'content_profile', 'content_profile.theme');
+     }
+-    elseif (user_access('create '. $type .' content') && content_profile_get_settings($type, 'add_link') && !$node && ($uid == $user->uid || user_access('administer nodes'))) {
++    elseif (user_access('create '. $type .' content') && content_profile_get_settings($type, 'add_link') && !$node && ($uid == $user->uid || user_access('administer content profiles'))) {
+       $content['content_profile_'. $type] = array(
+         '#admin' => $uid != $user->uid,
+         '#theme' => 'content_profile_display_add_link',

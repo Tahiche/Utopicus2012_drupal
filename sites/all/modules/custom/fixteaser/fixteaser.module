@@ -1,0 +1,31 @@
+<?php
+// $Id:$
+
+function fixteaser_nodeapi(&$node, $op, $a3 = null, $a4 = null) {
+  switch($op) {
+    case 'prepare':
+      //if(in_array($node->type, $node_types)) {
+       /* if($node->teaser == substr($node->body, 0, strlen($node->teaser))) {
+          // reset node teaser on edit
+          $node->teaser = '';
+        }*/
+     // }
+	 $node->teaser = '';
+      break;
+    case 'presave':
+     // if(in_array($node->type, $node_types)) {
+        // strip markup from teaser
+        //$node->teaser = node_teaser(preg_replace('@\[[\/\!]*?[^\[\]]*?\]@si', '\\2', $node->body));
+		
+		//$node->teaser =node_teaser(strip_tags($node->body));
+		//$node->teaser =check_markup($node->body);
+     // }
+	  // miKrumo( $node );
+	 //$node->teaser =trim_text(check_markup($node->body, 3, FALSE),200);
+	 $node->teaser =trim_text(strip_tags($node->body, "<p>"),200); 
+     /*$node = node_load($nid);
+     $node->teaser = check_markup($node->teaser, 3, FALSE);*/
+
+      break;
+}
+}

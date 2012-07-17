@@ -1,0 +1,18 @@
+@charset "utf-8";
+/* CSS Document */
+
+.coworkergrid_terms{
+	display:none;
+	}
+.post-columns {
+	background:none !important;
+}
+
+h2.secc_equipo{
+font-size: 14px;
+    font-weight: bold;
+    margin: 20px 0;
+	}
+.cargo_equipo{
+	font-style:italic;
+	}

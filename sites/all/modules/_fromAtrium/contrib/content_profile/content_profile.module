@@ -152,7 +152,7 @@ function content_profile_admin_settings(&$form_state, $type) {
     '#title' => t("User page display style"),
     '#default_value' => content_profile_get_settings($type, 'user_display'),
     '#options' => array(
-      0 => t("Don't display this content profile on the user account page"),
+      0 => t("Don't display this content profile on the user account page"), 
       'link' => t('Display it as link to the profile content'),
       'full' => t('Display the full content'),
       'teaser' => t("Display the content's teaser"),

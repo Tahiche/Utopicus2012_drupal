@@ -10,7 +10,7 @@
  */
 function content_profile_enable() {
   //enable the default content type 'profile' to be a content profile
-  $setting = variable_get('content_profile_profile', FALSE);
+  $setting = variable_get('content_profile_profile', FALSE); 
   if (!$setting && $setting !== array()) {
     variable_set('content_profile_profile', array());
   }
