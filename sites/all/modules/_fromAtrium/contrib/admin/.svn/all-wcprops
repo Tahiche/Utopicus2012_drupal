@@ -1,0 +1,53 @@
+K 25
+svn:wc:ra_dav:version-url
+V 48
+/nuevarevista/!svn/ver/6/sites/all/modules/admin
+END
+LICENSE.txt
+K 25
+svn:wc:ra_dav:version-url
+V 60
+/nuevarevista/!svn/ver/6/sites/all/modules/admin/LICENSE.txt
+END
+admin.info
+K 25
+svn:wc:ra_dav:version-url
+V 59
+/nuevarevista/!svn/ver/6/sites/all/modules/admin/admin.info
+END
+PATCHES.txt
+K 25
+svn:wc:ra_dav:version-url
+V 60
+/nuevarevista/!svn/ver/6/sites/all/modules/admin/PATCHES.txt
+END
+admin.admin.inc
+K 25
+svn:wc:ra_dav:version-url
+V 64
+/nuevarevista/!svn/ver/6/sites/all/modules/admin/admin.admin.inc
+END
+README.txt
+K 25
+svn:wc:ra_dav:version-url
+V 59
+/nuevarevista/!svn/ver/6/sites/all/modules/admin/README.txt
+END
+admin.install.orig
+K 25
+svn:wc:ra_dav:version-url
+V 67
+/nuevarevista/!svn/ver/6/sites/all/modules/admin/admin.install.orig
+END
+admin.module
+K 25
+svn:wc:ra_dav:version-url
+V 61
+/nuevarevista/!svn/ver/6/sites/all/modules/admin/admin.module
+END
+admin.install
+K 25
+svn:wc:ra_dav:version-url
+V 62
+/nuevarevista/!svn/ver/6/sites/all/modules/admin/admin.install
+END

@@ -146,7 +146,7 @@ $opciones=array("customlink"=>"espacios/open_us");
 			<div class="box">
 				<strong class="title"><a href="#">ACTIVIDADES</a></strong>
 				<ul>
-					<li><a href="/es/secciones/actividades/agenda">Agenda</a></li>
+					<li><a href="/es/coworking/actividades/agenda-eventos">Agenda</a></li>
                                 <li><a href="/es/actividades/utopic_gallery">Utopic_Gallery</a></li>
                                 <li><a href="/es/actividades/utopic_sundays">Utopic_Sundays</a></li>
                                 <li><a href="/es/actividades/mmm_us">MMM_US</a></li>
@@ -178,7 +178,7 @@ $opciones=array("customlink"=>"espacios/open_us");
 				<ul>
 					<li><a href="<?php echo url("_US/el_proyecto") ?>">El proyecto</a></li>
                                     <li><a href="<?php echo url("_US/el_equipo") ?>">El equipo</a></li>
-                                    <li><a href="<?php echo url("_US/secciones/noticias") ?>">Noticias</a></li>
+                                    <li><a href="<?php echo url("_US/coworking/noticias") ?>">Noticias</a></li>
                                     <li><a href="<?php echo url("_US/patrocinadores") ?>">Patrocinadores</a></li>
                                     <li><a href="<?php echo url("_US/sala_de_prensa") ?>">Sala de prensa</a></li>
                                     <li><a href="<?php echo url("_US/contacto") ?>">Contacto</a></li>

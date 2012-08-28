@@ -37,7 +37,7 @@ $items['admin/user/user/create']['page callback']="redirect_usercreate";
 */
 function redirect_tour() {
 	//http://www.utopicus.consinergia.es/es/coworking/tour/que-es
-  drupal_goto('coworking/tour/que-es');
+  drupal_goto('coworking');
 }
 
 function redirect_usercreate(){

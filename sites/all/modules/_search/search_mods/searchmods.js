@@ -17,9 +17,27 @@
 
 // JavaScript Document
 Drupal.behaviors.exposedfilter_mod = function (context) {
-	
+
+// This is the hack for IE
+if ($.browser.msie) {
+	/*try{console.log("$.browser.msie");}
+	catch(e){};*/
+  $('select#edit-term-node-tid-depth-limited, select.selector-jump').click(function() {
+	/*try{console.log("XXXXXX"+this);}
+	catch(e){};*/
+	//jquerymain 1926 ... IExplorer change hack
+    this.blur();
+	$(this).trigger('change');
+    //this.focus();
+  });
+}
+
+
  $('select#edit-term-node-tid-depth-limited, select.selector-jump').change(function() {
 	 // alert("cambia");
+	/* try{console.log("realElement change "+this.realElement)}
+	 catch(e){};*/
+			
 	 $('#edit-nombre').val("");
 	 $('#edit-freeterm').val("");
 	$('#edit-title').val("");

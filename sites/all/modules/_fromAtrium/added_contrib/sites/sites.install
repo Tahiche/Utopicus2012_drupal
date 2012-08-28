@@ -1,0 +1,139 @@
+<?php
+
+// $Id: sites.install,v 1.2.2.4 2010/05/06 15:47:56 brynbellomy Exp $
+
+/**
+ * Implementaton of hook_install().
+ */
+function sites_install() {
+  drupal_install_schema('sites');
+}
+
+/**
+ * Implementation of hook_uninstall()
+ */
+function sites_uninstall() {
+  drupal_uninstall_schema('sites');
+
+  db_query("DELETE FROM {purl} WHERE provider = 'sites'");
+}
+
+/**
+ * Implementaton of hook_enable().
+ */
+function sites_enable() {
+  db_query("UPDATE {system} SET weight = -1 WHERE name = 'sites' AND type = 'module'");
+}
+
+/**
+ * Implementation of hook_schema()
+ */
+function sites_schema() {
+  $schema = array();
+  $schema['sites'] = array(
+    'description' => t('sites'),
+    'fields' => array(
+      'sid' => array(
+        'description' => t('The site id.'),
+        'type' => 'serial',
+        'unsigned' => TRUE,
+        'not null' => TRUE,
+        'primary key' => TRUE,
+        'unique' => TRUE,
+      ),
+      'title' => array(
+        'description' => t('The site\'s administrative title.'),
+        'type' => 'varchar',
+        'length' => 64,
+        'not null' => TRUE,
+        'default' => '',
+      ),
+      'purl_prefix'=> array(
+        'description' => t('The PURL prefix.'),
+        'type' => 'varchar',
+        'length' => 128,
+        'not null' => TRUE,
+        'default' => '',
+      ),
+      'name'=> array(
+        'description' => t('Name of the site.'),
+        'type' => 'varchar',
+        'length' => 256,
+        'not null' => TRUE,
+        'default' => '',
+      ),
+      'front_page'=> array(
+        'description' => t('Front page of the site.'),
+        'type' => 'varchar',
+        'length' => 256,
+        'not null' => TRUE,
+        'default' => '',
+      ),
+	  'menu_primary_links'=> array(
+        'description' => t('Which menu to use as primary links.'),
+        'type' => 'varchar',
+        'length' => 256,
+        'not null' => TRUE,
+        'default' => '',
+      ),
+      'menu_secondary_links'=> array(
+        'description' => t('Which menu to use as secondary links.'),
+        'type' => 'varchar',
+        'length' => 256,
+        'not null' => TRUE,
+        'default' => '',
+  ),
+    ),
+    'primary key' => array('sid'),
+  );
+
+  $schema['site_node'] = array(
+    'description' => t('site_node'),
+    'fields' => array(
+      'sid' => array(
+        'description' => t('The site id.'),
+        'type' => 'int',
+        'unsigned' => TRUE,
+        'not null' => TRUE,
+        'primary key' => TRUE,
+        'unique' => TRUE,
+        'default' => 0,
+      ),
+      'nid' => array(
+        'description' => t('The node id.'),
+        'type' => 'int',
+        'unsigned' => TRUE,
+        'not null' => TRUE,
+        'primary key' => TRUE,
+        'unique' => TRUE,
+        'default' => 0,
+      ),
+    ),
+    'indexes' => array(
+      'sid' => array('sid'),
+      'nid' => array('nid'),
+    ),
+    'primary key' => array('sid', 'nid'),
+  );
+
+  return $schema;
+}
+
+
+/**
+ * Add the 'name' field, which is the site name displayed in themes
+ */
+function sites_update_6001() {
+  $ret = array();
+  
+  $field = array(
+    'description' => t('Name of the site.'),
+    'type' => 'varchar',
+    'length' => 256,
+    'not null' => TRUE,
+    'default' => '',
+  );
+  db_add_field($ret, 'sites', 'name', $field);
+  return $ret;
+}
+

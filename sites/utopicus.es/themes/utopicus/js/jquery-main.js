@@ -1,5 +1,9 @@
+/*console = console || {}; 
+console.log = console.log || function(){};
+*/
 // back button modified other usert fix
 $(window).load(function(){
+	//console.log("windowww");
 	if($('#edit-changed')){
 	var ts = Math.round(new Date().getTime() / 1000);
 	$('#edit-changed').val(ts);
@@ -25,20 +29,20 @@ $(function() {
 
 // extension del js de logintoboggan, que no se incluye cando el usuario esta registrado
 Drupal.behaviors.userPopup= function(context) {
-	console.log("Drupal.behaviors.userPopup");
+	//console.log("Drupal.behaviors.userPopup");
 	$("#toboggan-user:not(.toboggan-login-processed)", context).each(
 	  function() {
-		 console.log($(this));
+		// console.log($(this));
 		  $(this).addClass('toboggan-login-processed').hide();
 		  Drupal.logintoboggan_toggleuserpop();
 		}
 	  );
 }
 Drupal.logintoboggan_toggleuserpop = function() {
-	console.log("logintoboggan_toggleuserpop");
+	//console.log("logintoboggan_toggleuserpop");
 $("#toboggan-user-link").click(
     function () {
-	console.log("toboggan-user-link");	
+	//console.log("toboggan-user-link");	
       $("#toboggan-user").slideToggle("fast");
       this.blur();
       return false;
@@ -72,10 +76,24 @@ $("#toboggan-user-link").click(
 }*/
 
 
-	Drupal.behaviors.my_ajaxrefresh = function (context) { 
+Drupal.behaviors.my_ajaxrefresh = function (context) { 
    //alert("my_ajaxrefresh");
+   /*if ($.browser.msie && $.browser.version.substr(0,1)<9) {
+   // return false;
+		}
+	else{*/
+		
+   try{ 
     jcf.customForms.replaceAll();
-	
+   }
+   catch(e){
+	   return false;
+	   };
+	/*}*/
+   
+	// replace custom forms
+//jcf.lib.domReady(); 
+
 	$('input[type="text"]').defaultText();
 	
 	/********************************************* open external links in new window ***************************/
@@ -110,7 +128,7 @@ jQuery(function(){
 	function sameHboxes(element){
 		var H = 0;
 		if(!element.length) return;
-		console.log(element);
+		//console.log(element);
 			element.each(function(i){
 				var h = element.eq(i).height();
 				if(h > H) H = h;
@@ -378,6 +396,7 @@ function initSameHeight(){
 
 // initLayoutFix
 function initLayoutFix(){
+	// console.log("initLayoutFix");
 	// init same style
 	jQuery('#nav>li').each(function(n){jQuery(this).addClass('style-'+(n+1))});
 	jQuery('.item-section .box').each(function(n){jQuery(this).addClass('style-'+(n+1))});
@@ -925,10 +944,13 @@ jcf = {
 		},
 		replaceAll: function() {
 			// alert("replaceAll");
+			
+
 			for(var k in jcf.modules) {
 				var els = jcf.lib.queryBySelector(jcf.modules[k].prototype.selector);
 				for(var i = 0; i<els.length; i++) {
-					if(els[i].jcf) {
+					try{
+					if( els[i].jcf) {
 						// refresh form element state
 						els[i].jcf.refreshState();
 					} else {
@@ -938,7 +960,10 @@ jcf = {
 								replaces:els[i]
 							});
 						}
+					} //fin else
 					}
+					catch(e){}
+					
 				}
 			}
 		},
@@ -1045,6 +1070,10 @@ jcf.setBaseModule({
 		// default module options (will be merged with base options)
 	},
 	checkElement: function(el){
+		
+		if ($.browser.msie && $.browser.version.substr(0,1)<9) {
+return false;
+		}
 		return true; // additional check for correct form element
 	},
 	replaceObject: function(){
@@ -1355,9 +1384,15 @@ jcf.lib = {
 				if (token.indexOf('#') > -1) {
 					var bits = token.split('#'), tagName = bits[0], id = bits[1];
 					var element = document.getElementById(id);
+					
+					
+					//console.log("element "+element);
+					if(element!== null){
 					if (tagName && element.nodeName.toLowerCase() != tagName) {
 						return [];
+						}
 					}
+					
 					currentContext = [element];
 					continue;
 				}
@@ -1740,8 +1775,11 @@ jcf.addModule({
 		console.log($(this.realElement).parents('.controlling-field'));*/
 	    //$(this.realElement).parents('.controlling-field').click(Drupal.ConditionalFields.fieldChange);
 		var condfield=$(this.realElement).parents('.controlling-field');
-		console.log(condfield);
-		$(condfield).click(Drupal.ConditionalFields.fieldChange);
+		//console.log(condfield);
+		if(condfield){
+			$(condfield).click(Drupal.ConditionalFields.fieldChange);
+			
+		}
 		/* ************************ **************************************************    *********/
 		this.refreshState();
 	},
@@ -1905,6 +1943,12 @@ jcf.addModule({
 			this.refreshState();
 			this.hideDropdown();
 			jcf.lib.fireEvent(this.realElement, 'change');
+			/************* fix for iE not firing change **********************/
+			if ($.browser.msie) {
+				this.realElement.click();
+				}
+			/*try{console.log("main"+this.realElement)}
+			catch(e){};*/
 		}
 		return false;
 	},

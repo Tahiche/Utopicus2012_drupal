@@ -1,0 +1,33 @@
+<?php
+// $Id:
+  
+  /**
+   * CTools plugin API hook for PURL. Note that a proper entry in
+   * hook_ctools_plugin_api() must exist for this hook to be called.
+   */
+   
+  function purl_comunidad_fix_purl_processor() {
+    $plugins = array();
+    $plugins['purl_comunidad_fix_purl'] = array(
+      'title' => t('Path purl_comunidad_fix_purl '),
+      'handler' => array(
+        'path' => drupal_get_path('module', 'purl_comunidad_fix') .'/includes',
+        'file' => 'purl_comunidad_fix_purl.inc',
+        'class' => 'purl_comunidad_fix_purl',
+        //'parent' => 'path', 
+      ),
+    );
+    return $plugins;
+  }
+
+ /*
+  * Implementation of hook_plugin_ctools_api().
+  */
+function purl_comunidad_fix_ctools_plugin_api($owner, $api) {
+  if ($owner == 'purl' && $api == 'processor') {
+    return array(
+      'version' => 1,
+      'path' => 'includes',
+    );
+  }
+}

@@ -1,0 +1,27 @@
+.visual .btn-list a{background:url(../images/bg-form.png) no-repeat -78px -118px;}
+.visual .btn-list a:hover{background:url(../images/bg-form.png) no-repeat -154px -118px;}
+.btn-add{background:url(../images/bg-form.png) no-repeat -230px -118px;}
+.btn-add:hover{background:url(../images/bg-form.png) no-repeat -230px -156px;}
+.cowoker-section .btn-add{background:url(../images/bg-form.png) no-repeat -350px -118px;}
+.cowoker-section .btn-add:hover{background:url(../images/bg-form.png) no-repeat -350px -157px;}
+.post-columns .post-block:hover .grey-image{visibility:hidden;}
+.btn-section .btn{background:url(../images/bg-form.png) no-repeat 0 -292px;}
+.btn-section .btn.style1{background:url(../images/bg-form.png) no-repeat -225px -292px;}
+.btn-section .box.alignleft .btn:hover{background:url(../images/bg-form.png) no-repeat -150px -292px;}
+.btn-section .box.alignright .btn:hover{background:url(../images/bg-form.png) no-repeat -75px -292px;}
+.main-heading .btn-circle,
+.info-block .btn{background:url(../images/bg-form.png) no-repeat -225px -292px;}
+.main-heading .btn-circle:hover,
+.info-block .btn:hover{background:url(../images/bg-form.png) no-repeat -150px -292px;}
+*+html .visual .btn-list span,
+*+html .btn-section .btn span,
+*+html .info-block .btn span,
+*+html .info-block .cell,
+*+html .info-section .menu span,
+*+html .photo-info dt span,
+*+html .photo-info img,
+*+html .main-heading .btn-circle span{
+	display:block;
+	margin-top: expression(this.parentNode.offsetHeight > this.offsetHeight ? ((this.parentNode.parentNode.offsetHeight-this.offsetHeight)/2 + "px") : "0");
+}
+*+html .info-section .cell{margin-top: expression(this.parentNode.offsetHeight > this.offsetHeight ? (this.parentNode.offsetHeight-this.offsetHeight + "px") : "0");}

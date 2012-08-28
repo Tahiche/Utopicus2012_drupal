@@ -54,7 +54,7 @@ stylesheets[handheld][] = css/allmobile.css
   
 conditional-stylesheets[if IE][all][]       = css/ie.css 
 
-; conditional-stylesheets[if lte IE 6][all][] = css/ie6.css
+ conditional-stylesheets[if lte IE 6][all][] = css/ie6.css
 
   ; Optionally add some JavaScripts to your theme.
  scripts[] = js/jquery-main.js

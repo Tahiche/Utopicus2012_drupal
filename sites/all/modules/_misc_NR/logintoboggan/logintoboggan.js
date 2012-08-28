@@ -2,7 +2,7 @@ Drupal.behaviors.LoginToboggan = function (context) {
 	//console.log("LoginToboggan");
   $("#toboggan-login:not(.toboggan-login-processed)", context).each(
     function() {
-	 console.log($(this));
+	 //console.log($(this));
       $(this).addClass('toboggan-login-processed').hide();
       Drupal.logintoboggan_toggleboggan();
     }

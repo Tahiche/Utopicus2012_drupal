@@ -1,0 +1,14 @@
+; $Id: sites.info,v 1.2 2010/02/17 21:28:29 brynbellomy Exp $
+name = "Sites"
+description = "Sites integrates PURL and Context directly."
+package = "Sites"
+dependencies[] = purl
+dependencies[] = context
+core = "6.x"
+
+; Information added by drupal.org packaging script on 2010-05-06
+version = "6.x-2.4"
+core = "6.x"
+project = "sites"
+datestamp = "1273161009"
+

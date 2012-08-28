@@ -1,0 +1,12 @@
+;$Id: purl_default.info,v 1.1.2.1 2011/02/13 14:44:27 johngriffin Exp $
+name = Purl  comunidad url fix
+description = Allow PURL to be activated with no modifier present in the URL.  Can be used to set a default space with spaces module.
+package = Other
+dependencies[] = purl
+core = 6.x
+; Information added by drupal.org packaging script on January 1, 1970 - 00:00
+version = "6.x-1.0-beta1"
+core = "6.x"
+project = "purl_comunidad_fix"
+datestamp = "1297609924"
+

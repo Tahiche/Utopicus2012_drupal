@@ -1,0 +1,12 @@
+name = "PURL Static"
+description = "Provides a simple UI for manually creating static Persistent URLs which activate a Context."
+core = 6.x
+dependencies[] = purl
+dependencies[] = context
+
+; Information added by drupal.org packaging script on 2012-01-23
+version = "6.x-1.0"
+core = "6.x"
+project = "purl_static"
+datestamp = "1327300252"
+

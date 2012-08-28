@@ -58,6 +58,8 @@ ul.load-more-pager li.pager-next{
     overflow: hidden;
     padding: 0;
     position: relative;
+	*position: absolute; /* IE */
+	
     width: 33px;
 	-webkit-transition:all 500ms ease-in-out;
 	-moz-transition:all 500ms ease-in-out;
@@ -176,6 +178,10 @@ p a{
 
 .grid-list li {
     display: inline-block !important;
+	
+	*display: inline !important; /* IE */
+       _height: 250px; /* IE6 */
+	   
     width: 223px;
 }
 
@@ -693,6 +699,11 @@ left: 60px;
 }
 
 /***************************** galleria galeria slider ************/
+/*.images_galleria, .galleria-stage, .galleria-image{
+	width:922px;
+	height:394px;
+	}*/
+	
 #galleria {
     height: 100%;
 	width: 100%;
@@ -710,11 +721,14 @@ left: 60px;
 	height:327px;
 	position:relative;
 	}
+
 #galleria.size_Imagen_pag_922x394{
 	width:922px;
 	height:394px;
 	}
 
+
+	
 .content_a_template .holder{
 	float: right;
     width: 578px;

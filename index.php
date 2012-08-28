@@ -1,7 +1,9 @@
 <?php
-error_reporting(E_ALL);
-ini_set('display_errors', TRUE);
-ini_set('display_startup_errors', TRUE);
+//error_reporting(E_ALL);
+// error_reporting(E_ERROR^E_NOTICE);
+
+/*ini_set('display_errors', TRUE);
+ini_set('display_startup_errors', TRUE);*/
 
 /**
  * @file
@@ -16,6 +18,11 @@ ini_set('display_startup_errors', TRUE);
 
 require_once './includes/bootstrap.inc';
 drupal_bootstrap(DRUPAL_BOOTSTRAP_FULL);
+
+
+/*menu_rebuild(); // use just once
+die();          // use just once*/
+
 
 $return = menu_execute_active_handler();
 

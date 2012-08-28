@@ -120,7 +120,7 @@ Drupal.ConditionalFields.fieldChange = function() {
 
 Drupal.behaviors.ConditionalFields = function (context) {
   $('.conditional-field.controlling-field:not(.conditional-field-processed)').addClass('conditional-field-processed').each(function () {
-	  console.log($(this));
+	  //console.log($(this));
     /* Set default state */
     Drupal.ConditionalFields.switchField('#' + $(this).attr('id'), Drupal.ConditionalFields.findValues($(this)), true);
     if ($(this).find('option, input:not(:text)').length > 0) {
